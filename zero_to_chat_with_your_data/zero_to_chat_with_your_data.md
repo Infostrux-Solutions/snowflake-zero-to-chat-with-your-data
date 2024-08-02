@@ -35,17 +35,26 @@ This lab will use the following Cybersyn datasets:
 Check out Cybersyn's [Consumer Spending product](https://app.snowflake.com/marketplace/listing/GZTSZ290BUX62/) and [explore all 60+ public sources](https://app.cybersyn.com/data_catalog/?utm_source=Snowflake+Quickstart&utm_medium=organic&utm_campaign=Snowflake+Quickstart) Cybersyn offers on the [Snowflake Marketplace](https://app.snowflake.com/marketplace/providers/GZTSZAS2KCS/Cybersyn).
 
 
-## Lab Environment Access Setup ##
-Let's setup your access to the lab environment.
+## Lab Environment Access ##
+Each of you should have received a number when you arrived to allow you to access your your own workspace in Snowflake.
 
-### Logging into the Snowflake User Interface (UI)
-Open a browser window and enter the URL of your Snowflake 30-day trial environment that was sent with your registration email. Enter the username and password that you specified during the registration:
+Open a browser window and enter the URL:
+
+> https://app.snowflake.com/umnxxyz/infostrux_hol_ai_data_chat
+
+> IMPORTANT: As soon as you log in, you will be prompted to change your password. Your new password must be at least 8 characters long and contain at least 1 number, 1 uppercase and 1 lowercase letter.
+> 
+> PLEASE NOTE DOWN THE NEW PASSWORD AS YOU WILL NEED IT LATER!
 
 ![login screen](assets/3UIStory_1.png)
 
-<!-- ------------------------ -->
+Log in with these credentials (replace the `<NUMBER>` with the number you were given):
+```text
+Username: HOL_USER_<NUMBER>
+Password: HOL123
+```
 
-## The Snowflake ​User Interface
+## The Snowflake User Interface ##
 
 Duration: 8
 
