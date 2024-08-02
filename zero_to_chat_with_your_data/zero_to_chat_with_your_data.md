@@ -1,41 +1,30 @@
-id: getting_started_with_snowflake
-summary: This is a broad introduction of Snowflake and covers how to login, run queries, and load data.
-categories: featured,getting-started
-environments: web
-status: Published
-feedback link: https://github.com/Snowflake-Labs/sfguides/issues
-tags: Getting Started, Data Science, Data Engineering
-authors: Victoria Warner (Cybersyn)
+# Zero to Chat with Your Snowflake Data in 120 Minutes #
 
-# Getting Started with Snowflake - Zero to Snowflake
+## Introduction ##
 
-<!-- ------------------------ -->
+> Based on the [Zero to Snowflake Quickstart](https://github.com/Snowflake-Labs/sfquickstarts/blob/master/site/sfguides/src/getting_started_with_snowflake/getting_started_with_snowflake.md) with an LLM twist.
 
-## Overview
+This entry-level lab, designed for database and data warehouse administrators and architects, will give you a brief introduction to Snowflake and will walk you through creating a Cortex AI-powered LLM Chatbot in Streamlit.
 
-Duration: 3
-
-Welcome to Snowflake! This entry-level guide, designed for database and data warehouse administrators and architects, will help you navigate the Snowflake interface and introduce you to some of our core capabilities. [Sign up for a free 30-day trial of Snowflake](https://trial.snowflake.com) and follow along with this lab. Once we cover the basics, you'll be ready to start processing your own data and diving into Snowflake's more advanced features!
-
-### Free Virtual Hands-on Lab
-This Snowflake Guide is available as a free, instructor-led Virtual Hands on Lab. [Sign up for the VHOL today](https://www.snowflake.com/virtual-hands-on-lab/).
-
-### Prerequisites:
-- Use of the [Snowflake free 30-day trial environment](https://trial.snowflake.com)
+### Prerequisites ###
 - Basic knowledge of SQL, database concepts, and objects
 - Familiarity with CSV (comma-delimited) files and JSON semi-structured data
 
-### What You'll Learn:
-- How to create stages, databases, tables, views, and virtual warehouses.
+## What You'll Learn ###
+We will use a Snowflake Enterprise edition account for this lab which has been pre-configured with databases, virtual warehouses and some additional objects to give us enough time to dig into the Streamlit Chatbot component of the lab. The lab will focus on:
+
+- How to create stages, tables and views.
 - How to load structured and semi-structured data.
 - How to consume Cybersyn data from the [Snowflake Data Marketplace](https://app.snowflake.com/marketplace/listing/GZTSZAS2KF7/).
 - How to perform analytical queries on data in Snowflake, including joins between tables.
 - How to clone objects.
 - How to undo user errors using Time Travel.
-- How to create roles and users, and grant them privileges.
-- How to securely and easily share data with other accounts.
+- How to use Cortex AI to ask questions about your data
+- How to use Cortex AI to summarize your data
+- How to create a Streamlit app
+- How to leverage Cortex AI queries to create your own Chatbot in Streamlit
 
-### Data You'll Use:
+### Data You'll Use: ###
 **Cybersyn** is a next generation data company creating a real-time view of the world's economy with analytics-ready data exclusively on Snowflake Marketplace. Initially focused on consumer insights, Cybersyn enables you to access external data directly in your Snowflake instance — no ETL required.
 
 This lab will use the following Cybersyn datasets:
@@ -44,17 +33,10 @@ This lab will use the following Cybersyn datasets:
 - Company metadata
 
 Check out Cybersyn's [Consumer Spending product](https://app.snowflake.com/marketplace/listing/GZTSZ290BUX62/) and [explore all 60+ public sources](https://app.cybersyn.com/data_catalog/?utm_source=Snowflake+Quickstart&utm_medium=organic&utm_campaign=Snowflake+Quickstart) Cybersyn offers on the [Snowflake Marketplace](https://app.snowflake.com/marketplace/providers/GZTSZAS2KCS/Cybersyn).
-<!-- ------------------------ -->
 
-## Prepare Your Lab Environment
 
-Duration: 1
-
-If you haven't already, register for a [Snowflake free 30-day trial](https://signup.snowflake.com/developers). This lab assumes you are using a new Snowflake account created by registering for a trial.
-
-The Snowflake edition (Standard, Enterprise, Business Critical, etc.), cloud provider (AWS, Azure, GCP), and Region (US East, EU, etc.) you use for this lab, do not matter. However, we suggest you select the region that is physically closest to you and Enterprise, our most popular offering, as your Snowflake edition.
-
-After registering, you will receive an email with an activation link and URL for accessing your Snowflake account.
+## Lab Environment Access Setup ##
+Let's setup your access to the lab environment.
 
 ### Logging into the Snowflake User Interface (UI)
 Open a browser window and enter the URL of your Snowflake 30-day trial environment that was sent with your registration email. Enter the username and password that you specified during the registration:
