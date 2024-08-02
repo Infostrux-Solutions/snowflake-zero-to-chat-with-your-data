@@ -32,7 +32,7 @@ BEGIN
             CREATE USER IDENTIFIER(:user_name)
                 PASSWORD = $initial_password
                 DEFAULT_ROLE = :user_role_name
-                MUST_CHANGE_PASSWORD = FALSE;
+                MUST_CHANGE_PASSWORD = TRUE;
             ;
 
             GRANT ROLE IDENTIFIER(:user_role_name) TO USER IDENTIFIER(:user_name);
