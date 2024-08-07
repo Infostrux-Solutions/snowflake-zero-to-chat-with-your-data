@@ -1,3 +1,5 @@
+-- noinspection SqlNoDataSourceInspectionForFile
+
 -- ------------------ --
 -- SETUP USER OBJECTS --
 -- ------------------ --

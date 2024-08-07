@@ -1,3 +1,5 @@
+-- noinspection SqlNoDataSourceInspectionForFile
+
 -- --------------------- --
 -- TEARDOWN USER OBJECTS --
 -- --------------------- --
