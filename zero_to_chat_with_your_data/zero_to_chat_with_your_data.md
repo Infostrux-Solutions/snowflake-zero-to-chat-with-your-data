@@ -117,7 +117,7 @@ Under **Projects** on the left-hand panel, select the **Notebooks** tab.
 >  **Notebooks vs. the UI**
 Most of the exercises in this lab are executed using pre-written SQL within the notebook to save time. These tasks can also be done via the UI, but would require navigating back-and-forth between multiple UI tabs.
 
-> 🚧 UNDER CONSTRUCTION
+> 🚧 UNDER CONSTRUCTION: Provide a description of the Notebooks UI.
 
 ### Projects > Dashboards ###
 
@@ -183,7 +183,7 @@ Clicking on your username in the bottom right of the UI allows you to change you
 
 ![user preferences dropdown](assets/3UIStory_14.png)
 
-## Data Lab: Stock Price & SEC Filings Data
+## Data Lab: Stock Price & SEC Filings Data ##
 
 Duration: 2
 
@@ -197,7 +197,7 @@ We will start by collecting data from three different sources:
 
 <!-- ------------------------ -->
 
-## Loading Structured Data into Snowflake: CSVs
+## Loading Structured Data into Snowflake: CSVs ##
 
 Duration: 8
 
@@ -205,25 +205,17 @@ Let's start by preparing to load structured `.csv` data into Snowflake.
 
 We are using company metadata developed from the Securities and Exchange Commission (SEC) that details the consumer packaged goods (CPG) companies we want to evaluate. The data has been exported and pre-staged for you in an Amazon AWS S3 bucket in the US-EAST region. It is in comma-delimited format with a single header line and double quotes enclosing all string values, including the field headings in the header line. This will be important when we configure the Snowflake table to store this data.
 
-<!-- victoria image of the CPG data -->
-
-> aside negative
-> 
 > **Free Datasets from Cybersyn direct to your Snowflake instance:** The full dataset is available [**for free**](https://app.snowflake.com/marketplace/listing/GZTSZAS2KF7) in Snowflake Marketplace from Cybersyn -- no ETL required. For the purposes of this demo, we will focus on working with a subset of the data, staged in a csv file to learn how to load structured data into Snowflake.
 
 **Getting Data into Snowflake**
 Data can be ingested into Snowflake from many locations by using the `COPY` command, Snowpipe auto-ingestion, external connectors, or third-party ETL/ELT solutions. For more information on getting data into Snowflake, see the [Snowflake documentation](https://docs.snowflake.net/manuals/user-guide-data-load.html). For the purposes of this lab, we use the `COPY` command and AWS S3 storage to load data manually. In a real-world scenario, you would more likely use an ETL solution or grab data directly from the Snowflake Marketplace!
 
 ### Create a Database and Table
-Ensure you are using the `SYSADMIN` role by selecting your name at the top left, **Switch Role** > **SYSADMIN**.
+Ensure you are using the `HOL_USER_ROLE_<NUMBER>` (replace the `<NUMBER>` with the number you were assigned) role by selecting your name at the top left, **Switch Role** > `HOL_USER_ROLE_<NUMBER>`.
 
-Navigate to the **Databases** tab. Click **Create**, name the database `CYBERSYN`, then click **CREATE**.
+Now navigate to the **Notebooks** screen. You should see the worksheet that has been pre-loaded for you.
 
-![worksheet creation](assets/4PreLoad_2.png)
-
-Now navigate to the **Worksheets** tab. You should see the worksheet we created in step 3.
-
-![new worksheet](assets/4PreLoad_3.png)
+> 🚧 UNDER CONSTRUCTION: Provide a screenshot of the Notebook
 
 We need to set the context appropriately within the worksheet. In the upper right corner of the worksheet, click the box to the left of the **Share** button to show the context menu. Here we control the elements you can see and run from each worksheet. We are using the UI here to set the context. Later in the lab, we will accomplish the same thing via SQL commands within the worksheet.
 
