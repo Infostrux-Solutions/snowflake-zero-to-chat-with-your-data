@@ -217,6 +217,8 @@ Now navigate to the **Notebooks** screen. You should see the worksheet that has 
 
 > 🚧 UNDER CONSTRUCTION: Provide a screenshot of the Notebook
 
+> 🚧 UNDER CONSTRUCTION: Users may not need to set the context for the Notebook but it is unclear how the Notebook will be shared with them and what DB/schema it will operate on.
+
 We need to set the context appropriately within the worksheet. In the upper right corner of the worksheet, click the box to the left of the **Share** button to show the context menu. Here we control the elements you can see and run from each worksheet. We are using the UI here to set the context. Later in the lab, we will accomplish the same thing via SQL commands within the worksheet.
 
 Select the following context settings:

@@ -5,6 +5,7 @@
 -- ------------------ --
 SET participant_count = 3;
 SET initial_password = 'HOL123';
+-- jn!*4rjQ2z*sja8y9XCh7QG9zCTLCMYe
 
 USE WAREHOUSE HOL_ADMIN_WAREHOUSE;
 
