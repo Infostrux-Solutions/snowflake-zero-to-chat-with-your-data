@@ -6,13 +6,13 @@
 SET participant_count = 1;
 
 USE ROLE ACCOUNTADMIN;
-USE WAREHOUSE HOL_ADMIN_WAREHOUSE;
+USE WAREHOUSE LAB_ADMIN_WAREHOUSE;
 
 -- DROP users and their roles
 DECLARE
     schema_prefix STRING DEFAULT 'CHAT_WITH_YOUR_DATA.WORKSPACE_';
-    role_prefix STRING DEFAULT 'HOL_USER_ROLE_';
-    user_prefix STRING DEFAULT 'HOL_USER_';
+    role_prefix STRING DEFAULT 'LAB_USER_ROLE_';
+    user_prefix STRING DEFAULT 'LAB_USER_';
 BEGIN
     FOR i IN 1 TO $participant_count DO
             LET user_schema_name := schema_prefix || i;
