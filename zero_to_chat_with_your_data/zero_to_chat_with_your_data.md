@@ -58,6 +58,8 @@ Username: HOL_USER_<NUMBER>
 Password: HOL123
 ```
 
+> You will be prompted to setup Multi-Factor Authentication. While this is a best practice and it is strongly recommended that you do that, we will be skipping it for the purposes of the lab, so just click on `Not now`.
+
 ## The Snowflake User Interface ##
 
 Duration: 8
@@ -182,6 +184,19 @@ The **Users** sub-tab of the **Users & Roles** tab shows a list of users in the 
 Clicking on your username in the bottom right of the UI allows you to change your password, roles, and preferences. Snowflake has several system defined roles. You are currently in the default role of `HOL_USER_ROLE_<NUMBER>` (replace the `<NUMBER>` with the number you were assigned).
 
 ![user preferences dropdown](assets/3UIStory_14.png)
+
+## Preparing to Run the Lab Queries ##
+The queries we will be using have been prepared in a Snowflake worsheet named `ZERO_TO_CHAT_WITH_YOUR_DATA`. To access it:
+
+* Switch role to `HOL_USER_<number>`
+* Navigate to `Projects` > `Worsheets` and open the `ZERO_TO_CHAT_WITH_YOUR_DATA` worksheet
+* Click on three dots `...` which appear to the right of the worksheet name and select `Duplicate`
+* Enable running your worksheet copy using your user role and the user warehouse:
+    * Select your user role `HOL_USER_<number>`
+    * Select the `HOL_USER_WAREHOUSE`
+* Select user workspace
+  * Highlight the group of queries at the top of the worksheet and click the "Play" ▶️ button at the top right of the worksheet.
+  * The header of the worksheet should show the selected database and schema like `CHAT_WITH_YOUR_DATA.WORKSPACE_<number>`
 
 ## Data Lab: Stock Price & SEC Filings Data ##
 

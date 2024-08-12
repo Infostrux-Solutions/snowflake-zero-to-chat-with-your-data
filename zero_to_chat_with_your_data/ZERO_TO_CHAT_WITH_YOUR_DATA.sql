@@ -1,9 +1,10 @@
+-- Select user workspace
 SET user_id = (SELECT ZEROIFNULL(REGEXP_SUBSTR(CURRENT_USER, '\\d+')));
-SET user_namespace = (SELECT CONCAT('HOL_USER_DB.WORKSPACE_' || $user_id));
-
-USE DATABASE HOL_USER_DB;
+SET user_namespace = (SELECT CONCAT('CHAT_WITH_YOUR_DATA.WORKSPACE_' || $user_id));
+USE DATABASE CHAT_WITH_YOUR_DATA;
 USE SCHEMA IDENTIFIER($user_namespace);
 
+-- Create company_metadata table
 CREATE OR REPLACE TABLE company_metadata (
     cybersyn_company_id string,
     company_name string,
