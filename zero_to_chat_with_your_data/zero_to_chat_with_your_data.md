@@ -185,19 +185,6 @@ Clicking on your username in the bottom right of the UI allows you to change you
 
 ![user preferences dropdown](assets/3UIStory_14.png)
 
-## Preparing to Run the Lab Queries ##
-The queries we will be using have been prepared in a Snowflake worsheet named `ZERO_TO_CHAT_WITH_YOUR_DATA`. To access it:
-
-* Switch role to `LAB_USER_<number>`
-* Navigate to `Projects` > `Worsheets` and open the `ZERO_TO_CHAT_WITH_YOUR_DATA` worksheet
-* Click on three dots `...` which appear to the right of the worksheet name and select `Duplicate`, then close the original Worksheet
-* Enable running your worksheet copy using your user role and the user warehouse:
-    * Select your user role `LAB_USER_<number>`
-    * Select the `LAB_USER_WAREHOUSE`
-* Select user workspace
-  * Highlight the group of queries at the top of the worksheet and click the "Play" ▶️ button at the top right of the worksheet.
-  * The header of the worksheet should show the selected database and schema like `CHAT_WITH_YOUR_DATA.WORKSPACE_<number>`
-
 ## Data Lab: Stock Price & SEC Filings Data ##
 
 Duration: 2
@@ -225,39 +212,35 @@ We are using company metadata developed from the Securities and Exchange Commiss
 **Getting Data into Snowflake**
 Data can be ingested into Snowflake from many locations by using the `COPY` command, Snowpipe auto-ingestion, external connectors, or third-party ETL/ELT solutions. For more information on getting data into Snowflake, see the [Snowflake documentation](https://docs.snowflake.net/manuals/user-guide-data-load.html). For the purposes of this lab, we use the `COPY` command and AWS S3 storage to load data manually. In a real-world scenario, you would more likely use an ETL solution or grab data directly from the Snowflake Marketplace!
 
-### Create a Database and Table
-Ensure you are using the `LAB_USER_ROLE_<NUMBER>` (replace the `<NUMBER>` with the number you were assigned) role by selecting your name at the top left, **Switch Role** > `LAB_USER_ROLE_<NUMBER>`.
+### Preparing to Run the Lab Queries ###
+Now navigate to the **Notebooks** screen. The queries we will be using have been prepared in a Snowflake Worksheet named `ZERO_TO_CHAT_WITH_YOUR_DATA`. This is the "master" worksheet owned by the lab admin. We will create a copy of that worksheet and use our individual copies.
 
-Now navigate to the **Notebooks** screen. You should see the worksheet that has been pre-loaded for you.
+> 🚧 UNDER CONSTRUCTION: Provide a screenshot of the Worksheet
 
-> 🚧 UNDER CONSTRUCTION: Provide a screenshot of the Notebook
+Now, let's create a copy of the worksheet:
+* Navigate to `Projects` > `Worsheets` and open the `ZERO_TO_CHAT_WITH_YOUR_DATA` worksheet
+* Click on three dots `...` which appear to the right of the worksheet name and select `Duplicate`, then close the original Worksheet.
 
-> 🚧 UNDER CONSTRUCTION: Users may not need to set the context for the Notebook but it is unclear how the Notebook will be shared with them and what DB/schema it will operate on.
-
-We need to set the context appropriately within the worksheet. In the upper right corner of the worksheet, click the box to the left of the **Share** button to show the context menu. Here we control the elements you can see and run from each worksheet. We are using the UI here to set the context. Later in the lab, we will accomplish the same thing via SQL commands within the worksheet.
+We need to set the context appropriately within the new Worksheet. In the upper right corner of the worksheet, click the box to the left of the **Share** button to show the context menu. Here we control the elements you can see and run from each worksheet. We are using the UI here to set the context. Later in the lab, we will accomplish the same thing via SQL commands within the worksheet.
 
 Select the following context settings:
 
-**Role:** `SYSADMIN`
-**Warehouse:** `COMPUTE_WH`
+**Role:** `LAB_USER_<number>`
+**Warehouse:** `LAB_USER_WAREHOUSE`
 
 ![context role and warehouse settings](assets/4PreLoad_4.png)
 
-Next, in the drop-down for the database, select the following context settings:
+Finally, we need to select the database and schema context of our worksheet:
+  * Highlight the group of queries at the top of the worksheet and click the "Play" ▶️ button at the top right of the worksheet.
+  * The header of the worksheet should show the selected database and schema like `CHAT_WITH_YOUR_DATA.WORKSPACE_<number>`
 
-**Database:** `CYBERSYN`
-**Schema:** `PUBLIC`
-
-![context database settings](assets/4PreLoad_4b.png)
-
-> aside negative
-> 
+### Create Our First Table
 >  **Data Definition Language (DDL) operations are free!**
 All the DDL operations we have done so far do not require compute resources, so we can create all our objects for free.
 
-To make working in the worksheet easier, let's rename it. In the top left corner, double-click the worksheet name, which is the timestamp when the worksheet was created, and change it to `ZERO_TO_SNOWFLAKE_WITH_CYBERSYN`.
+To make working in the worksheet easier, let's rename it. In the top left corner, double-click the worksheet name, which is the timestamp when the worksheet was created, and change it to `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN`.
 
-Next we create a table called `COMPANY_METADATA` to use for loading the comma-delimited data. Instead of using the UI, we use the worksheet to run the DDL that creates the table. Copy the following SQL text into your worksheet:
+Next we create a table called `COMPANY_METADATA` to use for loading the comma-delimited data. Instead of using the UI, we use the worksheet to run the DDL that creates the table:
 
 ```SQL
 CREATE OR REPLACE TABLE company_metadata
@@ -275,8 +258,6 @@ exchange_code variant,
 permid_quote_id variant);
 ```
 
-> aside negative
-> 
 >  **Many Options to Run Commands.**
 SQL commands can be executed through the UI, via the **Worksheets** tab, using our SnowSQL command line tool, with a SQL editor of your choice via ODBC/JDBC, or through our other connectors (Python, Spark, etc.).
 As mentioned earlier, to save time, we are performing most of the operations in this lab via pre-written SQL executed in the worksheet as opposed to using the UI.
