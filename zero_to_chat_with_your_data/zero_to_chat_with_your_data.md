@@ -806,19 +806,9 @@ FROM company_metadata;
 
 <!-- ------------------------ -->
 
-## Working with Roles, Account Admin, & Account Usage
+## Working with Account Admin, & Account Usage
 
 Duration: 8
-
-In this section, we will explore aspects of Snowflake's access control security model, such as creating a role and granting it specific permissions. We will also explore other usage of the `ACCOUNTADMIN` (Account Administrator) role.
-
-Continuing with the lab story, let's assume a junior DBA has joined our internal analytics team, and we want to create a new role for them with less privileges than the system-defined, default role of `SYSADMIN`.
-
-> aside negative
-> 
->  **Role-Based Access Control**
-Snowflake offers very powerful and granular access control that dictates the objects and functionality a user can access, as well as the level of access they have. For more details, check out the [Snowflake documentation](https://docs.snowflake.net/manuals/user-guide/security-access-control.html).
-
 
 #### Admin > Cost Management
 
@@ -872,5 +862,3 @@ We encourage you to continue with your free trial by loading your own sample or 
 - How to perform analytical queries on data in Snowflake, including joins between tables.
 - How to clone objects.
 - How to undo user errors using Time Travel.
-- How to create roles and users, and grant them privileges.
-- How to securely and easily share data with other accounts.
