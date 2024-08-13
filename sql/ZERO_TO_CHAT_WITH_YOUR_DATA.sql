@@ -65,6 +65,8 @@ CREATE OR REPLACE TABLE sec_filings_attributes (v variant);
 
 -- Create Another External Stage
 
+-- Create Another External Stage
+
 CREATE OR REPLACE STAGE cybersyn_sec_filings
     URL = 's3://sfquickstarts/zero_to_snowflake/cybersyn_cpg_sec_filings/'
 ;
