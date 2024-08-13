@@ -5,19 +5,20 @@ USE DATABASE CHAT_WITH_YOUR_DATA;
 USE SCHEMA IDENTIFIER($user_namespace);
 
 -- Create company_metadata table
-CREATE OR REPLACE TABLE company_metadata (
-    cybersyn_company_id string,
-    company_name string,
-    permid_security_id string,
-    primary_ticker string,
-    security_name string,
-    asset_class string,
-    primary_exchange_code string,
-    primary_exchange_name string,
-    security_status string,
-    global_tickers variant,
-    exchange_code variant,
-    permid_quote_id variant
+CREATE OR REPLACE TABLE company_metadata
+(
+     cybersyn_company_id string,
+     company_name string,
+     permid_security_id string,
+     primary_ticker string,
+     security_name string,
+     asset_class string,
+     primary_exchange_code string,
+     primary_exchange_name string,
+     security_status string,
+     global_tickers variant,
+     exchange_code variant,
+     permid_quote_id variant
 );
 
 CREATE OR REPLACE STAGE cybersyn_company_metadata
@@ -28,18 +29,18 @@ LIST @cybersyn_company_metadata;
 
 CREATE OR REPLACE FILE FORMAT csv
     TYPE = 'CSV'
-    COMPRESSION = 'AUTO'  -- Automatically determines the compression of files
-    FIELD_DELIMITER = ','  -- Specifies comma as the field delimiter
-    RECORD_DELIMITER = '\n'  -- Specifies newline as the record delimiter
-    SKIP_HEADER = 1  -- Skip the first line
-    FIELD_OPTIONALLY_ENCLOSED_BY = '\042'  -- Fields are optionally enclosed by double quotes (ASCII code 34)
-    TRIM_SPACE = FALSE  -- Spaces are not trimmed from fields
-    ERROR_ON_COLUMN_COUNT_MISMATCH = FALSE  -- Does not raise an error if the number of fields in the data file varies
-    ESCAPE = 'NONE'  -- No escape character for special character escaping
-    ESCAPE_UNENCLOSED_FIELD = '\134'  -- Backslash is the escape character for unenclosed fields
-    DATE_FORMAT = 'AUTO'  -- Automatically detects the date format
-    TIMESTAMP_FORMAT = 'AUTO'  -- Automatically detects the timestamp format
-    NULL_IF = ('')  -- Treats empty strings as NULL values
+        COMPRESSION = 'AUTO'  -- Automatically determines the compression of files
+        FIELD_DELIMITER = ','  -- Specifies comma as the field delimiter
+        RECORD_DELIMITER = '\n'  -- Specifies newline as the record delimiter
+        SKIP_HEADER = 1  -- Skip the first line
+        FIELD_OPTIONALLY_ENCLOSED_BY = '\042'  -- Fields are optionally enclosed by double quotes (ASCII code 34)
+        TRIM_SPACE = FALSE  -- Spaces are not trimmed from fields
+        ERROR_ON_COLUMN_COUNT_MISMATCH = FALSE  -- Does not raise an error if the number of fields in the data file varies
+        ESCAPE = 'NONE'  -- No escape character for special character escaping
+        ESCAPE_UNENCLOSED_FIELD = '\134'  -- Backslash is the escape character for unenclosed fields
+        DATE_FORMAT = 'AUTO'  -- Automatically detects the date format
+        TIMESTAMP_FORMAT = 'AUTO'  -- Automatically detects the timestamp format
+        NULL_IF = ('')  -- Treats empty strings as NULL values
     COMMENT = 'File format for ingesting data for zero to snowflake'
 ;
 
@@ -54,9 +55,9 @@ COPY INTO company_metadata
 
 SELECT * FROM company_metadata LIMIT 10;
 
-CREATE TABLE sec_filings_index (v variant);
+CREATE OR REPLACE TABLE sec_filings_index (v variant);
 
-CREATE TABLE sec_filings_attributes (v variant);
+CREATE OR REPLACE TABLE sec_filings_attributes (v variant);
 
 CREATE OR REPLACE STAGE cybersyn_sec_filings
     URL = 's3://sfquickstarts/zero_to_snowflake/cybersyn_cpg_sec_filings/'
