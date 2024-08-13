@@ -115,3 +115,110 @@ FROM sec_filings_attributes
 SELECT * FROM sec_filings_index_view LIMIT 20;
 
 SELECT * FROM sec_filings_attributes_view LIMIT 20;
+
+-- Closing Price Statistics
+SELECT
+    meta.primary_ticker,
+    meta.company_name,
+    ts.date,
+    ts.value AS post_market_close,
+    (ts.value / LAG(ts.value, 1) OVER (PARTITION BY meta.primary_ticker ORDER BY ts.date))::DOUBLE AS daily_return,
+    AVG(ts.value) OVER (PARTITION BY meta.primary_ticker ORDER BY ts.date ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS five_day_moving_avg_price
+FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
+         INNER JOIN company_metadata meta
+                    ON ts.ticker = meta.primary_ticker
+WHERE ts.variable_name = 'Post-Market Close';
+
+-- Trading Volume Statistics
+SELECT
+    meta.primary_ticker,
+    meta.company_name,
+    ts.date,
+    ts.value AS nasdaq_volume,
+    (ts.value / LAG(ts.value, 1) OVER (PARTITION BY meta.primary_ticker ORDER BY ts.date))::DOUBLE AS volume_change
+FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
+         INNER JOIN company_metadata meta
+                    ON ts.ticker = meta.primary_ticker
+WHERE ts.variable_name = 'Nasdaq Volume';
+
+-- Clone a Table
+CREATE TABLE company_metadata_dev CLONE company_metadata;
+
+-- Joining Tables
+WITH data_prep AS (
+    SELECT
+        idx.cik,
+        idx.company_name,
+        idx.adsh,
+        idx.form_type,
+        att.measure_description,
+        CAST(att.value AS DOUBLE) AS value,
+        att.period_start_date,
+        att.period_end_date,
+        att.covered_qtrs,
+        TRIM(att.metadata:"ProductOrService"::STRING) AS product
+    FROM sec_filings_attributes_view att
+             JOIN sec_filings_index_view idx
+                  ON idx.cik = att.cik AND idx.adsh = att.adsh
+    WHERE idx.cik = '0001637459'
+      AND idx.form_type IN ('10-K', '10-Q')
+      AND LOWER(att.measure_description) = 'net sales'
+      AND (att.metadata IS NULL OR OBJECT_KEYS(att.metadata) = ARRAY_CONSTRUCT('ProductOrService'))
+      AND att.covered_qtrs IN (1, 4)
+      AND value > 0
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY idx.cik, idx.company_name, att.measure_description, att.period_start_date, att.period_end_date, att.covered_qtrs, product
+        ORDER BY idx.filed_date DESC
+        ) = 1
+)
+
+SELECT
+    company_name,
+    measure_description,
+    product,
+    period_end_date,
+    CASE
+        WHEN covered_qtrs = 1 THEN value
+        WHEN covered_qtrs = 4 THEN value - SUM(value) OVER (
+            PARTITION BY cik, measure_description, product, YEAR(period_end_date)
+            ORDER BY period_end_date
+            ROWS BETWEEN 4 PRECEDING AND 1 PRECEDING
+            )
+        END AS quarterly_value
+FROM data_prep
+ORDER BY product, period_end_date;
+
+-- Using Time Travel
+-- Drop and Undrop a Table
+DROP TABLE sec_filings_index;
+
+-- The following query should result in an error because the underlying table has been dropped
+SELECT * FROM sec_filings_index LIMIT 10;
+
+-- Restore the table
+UNDROP TABLE sec_filings_index;
+
+SELECT * FROM sec_filings_index LIMIT 10;
+
+-- Roll back changes to a table
+-- Let's simulate an accidental column overwrite
+UPDATE company_metadata SET company_name = 'oops';
+SELECT company_name FROM company_metadata LIMIT 10;
+
+-- Set the session variable with the query_id of the last UPDATE query
+SET query_id = (
+    SELECT query_id
+    FROM TABLE(information_schema.query_history_by_session(result_limit=>5))
+    WHERE query_text LIKE 'UPDATE%'
+    ORDER BY start_time DESC
+    LIMIT 1
+);
+
+-- Use the session variable with the identifier syntax (e.g., $query_id)
+CREATE OR REPLACE TABLE company_metadata AS
+SELECT *
+FROM company_metadata
+         BEFORE (STATEMENT => $query_id);
+
+-- Verify the company names have been restored
+SELECT company_name FROM company_metadata LIMIT 10;
