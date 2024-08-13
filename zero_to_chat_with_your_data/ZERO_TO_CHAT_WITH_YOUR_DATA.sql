@@ -20,12 +20,14 @@ CREATE OR REPLACE TABLE company_metadata (
     permid_quote_id variant
 );
 
+-- Create external stage to load the data
 CREATE OR REPLACE STAGE cybersyn_company_metadata
     URL = 's3://sfquickstarts/zero_to_snowflake/cybersyn-consumer-company-metadata-csv/'
 ;
 
 LIST @cybersyn_company_metadata;
 
+-- Creation of data format 
 CREATE OR REPLACE FILE FORMAT csv
     TYPE = 'CSV'
     COMPRESSION = 'AUTO'  -- Automatically determines the compression of files
@@ -43,8 +45,10 @@ CREATE OR REPLACE FILE FORMAT csv
     COMMENT = 'File format for ingesting data for zero to snowflake'
 ;
 
+-- verify the file format has been created succesfully 
 SHOW FILE FORMATS;
 
+-- Load the data into COMPANY_METADATA table
 COPY INTO company_metadata
     FROM @cybersyn_company_metadata
     FILE_FORMAT = csv
@@ -54,15 +58,25 @@ COPY INTO company_metadata
 
 SELECT * FROM company_metadata LIMIT 10;
 
+
+-- LOAD SEMI-STRUCTURE DATA
+-- create two tables, SEC_FILINGS_INDEX and SEC_FILINGS_ATTRIBUTES to use for loading JSON data
+
 CREATE TABLE sec_filings_index (v variant);
 
 CREATE TABLE sec_filings_attributes (v variant);
+
+-- Create Another External Stage
 
 CREATE OR REPLACE STAGE cybersyn_sec_filings
     URL = 's3://sfquickstarts/zero_to_snowflake/cybersyn_cpg_sec_filings/'
 ;
 
+-- Take a look at the content of the chat_with_your_data_sec_filings
+
 LIST @cybersyn_sec_filings;
+
+-- Load and Verify the Semi-structured Data
 
 COPY INTO sec_filings_index
     FROM @cybersyn_sec_filings/cybersyn_sec_report_index.json.gz
@@ -77,6 +91,8 @@ COPY INTO sec_filings_attributes
 ;
 
 SELECT * FROM sec_filings_attributes LIMIT 10;
+
+-- Create a View and Query Semi-Structured Data
 
 CREATE OR REPLACE VIEW sec_filings_index_view AS
 SELECT
