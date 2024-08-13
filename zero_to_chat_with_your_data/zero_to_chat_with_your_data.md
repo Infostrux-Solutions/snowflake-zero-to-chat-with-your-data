@@ -268,7 +268,7 @@ Verify your `COMPANY_METADATA` table has been created. At the bottom of the work
 
 ![TRIPS confirmation message](assets/4PreLoad_5.png)
 
-Navigate to the **Databases** tab by clicking the **HOME** icon in the upper left corner of the worksheet. Then click **Data** > **Databases**. In the list of databases, click `CYBERSYN` > `PUBLIC` > **TABLES** to see your newly created `COMPANY_METADATA` table. If you don't see any databases on the left, expand your browser because they may be hidden.
+Navigate to the **Databases** tab by clicking the **HOME** icon in the upper left corner of the worksheet. Then click **Data** > **Databases**. In the list of databases, click `CHAT_WITH_YOUR_DATA` > `WORKSPACE_<number>` > **TABLES** to see your newly created `COMPANY_METADATA` table. If you don't see any databases on the left, expand your browser because they may be hidden.
 
 ![TRIPS table](assets/4PreLoad_6.png)
 
@@ -280,9 +280,9 @@ Click `COMPANY_METADATA` and the **Columns** tab to see the table structure you 
 
 We are working with structured, comma-delimited data that has already been staged in a public, external S3 bucket. Before we can use this data, we first need to create a _stage_ that specifies the location of our external bucket.
 
-> aside positive
-> 
 >  For this lab, we are using an AWS-East bucket. To prevent data egress/transfer costs in the future, you should select a staging location from the same cloud provider and region as your Snowflake account.
+
+> 🚧 UNDER CONSTRUCTION: <<<GOT THIS FAR>>>
 
 From the **Databases** tab, click the `CYBERSYN` database and `PUBLIC` schema. Click the **Create** button, then **Stage** > **Amazon S3**.
 
