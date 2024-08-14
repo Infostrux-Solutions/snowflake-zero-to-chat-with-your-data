@@ -348,7 +348,7 @@ Many of the virtual warehouse and compute capabilities we just covered, such as 
 
 Now we can run a COPY command to load the data into the `COMPANY_METADATA` table we created earlier.
 
-Navigate back to the `ZERO_TO_CHAT_WITH_YOUR_DATA` worksheet in the **Worksheets** tab. Make sure the worksheet context is correctly set:
+Navigate back to the `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN` worksheet in the **Worksheets** tab. Make sure the worksheet context is correctly set:
 
 **Role:** `LAB_USER_<number>`
 **Warehouse:** `LAB_USER_WAREHOUSE`
@@ -422,7 +422,7 @@ In the results pane at the bottom of the worksheet, verify that your tables, `SE
 
 ### Create Another External Stage
 
-In the `ZERO_TO_CHAT_WITH_YOUR_DATA` worksheet, use the following command to create a stage that points to the bucket where the semi-structured JSON data is stored on AWS S3:
+In the `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN` worksheet, use the following command to create a stage that points to the bucket where the semi-structured JSON data is stored on AWS S3:
 
 ```SQL
 CREATE STAGE cybersyn_sec_filings
@@ -572,7 +572,7 @@ That's it! You have now successfully subscribed to the Financial & Economic Esse
 
 ### Execute Some Queries
 
-Go to the **ZERO_TO_CHAT_WITH_YOUR_DATA** worksheet and change the warehouse to use the new warehouse you created in the last section. Your worksheet context should be the following:
+Go to the **ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN** worksheet and change the warehouse to use the new warehouse you created in the last section. Your worksheet context should be the following:
 
 **Role:** `LAB_USER_ROLE_<NUMBER>`
 **Warehouse:** `LAB_USER_WAREHOUSE`
@@ -734,7 +734,7 @@ Some useful applications include:
 
 First let's see how we can restore data objects that have been accidentally or intentionally deleted.
 
-In the `ZERO_TO_CHAT_WITH_YOUR_DATA` worksheet, run the following DROP command to remove the `SEC_FILINGS_INDEX` table:
+In the `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN` worksheet, run the following DROP command to remove the `SEC_FILINGS_INDEX` table:
 
 ```SQL
 DROP TABLE sec_filings_index;
