@@ -334,15 +334,35 @@ SHOW FILE FORMATS;
 The file format created should be listed in the result:
 ![create file format settings](assets/Lab_Image_05.png)
 
+### Use a Warehouse for Data Loading
 
-> 🚧 **TODO** -- Validate whether to keep this paragraph or remove it.
->
->  aside negative
->
->  **Snowflake Compute vs Other Data Warehouses**
-Many of the virtual warehouse and compute capabilities we just covered, such as the ability to create, scale up, scale out, and auto-suspend/resume virtual warehouses are easy to use in Snowflake and can be done in seconds. For on-premise data warehouses, these capabilities are much more difficult, if not impossible, as they require significant physical hardware, over-provisioning of hardware for workload spikes, and significant configuration work, as well as additional challenges. Even other cloud-based data warehouses cannot scale up and out like Snowflake without significantly more configuration work and time.
->
-> ---------------------
+We will now use a virtual warehouse and the `COPY` command to initiate bulk loading of structured data into the Snowflake table we created.
+
+> **Note:** For this lab, the user is granted access to a pre-established warehouse designed specifically for their use.
+
+Compute resources are needed for loading data. Snowflake's compute nodes are called virtual warehouses and they can be dynamically sized up or out according to workload, whether you are loading data, running a query, or performing a DML operation. Each workload can have its own warehouse so there is no resource contention.
+
+Navigate to the **Warehouses** tab (under **Admin**). This is where you can view all of your existing warehouses, as well as analyze their usage trends.
+
+Note the **+ Warehouse** option in the upper right corner of the top. This is where you can quickly add a new warehouse. However, we want to use the existing warehouse `LAB_USER_WAREHOUSE_<NUMBER>`.
+
+
+Click the row of the `LAB_USER_WAREHOUSE_<NUMBER>` warehouse. Then click the **[...]** in the upper right corner text above it to see the actions you can perform on the warehouse. We will use this warehouse to load the data from AWS S3.
+
+![warehouse image](assets/Lab_Image_1_wh.png)
+
+The **Size** drop-down is where the capacity of the warehouse is selected. For larger data loading operations or more compute-intensive queries, a larger warehouse is recommended. The sizes translate to the underlying compute resources provisioned from the cloud provider (AWS, Azure, or GCP) where your Snowflake account is hosted. It also determines the number of credits consumed by the warehouse for each full hour it runs. The larger the size, the more compute resources from the cloud provider are allocated to the warehouse and the more credits it consumes. For example, the `4X-Large` setting consumes 128 credits for each full hour. This sizing can be changed up or down at any time with a simple click.
+
+![warehouse edit image](assets/Lab_Image_2_wh.png)
+
+
+
+**Warning - Watch Your Spend!**
+During or after this lab, you should be careful about performing the following actions without good reason or you may burn through your $400 of free credits more quickly than desired:
+
+- Do not disable auto-suspend. If auto-suspend is disabled, your warehouses continues to run and consume credits even when not in use.
+- Do not use a warehouse size that is excessive given the workload. The larger the warehouse, the more credits are consumed.
+
 
 ### Load the Data
 
@@ -572,7 +592,8 @@ That's it! You have now successfully subscribed to the Financial & Economic Esse
 
 ### Execute Some Queries
 
-Go to the **ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN** worksheet and change the warehouse to use the new warehouse you created in the last section. Your worksheet context should be the following:
+Go to the 
+**ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN** worksheet. Your worksheet context should be the following:
 
 **Role:** `LAB_USER_ROLE_<NUMBER>`
 **Warehouse:** `LAB_USER_WAREHOUSE`
