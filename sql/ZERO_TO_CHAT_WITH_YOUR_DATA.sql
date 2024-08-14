@@ -127,7 +127,8 @@ SELECT
 FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
          INNER JOIN company_metadata meta
                     ON ts.ticker = meta.primary_ticker
-WHERE ts.variable_name = 'Post-Market Close';
+WHERE ts.variable_name = 'Post-Market Close'
+LIMIT 100;
 
 -- Trading Volume Statistics
 SELECT
@@ -139,12 +140,15 @@ SELECT
 FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
          INNER JOIN company_metadata meta
                     ON ts.ticker = meta.primary_ticker
-WHERE ts.variable_name = 'Nasdaq Volume';
+WHERE ts.variable_name = 'Nasdaq Volume'
+LIMIT 100;
 
 -- Clone a Table
 CREATE TABLE company_metadata_dev CLONE company_metadata;
 
--- Joining Tables
+DROP TABLE company_metadata_dev;
+
+-- Joining Tables (limited to KRAFT HEINZ CO, cik = '0001637459')
 WITH data_prep AS (
     SELECT
         idx.cik,
@@ -213,6 +217,8 @@ SET query_id = (
     ORDER BY start_time DESC
     LIMIT 1
 );
+
+SELECT $query_id;
 
 -- Use the session variable with the identifier syntax (e.g., $query_id)
 CREATE OR REPLACE TABLE company_metadata AS
