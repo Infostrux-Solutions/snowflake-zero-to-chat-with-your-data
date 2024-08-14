@@ -1,7 +1,7 @@
 # Snowflake Hands-on Lab - Zero to Chat with Your Data in 120 Minutes #
 
 ## Admin Setup ##
-* Log in to https://app.snowflake.com/umnxxyz/infostrux_hol_ai_data_chat
+* Log in to https://app.snowflake.com/umnxxyz/chat_with_your_data
 * Run `sql/SETUP_BASE` SQL script
 * Run `sql/SETUP_USERS` SQL script
 * Switch role to `LAB_ADMIN`

@@ -44,7 +44,7 @@ Each of you should have received a number when you arrived to allow you to acces
 
 Open a browser window and enter the URL:
 
-> https://app.snowflake.com/umnxxyz/infostrux_hol_ai_data_chat
+> https://app.snowflake.com/umnxxyz/chat_with_your_data
 
 > IMPORTANT: As soon as you log in, you will be prompted to change your password. Your new password must be at least 8 characters long and contain at least 1 number, 1 uppercase and 1 lowercase letter.
 > 
@@ -1123,6 +1123,35 @@ Snowflake provides several ways to securely share data without compromising conf
 
 <!-- ------------------------ -->
 
+## Creating the Streamlit App ##
+
+In the left Snowsight navigation panel, select `Projects > Streamlit` tab and then click the `+ Streamlit App` button at the top right to create a new Streamlit-in-Snowflake application. Select the following parameters:
+
+> 🚧 UNDER CONSTRUCTION: Provide a screenshot of Streamlit application parameters dialog
+
+```text
+App Title:  SAMPLE_APP
+Database:   CHAT_WITH_YOUR_DATA
+Schema:     WORKSPACE_<number>
+Warehouse:  LAB_USER_WAREHOUSE
+```
+... and click `Create`. The Streamlit in Snowflake editor opens an example Streamlit app in Viewer mode. Viewer mode allows you to see how the Streamlit application appears to users.
+
+The Streamlit in Snowflake interface is divided into three panes:
+
+* Object browser: Allows you to see the databases, schemas, and views you have permissions to access.
+* Streamlit editor: Provides a Python editor for your Streamlit code.
+* Streamlit preview: Displays the running Streamlit app.
+
+By default, only the Streamlit editor and preview panes are displayed. To change the display, use the show/hide buttons in the lower-left corner of the Streamlit in Snowflake editor.
+
+> 🚧 UNDER CONSTRUCTION: Provide a screenshot of the default Streamlit application
+
+Add snowpark-ml-python package from the packages dropdown in the code editor section
+
+
+Copy the code below into the code editor section
+Run the app!
 ## Resetting Your Snowflake Environment
 
 Duration: 2
