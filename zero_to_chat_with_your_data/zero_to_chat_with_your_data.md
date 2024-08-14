@@ -159,7 +159,7 @@ Under **Monitoring** there are multiple tabs for tracking your usage of your Sno
 
 ### Admin > Warehouses ###
 
-Under **Admin**, the **​Warehouses​** tab is where you set up and manage compute resources known as virtual warehouses to load or query data in Snowflake. A warehouse called `LAB_USER_WAREHOUSE` already exists in your environment.
+Under **Admin**, the **​Warehouses​** tab is where you set up and manage compute resources known as virtual warehouses to load or query data in Snowflake. A warehouse called `LAB_USER_WAREHOUSE_<number>` already exists in your environment.
 
 ![warehouses tab](assets/3UIStory_10.png)
 
@@ -226,7 +226,7 @@ We need to set the context appropriately within the new Worksheet. In the upper 
 Select the following context settings:
 
 **Role:** `LAB_USER_<number>`
-**Warehouse:** `LAB_USER_WAREHOUSE`
+**Warehouse:** `LAB_USER_WAREHOUSE_<number>`
 
 ![context role and warehouse settings](assets/4PreLoad_4.png)
 
@@ -1123,17 +1123,33 @@ Snowflake provides several ways to securely share data without compromising conf
 
 <!-- ------------------------ -->
 
-## Creating the Streamlit App ##
+## Creating the Chatbot Streamlit App ##
+
+We will build an LLM-powered chatbot named "Frosty" that performs data exploration and answers questions by writing and executing SQL queries on Snowflake data.
+
+The application uses Streamlit and Snowflake and can be plugged into your LLM of choice, alongside data from Snowflake Marketplace. By the end of the session, you will have an interactive web application chatbot that can converse and answer questions based on a financial dataset.
+
+### Key features & technology
+* Large language models (LLMs)
+* Streamlit
+
+### What is Streamlit?
+Streamlit is an open-source Python library that enables developers to quickly create, deploy, and share web apps from Python scripts. Learn more about [Streamlit](https://streamlit.io/).
+
+### What is a large language model (LLM)?
+A large language model, or LLM, is a deep learning algorithm that can recognize, summarize, translate, predict and generate text and other content based on knowledge gained from massive datasets. Some examples of popular LLMs are [GPT-4](https://openai.com/research/gpt-4), [GPT-3](https://openai.com/blog/gpt-3-apps), [BERT](https://cloud.google.com/ai-platform/training/docs/algorithms/bert-start), [LLaMA](https://ai.facebook.com/blog/large-language-model-llama-meta-ai/), and [LaMDA](https://blog.google/technology/ai/lamda/).
+
+The application uses Streamlit and Snowflake and can be plugged into your LLM of choice, alongside data from Snowflake Marketplace. By the end of the session, you will have an interactive web application chatbot that can converse and answer questions based on a financial dataset.
 
 In the left Snowsight navigation panel, select `Projects > Streamlit` tab and then click the `+ Streamlit App` button at the top right to create a new Streamlit-in-Snowflake application. Select the following parameters:
 
 > 🚧 UNDER CONSTRUCTION: Provide a screenshot of Streamlit application parameters dialog
 
 ```text
-App Title:  SAMPLE_APP
+App Title:  CHATBOT
 Database:   CHAT_WITH_YOUR_DATA
 Schema:     WORKSPACE_<number>
-Warehouse:  LAB_USER_WAREHOUSE
+Warehouse:  LAB_USER_WAREHOUSE_<number>
 ```
 ... and click `Create`. The Streamlit in Snowflake editor opens an example Streamlit app in Viewer mode. Viewer mode allows you to see how the Streamlit application appears to users.
 
