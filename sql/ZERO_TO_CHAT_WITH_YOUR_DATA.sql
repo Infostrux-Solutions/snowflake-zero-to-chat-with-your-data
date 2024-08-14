@@ -127,7 +127,8 @@ SELECT
 FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
          INNER JOIN company_metadata meta
                     ON ts.ticker = meta.primary_ticker
-WHERE ts.variable_name = 'Post-Market Close';
+WHERE ts.variable_name = 'Post-Market Close'
+LIMIT 100;
 
 -- Trading Volume Statistics
 SELECT
@@ -139,12 +140,15 @@ SELECT
 FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
          INNER JOIN company_metadata meta
                     ON ts.ticker = meta.primary_ticker
-WHERE ts.variable_name = 'Nasdaq Volume';
+WHERE ts.variable_name = 'Nasdaq Volume'
+LIMIT 100;
 
 -- Clone a Table
 CREATE TABLE company_metadata_dev CLONE company_metadata;
 
--- Joining Tables
+DROP TABLE company_metadata_dev;
+
+-- Joining Tables (limited to KRAFT HEINZ CO, cik = '0001637459')
 WITH data_prep AS (
     SELECT
         idx.cik,
@@ -214,6 +218,8 @@ SET query_id = (
     LIMIT 1
 );
 
+SELECT $query_id;
+
 -- Use the session variable with the identifier syntax (e.g., $query_id)
 CREATE OR REPLACE TABLE company_metadata AS
 SELECT *
@@ -222,3 +228,43 @@ FROM company_metadata
 
 -- Verify the company names have been restored
 SELECT company_name FROM company_metadata LIMIT 10;
+
+-- ----------------- --
+-- CHATBOT DATA PREP --
+-- ----------------- --
+
+-- Create the limited attributes view
+CREATE VIEW IF NOT EXISTS financial_entity_attributes_limited AS
+SELECT * from financial__economic_essentials.cybersyn.financial_institution_attributes
+WHERE VARIABLE IN (
+                   'ASSET',
+                   'ESTINS',
+                   'LNRE',
+                   'DEP',
+                   'SC'
+    );
+
+-- Confirm the view was created correctly - should show 6 rows with variable name and definition
+SELECT * FROM financial_entity_attributes_limited;
+
+-- Create the modified time series view
+CREATE VIEW IF NOT EXISTS financial_entity_annual_time_series AS
+SELECT
+    ent.name as entity_name,
+    ent.city,
+    ent.state_abbreviation,
+    ts.variable_name,
+    year(ts.date) as "YEAR",
+    to_double(ts.value) as value,
+    ts.unit,
+    att.definition
+FROM financial__economic_essentials.cybersyn.financial_institution_timeseries AS ts
+         INNER JOIN financial_entity_attributes_limited att
+                    ON (ts.variable = att.variable)
+         INNER JOIN financial__economic_essentials.cybersyn.financial_institution_entities AS ent
+                    ON (ts.id_rssd = ent.id_rssd)
+WHERE MONTH(date) = 12
+  AND DAY(date) = 31;
+
+-- Confirm the view was created correctly and view sample data
+SELECT * FROM financial_entity_annual_time_series  LIMIT 10;
