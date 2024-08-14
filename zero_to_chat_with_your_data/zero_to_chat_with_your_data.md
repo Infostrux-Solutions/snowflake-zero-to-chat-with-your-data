@@ -883,24 +883,6 @@ Add snowpark-ml-python package from the packages dropdown in the code editor sec
 
 Copy the code below into the code editor section
 Run the app!
-## Resetting Your Snowflake Environment
-
-Duration: 2
-
-If you would like to reset your environment by deleting all the objects created as part of this lab, ensure you are using the `ACCOUNTADMIN` role in the worksheet and run the following commands to drop the objects we created in the lab:
-
-```SQL
-USE ROLE accountadmin;
-
-DROP DATABASE IF EXISTS CYBERSYN;
-
-DROP WAREHOUSE IF EXISTS analytics_wh;
-
-DROP ROLE IF EXISTS junior_dba;
-```
->>>>>>> origin/main
-
-<!-- ------------------------ -->
 
 ## Conclusion & Next Steps
 
