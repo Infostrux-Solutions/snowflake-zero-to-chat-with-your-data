@@ -1,7 +1,7 @@
 # Snowflake Hands-on Lab - Zero to Chat with Your Data in 120 Minutes #
 
 ## Admin Setup ##
-* Log in to https://app.snowflake.com/umnxxyz/infostrux_hol_ai_data_chat
+* Log in to https://app.snowflake.com/umnxxyz/chat_with_your_data
 * Run `sql/SETUP_BASE` SQL script
 * Run `sql/SETUP_USERS` SQL script
 * Switch role to `LAB_ADMIN`
@@ -9,7 +9,7 @@
 * Click `SHARE` and add the lab attendants with a `View results` permission
 * Make the Cybersyn data shares available to lab users:
   * In Snowflake, navigate to `Data Products > Marketplace`
-  * Type stock prices in the search box at the top, scroll through the results, and select [Financial & Economic Essentials](https://app.snowflake.com/marketplace/listing/GZTSZAS2KF7/) (provided by Cybersyn).
+  * Type `stock prices` in the search box at the top, scroll through the results, and select [Financial & Economic Essentials](https://app.snowflake.com/marketplace/listing/GZTSZAS2KF7/) (provided by Cybersyn).
   * Click `Get` and enter your contact information in the prompt window
   * In the next window
     * leave the default database name as-is: `FINANCIAL__ECONOMIC_ESSENTIALS`
