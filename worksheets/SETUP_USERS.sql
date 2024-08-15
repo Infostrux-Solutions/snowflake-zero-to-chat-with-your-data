@@ -5,7 +5,6 @@
 -- ------------------ --
 SET participant_count = 2;
 SET initial_password = 'LAB123';
--- jn4rjQ2zsja8y9XCh7QG9zCTLCMYe
 
 USE WAREHOUSE LAB_ADMIN_WAREHOUSE;
 
