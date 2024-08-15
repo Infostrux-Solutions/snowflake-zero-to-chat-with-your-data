@@ -7,7 +7,7 @@ from snowflake.snowpark.context import get_active_session
 
 # Write directly to the app
 st.set_page_config(layout="wide")
-st.title("Cortex Data Chatbot")
+st.title("Chatbot")
 st.write("""[docs.streamlit.io](https://docs.streamlit.io)""")
 
 # Get the current credentials
