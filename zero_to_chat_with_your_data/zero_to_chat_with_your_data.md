@@ -900,6 +900,139 @@ Add snowpark-ml-python package from the packages dropdown in the code editor sec
 Copy the code below into the code editor section
 Run the app!
 
+## Visualizate your data.
+
+To facilitate data visualization, we are utilizing the inherent integration capabilities between Snowflake and Streamlit.
+
+### Build the streamlit app
+
+This detailed documentation should help you understand each part of your Streamlit app involving data manipulation, interactive input, and visualization within a Snowflake environment.
+
+### 1. Import the necesary libs to create the streamlit app
+ ```PYTHON 
+# Import necessary packages for the Streamlit app and Snowflake integration
+import streamlit as st
+import re
+from snowflake.snowpark import functions as F
+from snowflake.core import Root
+from snowflake.cortex import Complete
+from snowflake.snowpark.context import get_active_session
+ ```
+
+ ### 2. Streamlit Configuration
+ Streamlit's options and page configurations are set, like disabling the deprecation warning for global use of pyplot and setting the page layout to "wide" and initializes an active session with Snowflake, allowing SQL commands to be executed directly from Streamlit.
+```PYTHON
+# Set global options and page configuration for Streamlit
+st.set_option('deprecation.showPyplotGlobalUse', False)
+st.set_page_config(layout="wide") # Set the layout of the page to wide mode
+
+# Initialize session from Snowflake to perform database operations
+session = get_active_session()
+
+# Streamlit application title
+st.title("Visualize your data! :brain:")
+```
+
+### 3. Streamlit Sidebar Configuration
+- **Sidebar Setup**: Uses Streamlit's sidebar feature to create interactive widgets.
+- **Database Selection**: Queries Snowflake to retrieve databases and allows the user to select a database through a dropdown box. Similar structures are used to select schemas, views, and specific settings such as the number of rows to plot.
+
+```PYTHON
+# Create DataFrame and retrieve column names
+with st.sidebar:
+    # SQL query to list databases and select one through a dropdown
+    databases = session.sql("SHOW DATABASES in ACCOUNT").select('"name"')
+    database = st.selectbox('Select Database:', databases)
+    # SQL query to list schemas in the selected database and select one, excluding 'INFORMATION_SCHEMA'
+    schemas = session.sql(f"SHOW SCHEMAS in DATABASE {database}").select('"name"').filter(F.col('"name"') != 'INFORMATION_SCHEMA')
+    schema = st.selectbox('Select Schema:', schemas)
+    # SQL query to list views in the selected schema and database, and select one through a dropdown
+    views = session.sql(f"SHOW VIEWS in SCHEMA {database}.{schema}").select('"name"')
+    table = st.selectbox('Select VIEW:', views)
+    rows_to_plot = st.number_input('Rows to plot', min_value=1, max_value=10000, value=1000)
+```
+### 4. Data Retrieval and Display
+- **Dataframe Creation**: Constructs a Pandas dataframe by querying a table in Snowflake, limited to a user-defined number of rows.
+- **Display**: Outputs the dataframe's first few rows directly on the Streamlit page, giving a preview of the data.
+
+```PYTHON
+df = session.table(f'{database}.{schema}.{table}').limit(rows_to_plot).to_pandas()
+column_specifications = [col_name for col_name in df.columns]
+
+# Plot DataFrame
+st.subheader('Data:')
+st.dataframe(df.head()) 
+```
+
+### 5. Visualization Prompt
+- **Library Selection**: Users can choose the Python visualization library they wish to use.
+- **User Input for Visualization**: Collects user input on what they want to visualize from the data.
+
+```PYTHON
+library = st.selectbox('Library', ['matplotlib','seaborn','plotly','wordcloud'])
+prompt = st.text_area('What do you want to visualize?')
+```
+
+### 6. Visualization Execution
+- **Visualization Trigger**: A button that, when clicked, processes the input and generates Python code for visualization.
+- **Dynamic Code Generation**: Uses a Large Language Model (LLM) to generate Python code based on the user's specifications.
+- **Code Execution**: Executes the generated Python code to render visualizations directly in Streamlit.
+
+```PYTHON
+if st.button('Visualize'):
+    prompt = f'You are a python developer that writes code using {library} and streamlit to visualize data. \
+    Your data input is a pandas dataframe that you can access with df. \
+    The pandas dataframe has the following columns: {column_specifications}.\
+    {prompt}\
+    If you are asked to return a list, create a dataframe and use st.dataframe() to display the dataframe.'
+    with st.spinner("Waiting for LLM"):
+        code = Complete('mistral-large', prompt)
+    execution_code = extract_python_code(code)
+```
+
+### 7. Output Display
+
+- **Code and Plot Display**: Displays the generated Python code in one column and executes it to render the plot in another, providing a comprehensive interface that showcases both the underlying code and its visual output.
+
+```PYTHON
+  with col1:
+        st.subheader('This is the executed code:')
+        st.code(execution_code, language="python", line_numbers=False)
+    with col2:
+        with st.spinner("Plotting ..."):
+            exec(execution_code)
+```
+
+Once you have assembled all the code, you can proceed to deploy the app
+
+![Deploy App](assets/visualize_data/streamlit_1.png)
+
+Additionally, the app has access to the views that we have created.
+
+![views](assets/visualize_data/streamlit_2.png)
+
+For testing purposes, enter the following question: `Create a bar chart for the top ten months with the highest number of EINs` using the **'SEC_FILINGS_INDEX_VIEW'** and the **Matplotlib library** and then click **Visualize**.
+![Question](assets/visualize_data/streamlit_3.png)
+
+After couple of seconds, the app will respond with: 
+
+![respond](assets/visualize_data/streamlit_4.png)
+
+#### Here is a list of potential questions that you may ask the application
+
+- `Transform Value to number and Give me the top ten year bar chart with most value` using  database `FINANCIAL__ECONOMIC_ESSENTIALS`, schema `CYBERSYN`, table `BANK_FOR_INTERNATIONAL_SETTLEMENTS_TIMESERIES` and `ploty` lib
+
+![question1](assets/visualize_data/question_1.png)
+
+- `Give me a list of all unique company names` using  database `FINANCIAL__ECONOMIC_ESSENTIALS`, schema `CYBERSYN`, table `COMPANY_INDEX`  and `ploty` lib
+
+![question2](assets/visualize_data/question_2.png)
+
+
+- `Transform value to number, Extract the year and filter by 2024 , Select quote_currency_id and value,  Aggregate and plot the result` using  database `FINANCIAL__ECONOMIC_ESSENTIALS`, schema `CYBERSYN`, table `FX_RATE_TIMESERIES` and `ploty` lib
+
+![question3](assets/visualize_data/question_3.png)
+
 ## Conclusion & Next Steps
 
 Duration: 2

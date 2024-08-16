@@ -1,24 +1,32 @@
 # Make sure to add all requirements to Streamlit in Snowflake via the package selection!
 # snowflake-ml-python, plotly, matplotlib, seaborn
-# Import python packages
+# Import necessary packages for the Streamlit app and Snowflake integration
 import streamlit as st
-st.set_option('deprecation.showPyplotGlobalUse', False)
-st.set_page_config(layout="wide")
 import re
 from snowflake.snowpark import functions as F
 from snowflake.core import Root
 from snowflake.cortex import Complete
 from snowflake.snowpark.context import get_active_session
+
+# Set global options and page configuration for Streamlit
+st.set_option('deprecation.showPyplotGlobalUse', False)
+st.set_page_config(layout="wide") # Set the layout of the page to wide mode
+
+# Initialize session from Snowflake to perform database operations
 session = get_active_session()
 
+# Streamlit application title
 st.title("Visualize your data! :brain:")
 
 # Create DataFrame and retrieve column names
 with st.sidebar:
+    # SQL query to list databases and select one through a dropdown
     databases = session.sql("SHOW DATABASES in ACCOUNT").select('"name"')
     database = st.selectbox('Select Database:', databases)
+    # SQL query to list schemas in the selected database and select one, excluding 'INFORMATION_SCHEMA'
     schemas = session.sql(f"SHOW SCHEMAS in DATABASE {database}").select('"name"').filter(F.col('"name"') != 'INFORMATION_SCHEMA')
     schema = st.selectbox('Select Schema:', schemas)
+    # SQL query to list views in the selected schema and database, and select one through a dropdown
     views = session.sql(f"SHOW VIEWS in SCHEMA {database}.{schema}").select('"name"')
     table = st.selectbox('Select VIEW:', views)
     rows_to_plot = st.number_input('Rows to plot', min_value=1, max_value=10000, value=1000)
