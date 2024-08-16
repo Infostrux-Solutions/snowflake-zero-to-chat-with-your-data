@@ -44,7 +44,7 @@ Each of you should have received a number when you arrived to allow you to acces
 
 Open a browser window and enter the URL:
 
-> https://app.snowflake.com/umnxxyz/chat_with_your_data
+> https://app.snowflake.com/umnxxyz/lab_data_chat
 
 > IMPORTANT: As soon as you log in, you will be prompted to change your password. Your new password must be at least 8 characters long and contain at least 1 number, 1 uppercase and 1 lowercase letter.
 > 
@@ -902,11 +902,11 @@ Run the app!
 
 ## Visualizate your data.
 
-To facilitate data visualization, we are utilizing the inherent integration capabilities between Snowflake and Streamlit.
+To facilitate data visualization, we are utilizing the inherent integration capabilities between Snowflake and Streamlit. We will use Snowflake's Cortex function, COMPLETE (https://docs.snowflake.com/en/sql-reference/functions/complete-snowflake-cortex), to access the pre-trained mistral-large LLM, which will generate the Python code for us. Streamlit will then execute this code to render the graphs. This process requires no development effort, allowing us to create variations of the graph on the fly without needing technical expertise.
 
 ### Build the streamlit app
 
-This detailed documentation should help you understand each part of your Streamlit app involving data manipulation, interactive input, and visualization within a Snowflake environment.
+Let's walk through the Streamlit app code involving data manipulation...
 
 ### 1. Import the necesary libs to create the streamlit app
  ```PYTHON 
@@ -970,7 +970,7 @@ st.dataframe(df.head())
 
 ```PYTHON
 library = st.selectbox('Library', ['matplotlib','seaborn','plotly','wordcloud'])
-prompt = st.text_area('What do you want to visualize?')
+ll_prompt = st.text_area('What do you want to visualize?')
 ```
 
 ### 6. Visualization Execution
@@ -980,13 +980,13 @@ prompt = st.text_area('What do you want to visualize?')
 
 ```PYTHON
 if st.button('Visualize'):
-    prompt = f'You are a python developer that writes code using {library} and streamlit to visualize data. \
+    user_prompt = f'You are a python developer that writes code using {library} and streamlit to visualize data. \
     Your data input is a pandas dataframe that you can access with df. \
     The pandas dataframe has the following columns: {column_specifications}.\
-    {prompt}\
+    {ll_prompt}\
     If you are asked to return a list, create a dataframe and use st.dataframe() to display the dataframe.'
     with st.spinner("Waiting for LLM"):
-        code = Complete('mistral-large', prompt)
+        code = Complete('mistral-large', user_prompt)
     execution_code = extract_python_code(code)
 ```
 
@@ -1011,7 +1011,7 @@ Additionally, the app has access to the views that we have created.
 
 ![views](assets/visualize_data/streamlit_2.png)
 
-For testing purposes, enter the following question: `Create a bar chart for the top ten months with the highest number of EINs` using the **'SEC_FILINGS_INDEX_VIEW'** and the **Matplotlib library** and then click **Visualize**.
+For testing purposes, enter the following question: `Create a bar chart for the top ten months with the highest number of EINs` using database `CHAT_WITH_YOUR_DATA`, schema `WORKSPACE_<NUMBER>`, table `SEC_FILINGS_INDEX_VIEW` and the library `Matplotlib` and then click `Visualize`.
 ![Question](assets/visualize_data/streamlit_3.png)
 
 After couple of seconds, the app will respond with: 

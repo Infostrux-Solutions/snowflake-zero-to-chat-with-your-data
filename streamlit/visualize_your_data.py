@@ -1,5 +1,5 @@
 # Make sure to add all requirements to Streamlit in Snowflake via the package selection!
-# snowflake-ml-python, plotly, matplotlib, seaborn
+# snowflake-ml-python, plotly, matplotlib, seaborn, snowflake.core
 # Import necessary packages for the Streamlit app and Snowflake integration
 import streamlit as st
 import re
@@ -40,7 +40,7 @@ st.dataframe(df.head())
     
 # Defining the library & prompt
 library = st.selectbox('Library', ['matplotlib','seaborn','plotly','wordcloud'])
-prompt = st.text_area('What do you want to visualize?')
+ll_prompt = st.text_area('What do you want to visualize?')
 
 # Function that extracts the actual Python code returned by mistral
 def extract_python_code(text):
@@ -57,18 +57,24 @@ def extract_python_code(text):
         return "No Python code found in the input string."
 
 if st.button('Visualize'):
-    prompt = f'You are a python developer that writes code using {library} and streamlit to visualize data. \
+    user_prompt = f'You are a python developer that writes code using {library} and streamlit to visualize data. \
     Your data input is a pandas dataframe that you can access with df. \
     The pandas dataframe has the following columns: {column_specifications}.\
-    {prompt}\
+    {ll_prompt}\
     If you are asked to return a list, create a dataframe and use st.dataframe() to display the dataframe.'
     with st.spinner("Waiting for LLM"):
-        code = Complete('mistral-large', prompt)
+        code = Complete('mistral-large',user_prompt)
     execution_code = extract_python_code(code)
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader('This is the executed code:')
-        st.code(execution_code, language="python", line_numbers=False)
+        try:
+            st.subheader('This is the executed code:')
+            st.code(execution_code, language="python", line_numbers=False)
+        except:
+            st.subheader("Please reformulate the question or choose other lib to plot it")
     with col2:
-        with st.spinner("Plotting ..."):
-            exec(execution_code)
+        try: 
+            with st.spinner("Plotting ..."):
+                exec(execution_code)
+        except:
+            st.subheader("Please reformulate the question or choose other lib to plot it")
