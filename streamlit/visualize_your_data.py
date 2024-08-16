@@ -1,5 +1,5 @@
 # Make sure to add all requirements to Streamlit in Snowflake via the package selection!
-# snowflake-ml-python, plotly, matplotlib, seaborn, snowflake.core
+# snowflake-ml-python, plotly, matplotlib, seaborn and snowflake.
 # Import necessary packages for the Streamlit app and Snowflake integration
 import streamlit as st
 import re
