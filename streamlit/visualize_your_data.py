@@ -67,14 +67,9 @@ if st.button('Visualize'):
     execution_code = extract_python_code(code)
     col1, col2 = st.columns(2)
     with col1:
-        try:
             st.subheader('This is the executed code:')
             st.code(execution_code, language="python", line_numbers=False)
-        except:
-            st.subheader("Please reformulate the question or choose other lib to plot it")
     with col2:
-        try: 
             with st.spinner("Plotting ..."):
                 exec(execution_code)
-        except:
             st.subheader("Please reformulate the question or choose other lib to plot it")
