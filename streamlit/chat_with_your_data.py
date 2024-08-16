@@ -91,14 +91,14 @@ def main():
 
                 message_placeholder.markdown(res_text)
 
-                message = {"role": "assistant", "content": response}
+                message = {"role": "assistant", "content": res_text}
                 # Parse the response for a SQL query and execute if available
                 sql_match = re.search(r"```sql\n(.*)\n```", res_text.replace(";", ""), re.DOTALL)
                 if sql_match:
                     sql = sql_match.group(1)
                     message["results"] = session.sql(sql)
                     st.dataframe(message["results"])
-                st.session_state.messages.append({"role": "assistant", "content": res_text})
+                st.session_state.messages.append(message)
 
 
 def config_options():
@@ -165,14 +165,8 @@ def create_prompt(myquestion):
     if st.session_state.use_chat_history:
         chat_history = get_chat_history()
 
-        if chat_history != []: #There is chat_history, so not first question
-            question_summary = summarize_question_with_history(chat_history, myquestion)
-            # prompt_context =  get_similar_chunks(question_summary)
-        # else:
-        # prompt_context = get_similar_chunks(myquestion) #First question when using history
-    else:
-        # prompt_context = get_similar_chunks(myquestion)
-        chat_history = ""
+        # if chat_history != []: #There is chat_history, so not first question
+        #     question_summary = summarize_question_with_history(chat_history, myquestion)
 
     # @TODO: Leverage the <context> reference below
     prompt = f"""
