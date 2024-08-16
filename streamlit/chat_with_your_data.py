@@ -10,7 +10,7 @@ session = get_active_session() # Get the current credentials
 ############
 
 # Sliding window for the number of last conversations to remember
-SLIDE_WINDOW = 7
+SLIDE_WINDOW = 20
 pd.set_option("max_colwidth",None)
 
 SCHEMA_PATH = 'CHAT_WITH_YOUR_DATA.WORKSPACE_0'
@@ -105,9 +105,9 @@ def config_options():
     st.sidebar.selectbox(
         'Select your model:',
         (
+            'mistral-large',
             'mixtral-8x7b',
             'snowflake-arctic',
-            'mistral-large',
             'llama3-8b',
             'llama3-70b',
             'reka-flash',
