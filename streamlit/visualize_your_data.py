@@ -40,7 +40,7 @@ st.dataframe(df.head())
     
 # Defining the library & prompt
 library = st.selectbox('Library', ['matplotlib','seaborn','plotly','wordcloud'])
-ll_prompt = st.text_area('What do you want to visualize?')
+user_prompt = st.text_area('What do you want to visualize?')
 
 # Function that extracts the actual Python code returned by mistral
 def extract_python_code(text):
@@ -57,13 +57,13 @@ def extract_python_code(text):
         return "No Python code found in the input string."
 
 if st.button('Visualize'):
-    user_prompt = f'You are a python developer that writes code using {library} and streamlit to visualize data. \
+    llm_prompt = f'You are a python developer that writes code using {library} and streamlit to visualize data. \
     Your data input is a pandas dataframe that you can access with df. \
     The pandas dataframe has the following columns: {column_specifications}.\
-    {ll_prompt}\
+    {user_prompt}\
     If you are asked to return a list, create a dataframe and use st.dataframe() to display the dataframe.'
     with st.spinner("Waiting for LLM"):
-        code = Complete('mistral-large',user_prompt)
+        code = Complete('mistral-large',llm_prompt)
     execution_code = extract_python_code(code)
     col1, col2 = st.columns(2)
     with col1:
