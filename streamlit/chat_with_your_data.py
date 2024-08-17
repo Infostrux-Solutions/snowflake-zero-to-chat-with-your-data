@@ -57,8 +57,36 @@ Now to get started, please briefly introduce yourself, describe the table at a h
 Then provide 3 example questions using bullet points.
 """
 
-def main():
+def handle_user_question(question):
+    # Add user message to chat history
+    st.session_state.messages.append({"role": "user", "content": question})
+    # Display user message in chat message container
+    with st.chat_message("user"):
+        st.markdown(question)
 
+    # Display assistant response in chat message container
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+
+        question = question.replace("'", "")
+
+        with st.spinner(f"{st.session_state.model_name} thinking..."):
+            response = complete(question)
+            res_text = response[0].RESPONSE
+
+            message_placeholder.markdown(res_text)
+
+            message = {"role": "assistant", "content": res_text}
+            # Parse the response for a SQL query and execute if available
+            sql_match = re.search(r"```sql\n(.*)\n```", res_text.replace(";", ""), re.DOTALL)
+            if sql_match:
+                sql = sql_match.group(1)
+                message["results"] = session.sql(sql)
+                st.dataframe(message["results"])
+
+            st.session_state.messages.append(message)
+
+def display_chat_and_input():
     st.title(f":speech_balloon: Chat with Your Data")
 
     config_options()
@@ -75,31 +103,9 @@ def main():
 
     # Accept user input
     if question := st.chat_input("What do you want to know about your data?"):
-        # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": question})
-        # Display user message in chat message container
-        with st.chat_message("user"):
-            st.markdown(question)
-        # Display assistant response in chat message container
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
+        handle_user_question(question)
 
-            question = question.replace("'","")
 
-            with st.spinner(f"{st.session_state.model_name} thinking..."):
-                response = complete(question)
-                res_text = response[0].RESPONSE
-
-                message_placeholder.markdown(res_text)
-
-                message = {"role": "assistant", "content": res_text}
-                # Parse the response for a SQL query and execute if available
-                sql_match = re.search(r"```sql\n(.*)\n```", res_text.replace(";", ""), re.DOTALL)
-                if sql_match:
-                    sql = sql_match.group(1)
-                    message["results"] = session.sql(sql)
-                    st.dataframe(message["results"])
-                st.session_state.messages.append(message)
 
 
 def config_options():
@@ -166,8 +172,6 @@ def create_prompt(myquestion):
     if st.session_state.use_chat_history:
         chat_history = get_chat_history()
 
-        # if chat_history != []: #There is chat_history, so not first question
-        #     question_summary = summarize_question_with_history(chat_history, myquestion)
 
     # @TODO: Leverage the <context> reference below
     prompt = f"""
@@ -207,37 +211,6 @@ def get_chat_history():
 
     return chat_history
 
-def summarize_question_with_history(chat_history, question):
-    # To get the right context, use the LLM to first summarize the previous conversation
-    # This will be used to get embeddings and find similar chunks in the docs for context
-
-    prompt = f"""
-        Based on the chat history below and the question, generate a query that extend the question
-        with the chat history provided. The query should be in natual language. 
-        Answer with only the query. Do not add any explanation.
-        
-        <chat_history>
-        {chat_history}
-        </chat_history>
-        <question>
-        {question}
-        </question>
-        """
-
-    cmd = """
-            select snowflake.cortex.complete(?, ?) as response
-          """
-    df_response = session.sql(cmd, params=[st.session_state.model_name, prompt]).collect()
-    summary = df_response[0].RESPONSE
-
-    if st.session_state.debug:
-        st.sidebar.text("Summary used for prompt context:")
-        st.sidebar.caption(summary)
-
-    summary = summary.replace("'", "")
-
-    return summary
-
 @st.cache_data(show_spinner="Loading chatbot context...")
 def get_table_context(table_name: str, table_description: str, metadata_query: str = None):
     table = table_name.split(".")
@@ -272,4 +245,4 @@ Here are the columns of the {'.'.join(table)}
     return context
 
 if __name__ == "__main__":
-    main()
+    display_chat_and_input()
