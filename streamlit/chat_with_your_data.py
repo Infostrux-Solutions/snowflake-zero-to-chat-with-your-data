@@ -12,10 +12,9 @@ session = get_active_session() # Get the current credentials
 # Sliding window for the number of last conversations to remember
 SLIDE_WINDOW = 20
 pd.set_option("max_colwidth",None)
-database = session.sql("SELECT CURRENT_ROLE() AS N").select("N").collect()
-number = ''.join(filter(str.isdigit, database[0][0]))
+database = session.sql("SELECT CURRENT_SCHEMA() AS schema").select("schema").collect()
 
-SCHEMA_PATH = f'CHAT_WITH_YOUR_DATA.WORKSPACE_{database[0][0]}'
+SCHEMA_PATH = f'CHAT_WITH_YOUR_DATA.{database[0][0]}'
 QUALIFIED_TABLE_NAME = f"{SCHEMA_PATH}.FINANCIAL_ENTITY_ANNUAL_TIME_SERIES"
 METADATA_QUERY = f"SELECT VARIABLE_NAME, DEFINITION FROM {SCHEMA_PATH}.FINANCIAL_ENTITY_ATTRIBUTES_LIMITED;"
 
