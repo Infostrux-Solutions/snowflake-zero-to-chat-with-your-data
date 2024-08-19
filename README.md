@@ -1,5 +1,8 @@
 # Snowflake Hands-on Lab - Zero to Chat with Your Data in 120 Minutes #
 
+## License
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
 ## Lab Setup ##
 * Log in to https://app.snowflake.com/umnxxyz/lab_data_chat
 * Run `worksheets/SETUP_BASE` SQL script
