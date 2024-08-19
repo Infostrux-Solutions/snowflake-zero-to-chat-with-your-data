@@ -1106,6 +1106,100 @@ def get_prompts():
     return prompts
 ```
 
+### Potential questions that you might want to ask your data
+
+- `Can you show me the top 10 financial entities with the highest Total Assets value for the year 2020?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_01.png" alt="Description" width="500">
+</ul>
+
+- `List the top 10 financial entities that have a Total Securities value below 5000000 for the year 1995.`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_02.png" alt="Description" width="500">
+</ul>
+
+- `What are the cities with the highest average Total deposits for the year 2000?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_03.png" alt="Description" width="500">
+</ul>
+
+- `What are the top 10 financial entities with the highest total assets?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_04.png" alt="Description" width="500">
+</ul>
+
+- `Show the number of real estate loans for the city of New York between 2010 and 2020.`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_05.png" alt="Description" width="500">
+</ul>
+
+- `What is the percentage of insured deposits for the financial entity named 'Bank of America'?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_06.png" alt="Description" width="500">
+</ul>
+
+- `What are the total assets of the financial entity named 'Bank of America'in 2020?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_07.png" alt="Description" width="500">
+</ul>
+
+- `List all financial entities named like 'Bank of America' with the total assets for each in 2020`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_08.png" alt="Description" width="500">
+</ul>
+
+- `Which banks have the highest percentage of insured deposits in California?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_09.png" alt="Description" width="500">
+</ul>
+
+- `What is the total amount of real estate loans for Sacramento in a 2021?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_10.png" alt="Description" width="500">
+</ul>
+
+- `What are the names of the top 10 banks with the highest Total Assets?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_11.png" alt="Description" width="500">
+</ul>
+
+- `Show me the Total Securities for all banks in New York.`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_12.png" alt="Description" width="500">
+</ul>
+
+- `What is the average percentage of Insured (Estimated) for all banks in California?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_13.png" alt="Description" width="500">
+</ul>
+
+- `List the financial entities in New York`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_14.png" alt="Description" width="500">
+</ul>
+
+- `List the bank has the most assets?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_15.png" alt="Description" width="500">
+</ul>
+
+### Sample with follow-up questions
+
+- `List the financial entities with their total securities values that have a total securities value below 5000000 for the year 1995`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_16.png" alt="Description" width="500">
+</ul>
+
+- `Sort the last result by total securities value in descending order`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_17.png" alt="Description" width="500">
+</ul>
+
+- `What are the top 5 in this list by Total Securities value?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_18.png" alt="Description" width="500">
+</ul>
+
 ## Visualizate your data.
 
 To facilitate data visualization, we are utilizing the inherent integration capabilities between Snowflake and Streamlit. We will use Snowflake's Cortex function, COMPLETE (https://docs.snowflake.com/en/sql-reference/functions/complete-snowflake-cortex), to access the pre-trained mistral-large LLM, which will generate the Python code for us. Streamlit will then execute this code to render the graphs. This process requires no development effort, allowing us to create variations of the graph on the fly without needing technical expertise.
