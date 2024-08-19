@@ -99,7 +99,6 @@ def config_options():
     # For educational purposes. Users can check the difference when using memory or not
     st.sidebar.checkbox('Do you want that I remember the chat history?', key="use_chat_history", value = True)
 
-    st.sidebar.checkbox('Debug: Click to see summary generated of previous conversation', key="debug", value = True)
     st.sidebar.button("Start Over", key="clear_conversation")
     st.sidebar.expander("Session State").write(st.session_state)
 
