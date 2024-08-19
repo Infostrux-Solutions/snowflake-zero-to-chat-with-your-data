@@ -133,13 +133,12 @@ def complete(myquestion):
 
 def create_prompt(myquestion):
 
-    question_summary = ''
     if st.session_state.use_chat_history:
         chat_history = get_chat_history()
 
 
     # @TODO: Leverage the <context> reference below
-    return prompts["history"].format(chat_history=chat_history, question_summary=question_summary, myquestion=myquestion)
+    return prompts["history"].format(chat_history=chat_history, myquestion=myquestion)
 
 def get_chat_history():
     #Get the history from the st.session_stage.messages according to the slide window parameter
@@ -221,8 +220,7 @@ def get_prompts():
             Then provide 3 example questions using bullet points.
         """,
         "history": """
-           You are an expert chat assistance that extracts information from the CONTEXT provided
-           between <context> and </context> tags.
+           You are an expert chat assistance that extracts information.
            You offer a chat experience considering the information included in the CHAT HISTORY
            provided between <chat_history> and </chat_history> tags..
            When answering the question contained between <question> and </question> tags
@@ -235,9 +233,6 @@ def get_prompts():
            <chat_history>
            {chat_history}
            </chat_history>
-           <context>
-           {question_summary}
-           </context>
            <question>  
            {myquestion}
            </question>
