@@ -930,10 +930,13 @@ If the assistant's response contains a SQL query, it executes the query and disp
 
 ```PYTHON
 def handle_user_question(question):
+    # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": question})
+    # Display user message in chat message container
     with st.chat_message("user"):
         st.markdown(question)
 
+    # Display assistant response in chat message container
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
 
@@ -946,11 +949,16 @@ def handle_user_question(question):
             message_placeholder.markdown(res_text)
 
             message = {"role": "assistant", "content": res_text}
+            # Parse the response for a SQL query and execute if available
             sql_match = re.search(r"```sql\n(.*)\n```", res_text.replace(";", ""), re.DOTALL)
             if sql_match:
                 sql = sql_match.group(1)
-                message["results"] = session.sql(sql)
-                st.dataframe(message["results"])
+                try: 
+                    message["results"] = session.sql(sql)
+                    st.dataframe(message["results"])
+                except:
+                    st.markdown("Looks like Cortex is having a '404 Brain Not Found' moment 🤖. Let's try that again!") 
+
 
             st.session_state.messages.append(message)
 ```
@@ -1013,7 +1021,7 @@ def get_system_prompt():
         table_description=TABLE_DESCRIPTION,
         metadata_query=METADATA_QUERY
     )
-    return prompts["gen_sql"].format(context=table_context)
+    return prompts["system"].format(context=table_context)
 ```
 
 ### 7. Completing User Queries
@@ -1028,7 +1036,31 @@ def complete(myquestion):
     return df_response
 ```
 
-### 8. Getting Table Context
+### 8. Creating the User Query Prompt and Retrieving Chat History
+
+- Creates a prompt for the Snowflake Cortex model based on the user’s question and chat history.
+
+```PYTHON
+def create_prompt(myquestion):
+
+    if st.session_state.use_chat_history:
+        chat_history = get_chat_history()
+
+    return prompts["history"].format(chat_history=chat_history, myquestion=myquestion)
+```
+- Retrieves the recent chat history based on the sliding window (SLIDE_WINDOW), which is used to generate the prompt context.
+
+```PYTHON
+def get_chat_history():
+    chat_history = []
+    start_index = max(0, len(st.session_state.messages) - SLIDE_WINDOW)
+    for i in range (start_index , len(st.session_state.messages) -1):
+        chat_history.append(st.session_state.messages[i])
+    return chat_history
+
+```
+
+### 9. Getting Table Context
 
 Retrieves metadata and context for the specified table, which is used in generating the system prompt.
 
@@ -1057,14 +1089,14 @@ Here are the columns of the {'.'.join(table)}
     return context
 ```
 
-### 9. Defining Prompts
+### 10. Defining Prompts
 
 - Consolidates all the prompt templates into a single function that returns a dictionary of prompts. This makes it easier to manage and update the prompts.
 
 ```PYTHON
 def get_prompts():
     prompts = {
-        "gen_sql": """
+        "system": """
             You will be acting as an AI Snowflake SQL Expert named Frosty...
         """,
         "history": """

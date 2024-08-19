@@ -98,7 +98,6 @@ def config_options():
 
     # For educational purposes. Users can check the difference when using memory or not
     st.sidebar.checkbox('Do you want that I remember the chat history?', key="use_chat_history", value = True)
-
     st.sidebar.button("Start Over", key="clear_conversation")
     st.sidebar.expander("Session State").write(st.session_state)
 
@@ -136,8 +135,6 @@ def create_prompt(myquestion):
     if st.session_state.use_chat_history:
         chat_history = get_chat_history()
 
-
-    # @TODO: Leverage the <context> reference below
     return prompts["history"].format(chat_history=chat_history, myquestion=myquestion)
 
 def get_chat_history():
