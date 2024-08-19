@@ -71,9 +71,6 @@ def display_chat_and_input():
     if question := st.chat_input("What do you want to know about your data?"):
         handle_user_question(question)
 
-
-
-
 def config_options():
     st.sidebar.selectbox(
         'Select your model:',
