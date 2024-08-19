@@ -896,9 +896,183 @@ By default, only the Streamlit editor and preview panes are displayed. To change
 
 Add snowpark-ml-python package from the packages dropdown in the code editor section
 
+### Build the streamlit app to chat with your data 
 
-Copy the code below into the code editor section
-Run the app!
+Let's walk through the Streamlit app code that integrates with Snowflake and utilizes Cortex for dynamic SQL generation... 
+
+### 1. Imports, Defaults and Configuration
+
+- **SLIDE_WINDOW**: sets the number of last conversations to remember.
+- **pd.set_option**: configures Pandas to show full content in columns without truncation.
+- **database**: extracts digits from the user's name (st.experimental_user.user_name) to generate a workspace identifier.
+- **SCHEMA_PATH, QUALIFIED_TABLE_NAME, and METADATA_QUERY**: define paths and queries based on the workspace, which are used to interact with the Snowflake database.
+```PYTHON
+import re
+import pandas as pd
+import streamlit as st
+from snowflake.snowpark.context import get_active_session
+session = get_active_session() # Get the current credentials
+
+SLIDE_WINDOW = 20
+pd.set_option("max_colwidth",None)
+database =  ''.join(filter(str.isdigit, st.experimental_user.user_name)) or '0'
+
+SCHEMA_PATH = f'CHAT_WITH_YOUR_DATA.WORKSPACE_{database}'
+QUALIFIED_TABLE_NAME = f"{SCHEMA_PATH}.FINANCIAL_ENTITY_ANNUAL_TIME_SERIES"
+METADATA_QUERY = f"SELECT VARIABLE_NAME, DEFINITION FROM {SCHEMA_PATH}.FINANCIAL_ENTITY_ATTRIBUTES_LIMITED;"
+```
+
+### 2. Handling User Questions
+
+- Manages the interaction with the user when they ask a question.
+- Updates the session state with the user's message and the assistant's response.
+If the assistant's response contains a SQL query, it executes the query and displays the results.
+
+```PYTHON
+def handle_user_question(question):
+    st.session_state.messages.append({"role": "user", "content": question})
+    with st.chat_message("user"):
+        st.markdown(question)
+
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+
+        question = question.replace("'", "")
+
+        with st.spinner(f"{st.session_state.model_name} thinking..."):
+            response = complete(question)
+            res_text = response[0].RESPONSE
+
+            message_placeholder.markdown(res_text)
+
+            message = {"role": "assistant", "content": res_text}
+            sql_match = re.search(r"```sql\n(.*)\n```", res_text.replace(";", ""), re.DOTALL)
+            if sql_match:
+                sql = sql_match.group(1)
+                message["results"] = session.sql(sql)
+                st.dataframe(message["results"])
+
+            st.session_state.messages.append(message)
+```
+### 3. Displaying Chat and Handling Input
+
+- Displays the chat UI, including the chat history and any results from previous queries.
+- Handles user input through a chat interface, passing it to handle_user_question for processing.
+
+```PYTHON
+def display_chat_and_input():
+    st.title(f":speech_balloon: Chat with Your Data")
+    config_options()
+    init_messages()
+
+    for message in st.session_state.messages:
+        if message["role"] == "system":
+            continue
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+            if "results" in message:
+                st.dataframe(message["results"])
+
+    if question := st.chat_input("What do you want to know about your data?"):
+        handle_user_question(question)
+```
+
+### 4. Configuration Options
+
+- Provides configuration options in the sidebar for selecting the model, toggling chat history, debugging, and resetting the conversation.
+
+```PYTHON
+def config_options():
+    st.sidebar.selectbox('Select your model:', [...], key="model_name")
+    st.sidebar.checkbox('Do you want that I remember the chat history?', key="use_chat_history", value=True)
+    st.sidebar.checkbox('Debug: Click to see summary generated of previous conversation', key="debug", value=True)
+    st.sidebar.button("Start Over", key="clear_conversation")
+    st.sidebar.expander("Session State").write(st.session_state)
+```
+
+### 5 Initializing Messages
+
+- Initializes the chat history with a system message when the conversation is reset or on the first run.
+
+```PYTHON
+def init_messages():
+    if st.session_state.clear_conversation or "messages" not in st.session_state:
+        system_prompt = get_system_prompt()
+        st.session_state.messages = [{"role": "system", "content": system_prompt}]
+        st.markdown(complete(system_prompt)[0].RESPONSE)
+```
+
+### 6. Generating Prompts
+
+- Generates the system prompt using the table context and predefined prompts, which is used to set the initial context for the chat.
+
+```PYTHON
+def get_system_prompt():
+    table_context = get_table_context(
+        table_name=QUALIFIED_TABLE_NAME,
+        table_description=TABLE_DESCRIPTION,
+        metadata_query=METADATA_QUERY
+    )
+    return prompts["gen_sql"].format(context=table_context)
+```
+
+### 7. Completing User Queries
+
+- Sends the user’s question to the Snowflake Cortex model to generate a response based on the prompt.
+
+```PYTHON
+def complete(myquestion):
+    prompt = create_prompt(myquestion)
+    cmd = 'select snowflake.cortex.complete(?, ?) as response'
+    df_response = session.sql(cmd, params=[st.session_state.model_name, prompt]).collect()
+    return df_response
+```
+
+### 8. Getting Table Context
+
+Retrieves metadata and context for the specified table, which is used in generating the system prompt.
+
+```PYTHON
+@st.cache_data(show_spinner="Loading chatbot context...")
+def get_table_context(table_name: str, table_description: str, metadata_query: str = None):
+    table = table_name.split(".")
+    columns = session.sql(f"""
+        SELECT COLUMN_NAME, DATA_TYPE FROM {table[0].upper()}.INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = '{table[1].upper()}' AND TABLE_NAME = '{table[2].upper()}'
+        """).to_pandas()
+    columns = "\n".join(
+        [f"- **{columns['COLUMN_NAME'][i]}**: {columns['DATA_TYPE'][i]}" for i in range(len(columns["COLUMN_NAME"]))])
+    
+    context = f"""
+Here is the table name <tableName> {'.'.join(table)} </tableName>
+<tableDescription>{table_description}</tableDescription>
+Here are the columns of the {'.'.join(table)}
+<columns>\n\n{columns}\n\n</columns>
+    """
+    
+    if metadata_query:
+        metadata = session.sql(metadata_query).to_pandas()
+        metadata = "\n".join([f"- **{metadata['VARIABLE_NAME'][i]}**: {metadata['DEFINITION'][i]}" for i in range(len(metadata["VARIABLE_NAME"]))])
+        context = context + f"\n\nAvailable variables by VARIABLE_NAME:\n\n{metadata}"
+    return context
+```
+
+### 9. Defining Prompts
+
+- Consolidates all the prompt templates into a single function that returns a dictionary of prompts. This makes it easier to manage and update the prompts.
+
+```PYTHON
+def get_prompts():
+    prompts = {
+        "gen_sql": """
+            You will be acting as an AI Snowflake SQL Expert named Frosty...
+        """,
+        "history": """
+            You are an expert chat assistance that extracts information...
+        """
+    }
+    return prompts
+```
 
 ## Visualizate your data.
 
