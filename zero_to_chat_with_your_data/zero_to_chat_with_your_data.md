@@ -857,33 +857,6 @@ FROM company_metadata;
 
 <!-- ------------------------ -->
 
-## Working with Account Admin, & Account Usage
-
-Duration: 8
-
-#### Admin > Cost Management
-
-![account usage](assets/9Role_5.png)
-
-The **Cost Management** tab shows your usage of Snowflake credits, with filters by account and consumption types:
-- **Organization**: Credit usage across all the accounts in your organization.
-- **Compute**: Credits consumed by the virtual warehouses in the current account.
-- **Storage**: Average amount of data stored in all databases, internal stages, and Snowflake Failsafe in the current account for the past month.
-- **Data Transfer**: Average amount of data transferred out of the region (for the current account) into other regions for the past month.
-
-#### Admin > Security
-
-![account usage](assets/9Role_6.png)
-
-The **Security** tab contains network policies created for the Snowflake account. New network policies can be created by selecting “+ Network Policy” at the top right hand side of the page.
-
-#### Admin > Billing & Terms
-
-The **Billing & Terms** tab contains the payment method for the account:
-- If you are a Snowflake contract customer, the tab shows the name associated with your contract information.
-- If you are an on-demand Snowflake customer, the tab shows the credit card used to pay month-to-month, if one has been entered. If no credit card is on file, you can add one to continue using Snowflake when your trial ends.
-
-
 ## Creating the Chatbot Streamlit App ##
 
 We will build an LLM-powered chatbot named "Frosty" that performs data exploration and answers questions by writing and executing SQL queries on Snowflake data.
