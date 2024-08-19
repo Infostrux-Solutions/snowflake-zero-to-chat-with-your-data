@@ -118,7 +118,7 @@ def get_system_prompt():
         metadata_query=METADATA_QUERY
     )
 
-    return  prompts["gen_sql"].format(context=table_context)
+    return  prompts["system"].format(context=table_context)
 
 def complete(myquestion):
 
@@ -184,7 +184,7 @@ Here are the columns of the {'.'.join(table)}
 
 def get_prompts():
     prompts = {
-        "gen_sql": """
+        "system": """
             You will be acting as an AI Snowflake SQL Expert named Frosty.
             Your goal is to give correct, executable sql query to users.
             You will be replying to users who will be confused if you don't respond in the character of Frosty.
