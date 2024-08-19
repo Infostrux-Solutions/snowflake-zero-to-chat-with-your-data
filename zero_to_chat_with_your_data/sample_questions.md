@@ -24,3 +24,9 @@ What is the average percentage of Insured (Estimated) for all banks in Californi
 List the financial entities in New York
 Which bank has the most assets?
 ```
+Sample with follow-up questions:
+```text
+List the financial entities with their total securities values that have a total securities value below 5000000 for the year 1995
+Sort the last result by total securities value in descending order
+What are the top 5 in this list by Total Securities value?
+```

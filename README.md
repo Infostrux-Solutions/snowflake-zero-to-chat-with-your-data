@@ -26,7 +26,12 @@
 * When you reach the point of users running queries, share workshop assets
   * Switch role to `LAB_ADMIN`
   * Open the `ZERO_TO_CHAT_WITH_YOUR_DATA` worksheet
-    * Click `SHARE` and add the lab attendants with a `View results` permission
+    * Click `SHARE` and add all the lab users with a `View results` permission
+      > NOTE: You will not be able to share a worksheet with a lab user who has not logged in
+* When you reach the point of presenting a Streamlit app, share it to the `PUBLIC` role
+  * Switch role to `LAB_ADMIN`
+  * Open the Streamlit app
+    * Click `SHARE` and it with the `PUBLIC` role with `View only` permission
 
 ## Teardown ##
 * Run `worksheets/TEARDOWN_USERS` SQL script
