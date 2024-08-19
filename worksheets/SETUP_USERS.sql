@@ -25,7 +25,7 @@ BEGIN
                 INITIALLY_SUSPENDED = TRUE
 --                 WAREHOUSE_SIZE = 'LARGE'
 --                 WAREHOUSE_TYPE = 'SNOWPARK-OPTIMIZED'
---                 AUTO_SUSPEND = 60
+                AUTO_SUSPEND = 60
             ;
 
             USE ROLE SECURITYADMIN;
