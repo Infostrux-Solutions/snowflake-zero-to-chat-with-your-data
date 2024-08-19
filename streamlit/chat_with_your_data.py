@@ -47,8 +47,12 @@ def handle_user_question(question):
             sql_match = re.search(r"```sql\n(.*)\n```", res_text.replace(";", ""), re.DOTALL)
             if sql_match:
                 sql = sql_match.group(1)
-                message["results"] = session.sql(sql)
-                st.dataframe(message["results"])
+                try: 
+                    message["results"] = session.sql(sql)
+                    st.dataframe(message["results"])
+                except:
+                    st.markdown("Looks like Cortex is having a '404 Brain Not Found' moment 🤖. Let's try that again!") 
+
 
             st.session_state.messages.append(message)
 
