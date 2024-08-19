@@ -12,8 +12,9 @@ session = get_active_session() # Get the current credentials
 # Sliding window for the number of last conversations to remember
 SLIDE_WINDOW = 20
 pd.set_option("max_colwidth",None)
+database =  ''.join(filter(str.isdigit, st.experimental_user.user_name)) or '0'
 
-SCHEMA_PATH = 'CHAT_WITH_YOUR_DATA.WORKSPACE_0'
+SCHEMA_PATH = f'CHAT_WITH_YOUR_DATA.WORKSPACE_{database}'
 QUALIFIED_TABLE_NAME = f"{SCHEMA_PATH}.FINANCIAL_ENTITY_ANNUAL_TIME_SERIES"
 METADATA_QUERY = f"SELECT VARIABLE_NAME, DEFINITION FROM {SCHEMA_PATH}.FINANCIAL_ENTITY_ATTRIBUTES_LIMITED;"
 
@@ -22,42 +23,40 @@ This table has various metrics for financial entities (also referred to as banks
 The user may describe the entities interchangeably as banks, financial institutions, or financial entities.
 """
 
-GEN_SQL = """
-You will be acting as an AI Snowflake SQL Expert named Frosty.
-Your goal is to give correct, executable sql query to users.
-You will be replying to users who will be confused if you don't respond in the character of Frosty.
-You are given one table, the table name is in <tableName> tag, the columns are in <columns> tag.
-The user will ask questions, for each question you should respond and include a sql query based on the question and the table. 
+def handle_user_question(question):
+    # Add user message to chat history
+    st.session_state.messages.append({"role": "user", "content": question})
+    # Display user message in chat message container
+    with st.chat_message("user"):
+        st.markdown(question)
 
-{context}
+    # Display assistant response in chat message container
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
 
-Here are 6 critical rules for the interaction you must abide:
-<rules>
-1. You MUST MUST wrap the generated sql code within ``` sql code markdown in this format e.g
-```sql
-(select 1) union (select 2)
-```
-2. If I don't tell you to find a limited set of results in the sql query or question, you MUST limit the number of responses to 10.
-3. Text / string where clauses must be fuzzy match e.g ilike %keyword%
-4. Make sure to generate a single snowflake sql code, not multiple. 
-5. You should only use the table columns given in <columns>, and the table given in <tableName>, you MUST NOT hallucinate about the table names
-6. DO NOT put numerical at the very front of sql variable.
-</rules>
+        question = question.replace("'", "")
 
-Don't forget to use "ilike %keyword%" for fuzzy match queries (especially for variable_name column)
-and wrap the generated sql code with ``` sql code markdown in this format e.g:
-```sql
-(select 1) union (select 2)
-```
+        with st.spinner(f"{st.session_state.model_name} thinking..."):
+            response = complete(question)
+            res_text = response[0].RESPONSE
 
-For each question from the user, make sure to include a query in your response.
+            message_placeholder.markdown(res_text)
 
-Now to get started, please briefly introduce yourself, describe the table at a high level, and share the available metrics in 2-3 sentences.
-Then provide 3 example questions using bullet points.
-"""
+            message = {"role": "assistant", "content": res_text}
+            # Parse the response for a SQL query and execute if available
+            sql_match = re.search(r"```sql\n(.*)\n```", res_text.replace(";", ""), re.DOTALL)
+            if sql_match:
+                sql = sql_match.group(1)
+                try: 
+                    message["results"] = session.sql(sql)
+                    st.dataframe(message["results"])
+                except:
+                    st.markdown("Looks like Cortex is having a '404 Brain Not Found' moment 🤖. Let's try that again!") 
 
-def main():
 
+            st.session_state.messages.append(message)
+
+def display_chat_and_input():
     st.title(f":speech_balloon: Chat with Your Data")
 
     config_options()
@@ -74,32 +73,7 @@ def main():
 
     # Accept user input
     if question := st.chat_input("What do you want to know about your data?"):
-        # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": question})
-        # Display user message in chat message container
-        with st.chat_message("user"):
-            st.markdown(question)
-        # Display assistant response in chat message container
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-
-            question = question.replace("'","")
-
-            with st.spinner(f"{st.session_state.model_name} thinking..."):
-                response = complete(question)
-                res_text = response[0].RESPONSE
-
-                message_placeholder.markdown(res_text)
-
-                message = {"role": "assistant", "content": res_text}
-                # Parse the response for a SQL query and execute if available
-                sql_match = re.search(r"```sql\n(.*)\n```", res_text.replace(";", ""), re.DOTALL)
-                if sql_match:
-                    sql = sql_match.group(1)
-                    message["results"] = session.sql(sql)
-                    st.dataframe(message["results"])
-                st.session_state.messages.append(message)
-
+        handle_user_question(question)
 
 def config_options():
     st.sidebar.selectbox(
@@ -124,8 +98,6 @@ def config_options():
 
     # For educational purposes. Users can check the difference when using memory or not
     st.sidebar.checkbox('Do you want that I remember the chat history?', key="use_chat_history", value = True)
-
-    st.sidebar.checkbox('Debug: Click to see summary generated of previous conversation', key="debug", value = True)
     st.sidebar.button("Start Over", key="clear_conversation")
     st.sidebar.expander("Session State").write(st.session_state)
 
@@ -142,14 +114,13 @@ def init_messages():
 
 
 def get_system_prompt():
-
     table_context = get_table_context(
         table_name=QUALIFIED_TABLE_NAME,
         table_description=TABLE_DESCRIPTION,
         metadata_query=METADATA_QUERY
     )
 
-    return GEN_SQL.format(context=table_context)
+    return  prompts["system"].format(context=table_context)
 
 def complete(myquestion):
 
@@ -161,39 +132,10 @@ def complete(myquestion):
 
 def create_prompt(myquestion):
 
-    question_summary = ''
     if st.session_state.use_chat_history:
         chat_history = get_chat_history()
 
-        # if chat_history != []: #There is chat_history, so not first question
-        #     question_summary = summarize_question_with_history(chat_history, myquestion)
-
-    # @TODO: Leverage the <context> reference below
-    prompt = f"""
-           You are an expert chat assistance that extracs information from the CONTEXT provided
-           between <context> and </context> tags.
-           You offer a chat experience considering the information included in the CHAT HISTORY
-           provided between <chat_history> and </chat_history> tags..
-           When answering the question contained between <question> and </question> tags
-           be concise and do not hallucinate. 
-           If you don´t have the information just say so.
-           
-           Do not mention the CONTEXT used in your answer.
-           Do not mention the CHAT HISTORY used in your asnwer.
-           
-           <chat_history>
-           {chat_history}
-           </chat_history>
-           <context>
-           {question_summary}
-           </context>
-           <question>  
-           {myquestion}
-           </question>
-           Answer: 
-           """
-
-    return prompt
+    return prompts["history"].format(chat_history=chat_history, myquestion=myquestion)
 
 def get_chat_history():
     #Get the history from the st.session_stage.messages according to the slide window parameter
@@ -205,37 +147,6 @@ def get_chat_history():
         chat_history.append(st.session_state.messages[i])
 
     return chat_history
-
-def summarize_question_with_history(chat_history, question):
-    # To get the right context, use the LLM to first summarize the previous conversation
-    # This will be used to get embeddings and find similar chunks in the docs for context
-
-    prompt = f"""
-        Based on the chat history below and the question, generate a query that extend the question
-        with the chat history provided. The query should be in natual language. 
-        Answer with only the query. Do not add any explanation.
-        
-        <chat_history>
-        {chat_history}
-        </chat_history>
-        <question>
-        {question}
-        </question>
-        """
-
-    cmd = """
-            select snowflake.cortex.complete(?, ?) as response
-          """
-    df_response = session.sql(cmd, params=[st.session_state.model_name, prompt]).collect()
-    summary = df_response[0].RESPONSE
-
-    if st.session_state.debug:
-        st.sidebar.text("Summary used for prompt context:")
-        st.sidebar.caption(summary)
-
-    summary = summary.replace("'", "")
-
-    return summary
 
 @st.cache_data(show_spinner="Loading chatbot context...")
 def get_table_context(table_name: str, table_description: str, metadata_query: str = None):
@@ -270,5 +181,64 @@ Here are the columns of the {'.'.join(table)}
         context = context + f"\n\nAvailable variables by VARIABLE_NAME:\n\n{metadata}"
     return context
 
+def get_prompts():
+    prompts = {
+        "system": """
+            You will be acting as an AI Snowflake SQL Expert named Frosty.
+            Your goal is to give correct, executable sql query to users.
+            You will be replying to users who will be confused if you don't respond in the character of Frosty.
+            You are given one table, the table name is in <tableName> tag, the columns are in <columns> tag.
+            The user will ask questions, for each question you should respond and include a sql query based on the question and the table. 
+
+            {context}
+
+            Here are 6 critical rules for the interaction you must abide:
+            <rules>
+            1. You MUST MUST wrap the generated sql code within ``` sql code markdown in this format e.g
+            ```sql
+            (select 1) union (select 2)
+            ```
+            2. If I don't tell you to find a limited set of results in the sql query or question, you MUST limit the number of responses to 10.
+            3. Text / string where clauses must be fuzzy match e.g ilike %keyword%
+            4. Make sure to generate a single snowflake sql code, not multiple. 
+            5. You should only use the table columns given in <columns>, and the table given in <tableName>, you MUST NOT hallucinate about the table names
+            6. DO NOT put numerical at the very front of sql variable.
+            </rules>
+
+            Don't forget to use "ilike %keyword%" for fuzzy match queries (especially for variable_name column)
+            and wrap the generated sql code with ``` sql code markdown in this format e.g:
+            ```sql
+            (select 1) union (select 2)
+            ```
+
+            For each question from the user, make sure to include a query in your response.
+
+            Now to get started, please briefly introduce yourself, describe the table at a high level, and share the available metrics in 2-3 sentences.
+            Then provide 3 example questions using bullet points.
+        """,
+        "history": """
+           You are an expert chat assistance that extracts information.
+           You offer a chat experience considering the information included in the CHAT HISTORY
+           provided between <chat_history> and </chat_history> tags..
+           When answering the question contained between <question> and </question> tags
+           be concise and do not hallucinate. 
+           If you don´t have the information just say so.
+           
+           Do not mention the CONTEXT used in your answer.
+           Do not mention the CHAT HISTORY used in your answer.
+           
+           <chat_history>
+           {chat_history}
+           </chat_history>
+           <question>  
+           {myquestion}
+           </question>
+           Answer: 
+        """
+    }
+    return prompts
+    
+prompts = get_prompts()
+
 if __name__ == "__main__":
-    main()
+    display_chat_and_input()
