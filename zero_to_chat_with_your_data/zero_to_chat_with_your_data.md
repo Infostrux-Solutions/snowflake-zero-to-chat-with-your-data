@@ -363,6 +363,36 @@ During or after this lab, you should be careful about performing the following a
 - Do not disable auto-suspend. If auto-suspend is disabled, your warehouses continues to run and consume credits even when not in use.
 - Do not use a warehouse size that is excessive given the workload. The larger the warehouse, the more credits are consumed.
 
+#### Warehouse size pricing 
+
+The following table shows the spending in credits per hour and per second.
+
+![dwh pride](assets/dwh_img_1.png)
+
+> `Note` : For more information you can refer to the [Overview of warehouses](https://docs.snowflake.com/en/user-guide/warehouses-overview) section of the official Snowflake documentation.
+
+
+### Scaling Up
+
+In Snowflake, "scale up" refers to increasing the computational resources of a virtual warehouse by switching to a larger warehouse size. This means increasing the amount of CPU, memory, and I/O resources available to handle queries and other operations.
+
+***When to Use It?*** You might scale up when you need to process more data, reduce query execution times, or handle a spike in workload. It’s useful for running more resource-intensive queries more quickly.
+
+>For more information about scaling up, you can refer to the [Warehouse considerations](https://docs.snowflake.com/en/user-guide/warehouses-considerations) section of the official Snowflake documentation.
+
+
+### Scaling Out / Multi Warehouses
+
+Multi-clusters are designed specifically for handling queuing and performance issues related to large numbers of concurrent users and/or queries.
+
+With multi-cluster warehouses, Snowflake supports allocating, either statically or dynamically, additional clusters to make a larger pool of compute resources available. A multi-cluster warehouse is defined by specifying the following properties:
+- Maximum number of clusters, greater than 1 (up to 10).
+- Minimum number of clusters, equal to or less than the maximum (up to 10). 
+ 
+>`Note`: It’s helpful to remember that the difference between scaling up > vs. out is that scaling out is best used for higher number of concurrent queries. When there are more queries submitted that can be processed, queries accumulate in the queue and wait to be run.
+>
+>For more information about scaling out, you can refer to the [What is a Multi-Cluster Warehouse?](https://docs.snowflake.com/en/user-guide/warehouses-multicluster) section of the official Snowflake documentation.
+
 
 ### Load the Data
 
