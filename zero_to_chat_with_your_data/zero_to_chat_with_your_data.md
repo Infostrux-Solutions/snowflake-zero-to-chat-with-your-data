@@ -968,7 +968,7 @@ WHERE VARIABLE IN (
 SELECT * FROM financial_entity_attributes_limited;
 ```
 
-- After that, exectute this SQL script which creates a view named financial_entity_annual_time_series, which combines data from financial institution time series, attributes, and entity information. The view filters for records on December 31st of each year and transforms and joins relevant columns to provide a unified dataset.
+- After that, exectute this SQL script which creates a view named `financial_entity_annual_time_series`, which combines data from financial institution time series, attributes, and entity information. The view filters for records on December 31st of each year and transforms and joins relevant columns to provide a unified dataset.
 
 ```SQL
 -- Create the modified time series view
