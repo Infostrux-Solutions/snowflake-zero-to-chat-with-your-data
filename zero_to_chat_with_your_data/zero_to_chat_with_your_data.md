@@ -106,6 +106,8 @@ The bottom pane displays the results of queries and other operations. Also inclu
 
 The various panes on this page can be resized by adjusting their sliders. If you need more room in the worksheet, collapse the database objects browser in the left panel. Many of the screenshots in this guide keep this panel closed.
 
+> **`Note`**: To save time, we'll use pre-written SQL statements in this lab, all provided within a worksheet `ZERO_TO_CHAT_WITH_YOUR_DATA`. 
+
 ### Projects > Notebooks ###
 
 Typically, a lot of SQL work happens in Snowflake's **Worksheets**. However, for this exercise we will use the Snowflake **Notebooks** interface. The **Notebooks** are Snowflake's implementation of Jupyter Notebooks, a powerful tool for data science that allow us to create a sequential mix of Markdown, SQL and Python cells to walk us through a complete data exploration or manipulation process.
@@ -116,10 +118,22 @@ Under **Projects** on the left-hand panel, select the **Notebooks** tab.
 
 ### Notebooks Structure
 
->  **Notebooks vs. the UI**
-To save time, the tasks in this notebook are executed using pre-written SQL. These tasks could also be completed through the UI, but would require navigating between multiple tabs
-
 ![notebook](assets/notebook_1.png)
+
+Here’s a breakdown of what each section outlined in red in the Snowflake notebook:
+
+**Left Panel (Files and Databases)**:
+
+- `Files Tab`: This section shows the available files within your Snowflake environment, including any notebooks you've created or are currently working on. You can manage and access your files, and it also allows you to connect a Git repository for version control and collaboration.
+- `Databases Tab`: Here, you can browse through the databases associated with your Snowflake account. It lets you explore tables, views, and other database objects, allowing you to query and analyze data directly from your notebook.
+
+**Main Code Area (Center Panel)**:
+
+- `Code Cells`: The central part of the screen is where you write and execute code. This area contains cells that can be set to different modes, such as SQL, Python, or Markdown, depending on the task you are performing. You can execute these cells individually, allowing for step-by-step data analysis or script execution.
+- `SQL and Python Cells`: The Python cell is likely used for data manipulation or analysis, while the SQL cell interacts with the Snowflake database, pulling or modifying data.
+
+**Top Right Panel (Toolbar)**: 
+- `The toolbar` offers controls for managing the notebook environment. You can add or remove packages, start or stop the execution environment, and run all code cells at once. This section helps manage the workflow, ensuring smooth execution of tasks within the notebook.
 
 ### Projects > Dashboards ###
 
@@ -397,13 +411,21 @@ In Snowflake, "scale up" refers to increasing the computational resources of a v
 >For more information about scaling up, you can refer to the [Warehouse considerations](https://docs.snowflake.com/en/user-guide/warehouses-considerations) section of the official Snowflake documentation.
 
 
-### Scaling Out / Multi Warehouses
+### Scaling Out / Multi-cluster Warehouses
 
 Multi-clusters are designed specifically for handling queuing and performance issues related to large numbers of concurrent users and/or queries.
 
 With multi-cluster warehouses, Snowflake supports allocating, either statically or dynamically, additional clusters to make a larger pool of compute resources available. A multi-cluster warehouse is defined by specifying the following properties:
 - Maximum number of clusters, greater than 1 (up to 10).
 - Minimum number of clusters, equal to or less than the maximum (up to 10). 
+
+#### Maximized vs. auto-scale
+
+You can run a multi-cluster warehouse in two modes:
+
+- `Maximized`: Set the same value for both the maximum and minimum number of clusters (must be larger than 1). All clusters start simultaneously, providing maximum resources, ideal for consistent high workloads.
+
+- `Auto-scale`: Set different values for the maximum and minimum number of clusters. Snowflake dynamically starts or stops clusters based on demand, optimizing resource use and cost.
  
 >`Note`: It’s helpful to remember that the difference between scaling up > vs. out is that scaling out is best used for higher number of concurrent queries. When there are more queries submitted that can be processed, queries accumulate in the queue and wait to be run.
 >
@@ -724,7 +746,7 @@ _A popular use case for zero-copy cloning is to clone a production environment f
 A massive benefit of zero-copy cloning is that the underlying data is not copied. Only the metadata and pointers to the underlying data change. Hence, clones are “zero-copy" and storage requirements are not doubled when the data is cloned. Most data warehouses cannot do this, but for Snowflake it is easy!
 >
 > ***Use Cases:***
-> - `Testing and Development`: Developers can use clones to create safe, isolated environments for testing without risking changes to production data.
+> - `Testing and Development`: Developers can use clones of production data to create safe, isolated environments for testing without risking changes to production data.
 > - `Data Analytics`: Analysts can create clones to experiment with different data transformations and analyses without altering the original dataset.
 >
 > Learn more about [Cloning](https://docs.snowflake.com/en/user-guide/object-clone)
@@ -925,23 +947,39 @@ Add snowpark-ml-python package from the packages dropdown in the code editor sec
 
 Snowflake offers two broad categories of powerful, intelligent features based on Artificial Intelligence (AI) and Machine Learning (ML). These features can help you do more with your data in less time than ever before.
 
-- Snowflake Cortex is a suite of AI features that use large language models (LLMs) to understand unstructured data, answer freeform questions, and provide intelligent assistance. This suite of Snowflake AI Features comprises:
+**Snowflake Cortex** is a suite of AI features that use large language models (LLMs) to understand unstructured data, answer freeform questions, and provide intelligent assistance. This suite of Snowflake AI Features comprises:
 
-  - Snowflake Cortex LLM Functions
+- **Snowflake Cortex LLM Functions**: These are SQL and Python-based functions that can be used to develop an understanding, query, translate, summarize, and generate free-form text.
+The available functions are summarized below.
 
-  - Universal Search
+  - [*`COMPLETE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-complete): Given a prompt, returns a response that completes the prompt. This function accepts either a single prompt or a conversation with multiple prompts and responses.
 
-  - Snowflake Copilot
+  - [*`EMBED_TEXT_768`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-embed-text): Creates a vector embedding of 768 dimensions for a given English-language text.
 
-  - Document AI
+  - [*`EMBED_TEXT_1024`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-embed-text-1024): Creates a vector embedding of 1024 dimensions for a given English-language text. 
 
-  - Cortex Fine-tuning
+  - [*`EXTRACT_ANSWER`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-extract-answer): Given a question and unstructured data, returns the answer to the question if it can be found in the data.
 
-  - Cortex Search
+  - [*`SENTIMENT`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-sentiment): Returns a sentiment score, from -1 to 1, representing the detected positive or negative sentiment of the given text.
 
-  - Cortex Analyst
+  - [*`SUMMARIZE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-summarize): The SUMMARIZE function returns a summary of the given English text.
 
-**Cortex AI** is particularly useful for tasks like generating SQL queries based on natural language inputs, analyzing trends and patterns in large datasets, and supporting decision-making processes with AI-powered recommendations.
+  - [*`TRANSLATE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-translate): The TRANSLATE function translates text from the indicated or detected source language to a target language..
+
+
+- **Universal Search** : Universal Search understands your query and information about your database objects and can find objects with names that differ from your search terms.
+
+- **Snowflake Copilot** : is an AI-powered assistant that helps you write, optimize, and understand SQL queries to analyze your Snowflake data assets
+
+- **Document AI** : Document AI is a Snowflake AI feature that uses Arctic-TILT, a proprietary large language model (LLM), to extract data from documents.
+
+- **Cortex Fine-tuning** : Cortex Fine-Tuning is a fully managed service that lets you fine-tune popular LLMs using your data, all within Snowflake.
+
+- **Cortex Search** : Snowflake’s fully managed search service for documents and other unstructured data, is designed to be that reliable retrieval partner in an enterprise RAG stack.
+
+- **Cortex Analyst** : Cortex Analyst is a fully-managed, LLM-powered Snowflake Cortex feature that helps you create applications capable of reliably answering business questions based on your structured data in Snowflake
+
+**`Cortex AI`** is particularly useful for tasks like generating SQL queries based on natural language inputs, analyzing trends and patterns in large datasets, and supporting decision-making processes with AI-powered recommendations.
 
 > Learn more about [Snowflake AI and ML](https://docs.snowflake.com/en/guides-overview-ai-features) documentation.
 
