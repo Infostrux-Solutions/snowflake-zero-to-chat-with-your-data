@@ -877,7 +877,7 @@ The application uses Streamlit and Snowflake and can be plugged into your LLM of
 
 In the left Snowsight navigation panel, select `Projects > Streamlit` tab and then click the `+ Streamlit App` button at the top right to create a new Streamlit-in-Snowflake application. Select the following parameters:
 
-> 🚧 UNDER CONSTRUCTION: Provide a screenshot of Streamlit application parameters dialog
+![streamlit](assets/streamlit_1.png)
 
 ```text
 App Title:  CHATBOT
@@ -895,9 +895,34 @@ The Streamlit in Snowflake interface is divided into three panes:
 
 By default, only the Streamlit editor and preview panes are displayed. To change the display, use the show/hide buttons in the lower-left corner of the Streamlit in Snowflake editor.
 
-> 🚧 UNDER CONSTRUCTION: Provide a screenshot of the default Streamlit application
+![streamlit](assets/streamlit_2.png)
 
 Add snowpark-ml-python package from the packages dropdown in the code editor section
+
+### Cortex AI
+
+Snowflake offers two broad categories of powerful, intelligent features based on Artificial Intelligence (AI) and Machine Learning (ML). These features can help you do more with your data in less time than ever before.
+
+- Snowflake Cortex is a suite of AI features that use large language models (LLMs) to understand unstructured data, answer freeform questions, and provide intelligent assistance. This suite of Snowflake AI Features comprises:
+
+  - Snowflake Cortex LLM Functions
+
+  - Universal Search
+
+  - Snowflake Copilot
+
+  - Document AI
+
+  - Cortex Fine-tuning
+
+  - Cortex Search
+
+  - Cortex Analyst
+
+**Cortex AI** is particularly useful for tasks like generating SQL queries based on natural language inputs, analyzing trends and patterns in large datasets, and supporting decision-making processes with AI-powered recommendations.
+
+> Learn more about [Snowflake AI and ML](https://docs.snowflake.com/en/guides-overview-ai-features) documentation.
+
 
 ### Build the streamlit app to chat with your data 
 
