@@ -117,7 +117,7 @@ Under **Projects** on the left-hand panel, select the **Notebooks** tab.
 ### Notebooks Structure
 
 >  **Notebooks vs. the UI**
-Most of the exercises in this lab are executed using pre-written SQL within the notebook to save time. These tasks can also be done via the UI, but would require navigating back-and-forth between multiple UI tabs.
+To save time, the tasks in this notebook are executed using pre-written SQL. These tasks could also be completed through the UI, but would require navigating between multiple tabs
 
 ![notebook](assets/notebook_1.png)
 
@@ -202,6 +202,21 @@ We will start by collecting data from three different sources:
 ## Loading Structured Data into Snowflake: CSVs ##
 
 Duration: 8
+### What are Micro-partitions?
+
+Before loading the data, it is worth knowing how the data is stored in Snowflake
+
+All data in Snowflake tables is automatically divided into micro-partitions, which are contiguous units of storage. Each micro-partition contains between 50 MB and 500 MB of uncompressed data (note that the actual size in Snowflake is smaller because data is always stored compressed). Groups of rows in tables are mapped into individual micro-partitions, organized in a columnar fashion. This size and structure allows for extremely granular pruning of very large tables, which can be comprised of millions, or even hundreds of millions, of micro-partitions.
+
+Snowflake stores metadata about all rows stored in a micro-partition, including:
+
+The range of values for each of the columns in the micro-partition.
+
+The number of distinct values.
+
+Additional properties used for both optimization and efficient query processing.
+
+> For more information about micro partition [tables-clustering-micropartitions](https://docs.snowflake.com/en/user-guide/tables-clustering-micropartitions)
 
 Let's start by preparing to load structured `.csv` data into Snowflake.
 
@@ -706,6 +721,12 @@ _A popular use case for zero-copy cloning is to clone a production environment f
 > 
 >  **Zero-Copy Cloning**
 A massive benefit of zero-copy cloning is that the underlying data is not copied. Only the metadata and pointers to the underlying data change. Hence, clones are “zero-copy" and storage requirements are not doubled when the data is cloned. Most data warehouses cannot do this, but for Snowflake it is easy!
+>
+> ***Use Cases:***
+> - `Testing and Development`: Developers can use clones to create safe, isolated environments for testing without risking changes to production data.
+> - `Data Analytics`: Analysts can create clones to experiment with different data transformations and analyses without altering the original dataset.
+>
+> Learn more about [Cloning](https://docs.snowflake.com/en/user-guide/object-clone)
 
 Run the following command in the worksheet to create a development (dev) table clone of the `company_metadata` table:
 
