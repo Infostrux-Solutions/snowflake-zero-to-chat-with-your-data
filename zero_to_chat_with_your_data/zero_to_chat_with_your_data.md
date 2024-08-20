@@ -106,6 +106,8 @@ The bottom pane displays the results of queries and other operations. Also inclu
 
 The various panes on this page can be resized by adjusting their sliders. If you need more room in the worksheet, collapse the database objects browser in the left panel. Many of the screenshots in this guide keep this panel closed.
 
+> **`Note`**: To save time, we'll use pre-written SQL statements in this lab, all provided within a worksheet `ZERO_TO_CHAT_WITH_YOUR_DATA`. 
+
 ### Projects > Notebooks ###
 
 Typically, a lot of SQL work happens in Snowflake's **Worksheets**. However, for this exercise we will use the Snowflake **Notebooks** interface. The **Notebooks** are Snowflake's implementation of Jupyter Notebooks, a powerful tool for data science that allow us to create a sequential mix of Markdown, SQL and Python cells to walk us through a complete data exploration or manipulation process.
@@ -116,10 +118,22 @@ Under **Projects** on the left-hand panel, select the **Notebooks** tab.
 
 ### Notebooks Structure
 
->  **Notebooks vs. the UI**
-Most of the exercises in this lab are executed using pre-written SQL within the notebook to save time. These tasks can also be done via the UI, but would require navigating back-and-forth between multiple UI tabs.
+![notebook](assets/notebook_1.png)
 
-> 🚧 UNDER CONSTRUCTION: Provide a description of the Notebooks UI.
+Here’s a breakdown of what each section outlined in red in the Snowflake notebook:
+
+**Left Panel (Files and Databases)**:
+
+- `Files Tab`: This section shows the available files within your Snowflake environment, including any notebooks you've created or are currently working on. You can manage and access your files, and it also allows you to connect a Git repository for version control and collaboration.
+- `Databases Tab`: Here, you can browse through the databases associated with your Snowflake account. It lets you explore tables, views, and other database objects, allowing you to query and analyze data directly from your notebook.
+
+**Main Code Area (Center Panel)**:
+
+- `Code Cells`: The central part of the screen is where you write and execute code. This area contains cells that can be set to different modes, such as SQL, Python, or Markdown, depending on the task you are performing. You can execute these cells individually, allowing for step-by-step data analysis or script execution.
+- `SQL and Python Cells`: The Python cell is likely used for data manipulation or analysis, while the SQL cell interacts with the Snowflake database, pulling or modifying data.
+
+**Top Right Panel (Toolbar)**: 
+- `The toolbar` offers controls for managing the notebook environment. You can add or remove packages, start or stop the execution environment, and run all code cells at once. This section helps manage the workflow, ensuring smooth execution of tasks within the notebook.
 
 ### Projects > Dashboards ###
 
@@ -202,6 +216,22 @@ We will start by collecting data from three different sources:
 ## Loading Structured Data into Snowflake: CSVs ##
 
 Duration: 8
+### What are Micro-partitions?
+
+Before loading the data, it is worth knowing how the data is stored in Snowflake
+
+All data in Snowflake tables is automatically divided into micro-partitions, which are contiguous units of storage. Each micro-partition contains between 50 MB and 500 MB of uncompressed data (note that the actual size in Snowflake is smaller because data is always stored compressed). Groups of rows in tables are mapped into individual micro-partitions, organized in a columnar fashion. This size and structure allows for extremely granular pruning of very large tables, which can be comprised of millions, or even hundreds of millions, of micro-partitions.
+
+Snowflake stores metadata about all rows stored in a micro-partition, including:
+
+- The range of values for each of the columns in the micro-partition.
+
+- The number of distinct values.
+
+- Additional properties used for both optimization and efficient query processing.
+
+
+> For more information about micro partition [tables-clustering-micropartitions](https://docs.snowflake.com/en/user-guide/tables-clustering-micropartitions)
 
 Let's start by preparing to load structured `.csv` data into Snowflake.
 
@@ -362,6 +392,44 @@ During or after this lab, you should be careful about performing the following a
 
 - Do not disable auto-suspend. If auto-suspend is disabled, your warehouses continues to run and consume credits even when not in use.
 - Do not use a warehouse size that is excessive given the workload. The larger the warehouse, the more credits are consumed.
+
+#### Warehouse size pricing 
+
+The following table shows the spending in credits per hour and per second.
+
+![dwh pride](assets/dwh_img_1.png)
+
+> `Note` : For more information you can refer to the [Overview of warehouses](https://docs.snowflake.com/en/user-guide/warehouses-overview) section of the official Snowflake documentation.
+
+
+### Scaling Up
+
+In Snowflake, "scale up" refers to increasing the computational resources of a virtual warehouse by switching to a larger warehouse size. This means increasing the amount of CPU, memory, and I/O resources available to handle queries and other operations.
+
+***When to Use It?*** You might scale up when you need to process more data, reduce query execution times, or handle a spike in workload. It’s useful for running more resource-intensive queries more quickly.
+
+>For more information about scaling up, you can refer to the [Warehouse considerations](https://docs.snowflake.com/en/user-guide/warehouses-considerations) section of the official Snowflake documentation.
+
+
+### Scaling Out / Multi-cluster Warehouses
+
+Multi-clusters are designed specifically for handling queuing and performance issues related to large numbers of concurrent users and/or queries.
+
+With multi-cluster warehouses, Snowflake supports allocating, either statically or dynamically, additional clusters to make a larger pool of compute resources available. A multi-cluster warehouse is defined by specifying the following properties:
+- Maximum number of clusters, greater than 1 (up to 10).
+- Minimum number of clusters, equal to or less than the maximum (up to 10). 
+
+#### Maximized vs. auto-scale
+
+You can run a multi-cluster warehouse in two modes:
+
+- `Maximized`: Set the same value for both the maximum and minimum number of clusters (must be larger than 1). All clusters start simultaneously, providing maximum resources, ideal for consistent high workloads.
+
+- `Auto-scale`: Set different values for the maximum and minimum number of clusters. Snowflake dynamically starts or stops clusters based on demand, optimizing resource use and cost.
+ 
+>`Note`: It’s helpful to remember that the difference between scaling up > vs. out is that scaling out is best used for higher number of concurrent queries. When there are more queries submitted that can be processed, queries accumulate in the queue and wait to be run.
+>
+>For more information about scaling out, you can refer to the [What is a Multi-Cluster Warehouse?](https://docs.snowflake.com/en/user-guide/warehouses-multicluster) section of the official Snowflake documentation.
 
 
 ### Load the Data
@@ -676,6 +744,12 @@ _A popular use case for zero-copy cloning is to clone a production environment f
 > 
 >  **Zero-Copy Cloning**
 A massive benefit of zero-copy cloning is that the underlying data is not copied. Only the metadata and pointers to the underlying data change. Hence, clones are “zero-copy" and storage requirements are not doubled when the data is cloned. Most data warehouses cannot do this, but for Snowflake it is easy!
+>
+> ***Use Cases:***
+> - `Testing and Development`: Developers can use clones of production data to create safe, isolated environments for testing without risking changes to production data.
+> - `Data Analytics`: Analysts can create clones to experiment with different data transformations and analyses without altering the original dataset.
+>
+> Learn more about [Cloning](https://docs.snowflake.com/en/user-guide/object-clone)
 
 Run the following command in the worksheet to create a development (dev) table clone of the `company_metadata` table:
 
@@ -827,33 +901,6 @@ FROM company_metadata;
 
 <!-- ------------------------ -->
 
-## Working with Account Admin, & Account Usage
-
-Duration: 8
-
-#### Admin > Cost Management
-
-![account usage](assets/9Role_5.png)
-
-The **Cost Management** tab shows your usage of Snowflake credits, with filters by account and consumption types:
-- **Organization**: Credit usage across all the accounts in your organization.
-- **Compute**: Credits consumed by the virtual warehouses in the current account.
-- **Storage**: Average amount of data stored in all databases, internal stages, and Snowflake Failsafe in the current account for the past month.
-- **Data Transfer**: Average amount of data transferred out of the region (for the current account) into other regions for the past month.
-
-#### Admin > Security
-
-![account usage](assets/9Role_6.png)
-
-The **Security** tab contains network policies created for the Snowflake account. New network policies can be created by selecting “+ Network Policy” at the top right hand side of the page.
-
-#### Admin > Billing & Terms
-
-The **Billing & Terms** tab contains the payment method for the account:
-- If you are a Snowflake contract customer, the tab shows the name associated with your contract information.
-- If you are an on-demand Snowflake customer, the tab shows the credit card used to pay month-to-month, if one has been entered. If no credit card is on file, you can add one to continue using Snowflake when your trial ends.
-
-
 ## Creating the Chatbot Streamlit App ##
 
 We will build an LLM-powered chatbot named "Frosty" that performs data exploration and answers questions by writing and executing SQL queries on Snowflake data.
@@ -874,7 +921,7 @@ The application uses Streamlit and Snowflake and can be plugged into your LLM of
 
 In the left Snowsight navigation panel, select `Projects > Streamlit` tab and then click the `+ Streamlit App` button at the top right to create a new Streamlit-in-Snowflake application. Select the following parameters:
 
-> 🚧 UNDER CONSTRUCTION: Provide a screenshot of Streamlit application parameters dialog
+![streamlit](assets/streamlit_1.png)
 
 ```text
 App Title:  CHATBOT
@@ -892,9 +939,98 @@ The Streamlit in Snowflake interface is divided into three panes:
 
 By default, only the Streamlit editor and preview panes are displayed. To change the display, use the show/hide buttons in the lower-left corner of the Streamlit in Snowflake editor.
 
-> 🚧 UNDER CONSTRUCTION: Provide a screenshot of the default Streamlit application
+![streamlit](assets/streamlit_2.png)
 
 Add snowpark-ml-python package from the packages dropdown in the code editor section
+
+### Cortex AI
+
+Snowflake offers two broad categories of powerful, intelligent features based on Artificial Intelligence (AI) and Machine Learning (ML). These features can help you do more with your data in less time than ever before.
+
+**Snowflake Cortex** is a suite of AI features that use large language models (LLMs) to understand unstructured data, answer freeform questions, and provide intelligent assistance. This suite of Snowflake AI Features comprises:
+
+- **Snowflake Cortex LLM Functions**: These are SQL and Python-based functions that can be used to develop an understanding, query, translate, summarize, and generate free-form text.
+The available functions are summarized below.
+
+  - [*`COMPLETE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-complete): Given a prompt, returns a response that completes the prompt. This function accepts either a single prompt or a conversation with multiple prompts and responses.
+
+  - [*`EMBED_TEXT_768`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-embed-text): Creates a vector embedding of 768 dimensions for a given English-language text.
+
+  - [*`EMBED_TEXT_1024`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-embed-text-1024): Creates a vector embedding of 1024 dimensions for a given English-language text. 
+
+  - [*`EXTRACT_ANSWER`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-extract-answer): Given a question and unstructured data, returns the answer to the question if it can be found in the data.
+
+  - [*`SENTIMENT`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-sentiment): Returns a sentiment score, from -1 to 1, representing the detected positive or negative sentiment of the given text.
+
+  - [*`SUMMARIZE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-summarize): The SUMMARIZE function returns a summary of the given English text.
+
+  - [*`TRANSLATE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-translate): The TRANSLATE function translates text from the indicated or detected source language to a target language..
+
+
+- **Universal Search** : Universal Search understands your query and information about your database objects and can find objects with names that differ from your search terms.
+
+- **Snowflake Copilot** : is an AI-powered assistant that helps you write, optimize, and understand SQL queries to analyze your Snowflake data assets
+
+- **Document AI** : Document AI is a Snowflake AI feature that uses Arctic-TILT, a proprietary large language model (LLM), to extract data from documents.
+
+- **Cortex Fine-tuning** : Cortex Fine-Tuning is a fully managed service that lets you fine-tune popular LLMs using your data, all within Snowflake.
+
+- **Cortex Search** : Snowflake’s fully managed search service for documents and other unstructured data, is designed to be that reliable retrieval partner in an enterprise RAG stack.
+
+- **Cortex Analyst** : Cortex Analyst is a fully-managed, LLM-powered Snowflake Cortex feature that helps you create applications capable of reliably answering business questions based on your structured data in Snowflake
+
+**`Cortex AI`** is particularly useful for tasks like generating SQL queries based on natural language inputs, analyzing trends and patterns in large datasets, and supporting decision-making processes with AI-powered recommendations.
+
+> Learn more about [Snowflake AI and ML](https://docs.snowflake.com/en/guides-overview-ai-features) documentation.
+
+### Data Prep for the Streamlit App
+
+Before diving deeper into the creation of the app, we need to create our dataset, which will serve as the source for the application.
+
+First, navigate  to our `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN` worksheet and execute the following statements.
+
+- This SQL script creates a view called `financial_entity_attributes_limited` that selects and filters specific VARIABLE values from the financial_institution_attributes table.
+```SQL
+-- Create the limited attributes view
+CREATE VIEW IF NOT EXISTS financial_entity_attributes_limited AS
+SELECT * from financial__economic_essentials.cybersyn.financial_institution_attributes
+WHERE VARIABLE IN (
+                   'ASSET',
+                   'ESTINS',
+                   'LNRE',
+                   'DEP',
+                   'SC'
+    );
+
+-- Confirm the view was created correctly - should show 6 rows with variable name and definition
+SELECT * FROM financial_entity_attributes_limited;
+```
+
+- After that, exectute this SQL script which creates a view named `financial_entity_annual_time_series`, which combines data from financial institution time series, attributes, and entity information. The view filters for records on December 31st of each year and transforms and joins relevant columns to provide a unified dataset.
+
+```SQL
+-- Create the modified time series view
+CREATE VIEW IF NOT EXISTS financial_entity_annual_time_series AS
+SELECT
+    ent.name as entity_name,
+    ent.city,
+    ent.state_abbreviation,
+    ts.variable_name,
+    year(ts.date) as "YEAR",
+    to_double(ts.value) as value,
+    ts.unit,
+    att.definition
+FROM financial__economic_essentials.cybersyn.financial_institution_timeseries AS ts
+         INNER JOIN financial_entity_attributes_limited att
+                    ON (ts.variable = att.variable)
+         INNER JOIN financial__economic_essentials.cybersyn.financial_institution_entities AS ent
+                    ON (ts.id_rssd = ent.id_rssd)
+WHERE MONTH(date) = 12
+  AND DAY(date) = 31;
+
+-- Confirm the view was created correctly and view sample data
+SELECT * FROM financial_entity_annual_time_series  LIMIT 10;
+```
 
 ### Build the streamlit app to chat with your data 
 
@@ -1105,6 +1241,100 @@ def get_prompts():
     }
     return prompts
 ```
+
+### Potential questions that you might want to ask your data
+
+- `Can you show me the top 10 financial entities with the highest Total Assets value for the year 2020?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_01.png" alt="Description" width="500">
+</ul>
+
+- `List the top 10 financial entities that have a Total Securities value below 5000000 for the year 1995.`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_02.png" alt="Description" width="500">
+</ul>
+
+- `What are the cities with the highest average Total deposits for the year 2000?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_03.png" alt="Description" width="500">
+</ul>
+
+- `What are the top 10 financial entities with the highest total assets?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_04.png" alt="Description" width="500">
+</ul>
+
+- `Show the number of real estate loans for the city of New York between 2010 and 2020.`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_05.png" alt="Description" width="500">
+</ul>
+
+- `What is the percentage of insured deposits for the financial entity named 'Bank of America'?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_06.png" alt="Description" width="500">
+</ul>
+
+- `What are the total assets of the financial entity named 'Bank of America'in 2020?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_07.png" alt="Description" width="500">
+</ul>
+
+- `List all financial entities named like 'Bank of America' with the total assets for each in 2020`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_08.png" alt="Description" width="500">
+</ul>
+
+- `Which banks have the highest percentage of insured deposits in California?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_09.png" alt="Description" width="500">
+</ul>
+
+- `What is the total amount of real estate loans for Sacramento in a 2021?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_10.png" alt="Description" width="500">
+</ul>
+
+- `What are the names of the top 10 banks with the highest Total Assets?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_11.png" alt="Description" width="500">
+</ul>
+
+- `Show me the Total Securities for all banks in New York.`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_12.png" alt="Description" width="500">
+</ul>
+
+- `What is the average percentage of Insured (Estimated) for all banks in California?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_13.png" alt="Description" width="500">
+</ul>
+
+- `List the financial entities in New York`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_14.png" alt="Description" width="500">
+</ul>
+
+- `List the bank has the most assets?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_15.png" alt="Description" width="500">
+</ul>
+
+### Sample with follow-up questions
+
+- `List the financial entities with their total securities values that have a total securities value below 5000000 for the year 1995`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_16.png" alt="Description" width="500">
+</ul>
+
+- `Sort the last result by total securities value in descending order`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_17.png" alt="Description" width="500">
+</ul>
+
+- `What are the top 5 in this list by Total Securities value?`
+<ul style="list-style-type:none;">
+<img src="assets/chat_data/chat_data_18.png" alt="Description" width="500">
+</ul>
 
 ## Visualizate your data.
 
