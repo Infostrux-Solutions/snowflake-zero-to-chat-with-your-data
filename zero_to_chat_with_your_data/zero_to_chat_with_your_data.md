@@ -2,31 +2,32 @@
 
 ## Introduction ##
 
-> Based on the [Zero to Snowflake Quickstart](https://github.com/Snowflake-Labs/sfquickstarts/blob/master/site/sfguides/src/getting_started_with_snowflake/getting_started_with_snowflake.md) with an LLM twist.
+> Based on the [Zero to Snowflake Quickstart](https://github.com/Snowflake-Labs/sfquickstarts/blob/master/site/sfguides/src/getting_started_with_snowflake/getting_started_with_snowflake.md) enhanced with:
+> - an LLM Chatbot borrowed from [Frosty: Build an LLM Chatbot in Streamlit on your Snowflake Data](https://quickstarts.snowflake.com/guide/frosty_llm_chatbot_on_streamlit_snowflake/#0)
+> - a Visualization implementaiton from [LLM-Driven Plotting in Streamlit in Snowflake (SiS)](https://www.youtube.com/watch?v=WwH8pejGMPI) 
 
-This entry-level lab, designed for database and data warehouse administrators and architects, will give you a brief introduction to Snowflake and will walk you through creating a Cortex AI-powered LLM Chatbot in Streamlit.
+This entry-level lab, designed for database and data warehouse administrators and architects, will give you a brief introduction to Snowflake and will demonstrate Snowflake Cortex LLM functionality with:
+- a text-to-SQL Chatbot
+- a text-to-Python Chart Creator
 
 ### Prerequisites ###
 - Basic knowledge of SQL, database concepts, and objects
 - Familiarity with CSV (comma-delimited) files and JSON semi-structured data
 
 ## What You'll Learn ###
-We will use a Snowflake Enterprise edition account for this lab which has been pre-configured with databases, virtual warehouses and some additional objects to give us enough time to dig into the Streamlit Chatbot component of the lab. The lab will focus on:
+We will use a Snowflake Enterprise edition account for this lab which has been pre-configured with databases, virtual warehouses and some additional objects to give us enough time to dig into the Snowflake Cortex LLM and Streamlit components of the lab. The lab will focus on:
 
 - How to create stages, tables and views.
 - How to load structured and semi-structured data.
-- How to consume Cybersyn data from the [Snowflake Data Marketplace](https://app.snowflake.com/marketplace/listing/GZTSZAS2KF7/).
 - How to perform analytical queries on data in Snowflake, including joins between tables.
 - How to clone objects.
 - How to undo user errors using Time Travel.
-- How to use Cortex AI to ask questions about your data
-- How to use Cortex AI to summarize your data
 - How to create a Streamlit app
 - How to leverage Cortex AI queries to create your own Chatbot in Streamlit
+- How to use Cortex AI to ask questions about your data (text-to-SQL)
+- How to use Cortex AI to generate visualizations of data (text-to-Python)
 
->  SCREENSHOTS, SAMPLE CODE AND ENVIRONMENTS:
-Screenshots in this lab depict examples; results may vary slightly from what you see when you complete the exercises.
-
+> **SCREENSHOTS, SAMPLE CODE AND ENVIRONMENTS in this lab depict examples; results may vary slightly from what you see when you complete the exercises.**
 
 ### Data You'll Use: ###
 **Cybersyn** is a next generation data company creating a real-time view of the world's economy with analytics-ready data exclusively on Snowflake Marketplace. Initially focused on consumer insights, Cybersyn enables you to access external data directly in your Snowflake instance — no ETL required.
