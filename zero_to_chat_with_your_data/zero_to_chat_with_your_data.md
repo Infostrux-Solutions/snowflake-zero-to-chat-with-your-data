@@ -119,7 +119,7 @@ Under **Projects** on the left-hand panel, select the **Notebooks** tab.
 >  **Notebooks vs. the UI**
 Most of the exercises in this lab are executed using pre-written SQL within the notebook to save time. These tasks can also be done via the UI, but would require navigating back-and-forth between multiple UI tabs.
 
-> 🚧 UNDER CONSTRUCTION: Provide a description of the Notebooks UI.
+![notebook](assets/notebook_1.png)
 
 ### Projects > Dashboards ###
 
