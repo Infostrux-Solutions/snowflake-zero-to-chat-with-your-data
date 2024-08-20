@@ -1,5 +1,7 @@
 # Zero to Chat with Your Snowflake Data in 120 Minutes #
 
+<!-- ------------------------ -->
+
 ## Introduction ##
 
 > Based on the [Zero to Snowflake Quickstart](https://github.com/Snowflake-Labs/sfquickstarts/blob/master/site/sfguides/src/getting_started_with_snowflake/getting_started_with_snowflake.md) enhanced with:
@@ -29,7 +31,7 @@ We will use a Snowflake Enterprise edition account for this lab which has been p
 
 > **SCREENSHOTS, SAMPLE CODE AND ENVIRONMENTS in this lab depict examples; results may vary slightly from what you see when you complete the exercises.**
 
-### Data You'll Use: ###
+### Data You'll Use ###
 **Cybersyn** is a next generation data company creating a real-time view of the world's economy with analytics-ready data exclusively on Snowflake Marketplace. Initially focused on consumer insights, Cybersyn enables you to access external data directly in your Snowflake instance — no ETL required.
 
 This lab will use the following Cybersyn datasets:
@@ -38,12 +40,13 @@ This lab will use the following Cybersyn datasets:
 - Company metadata
 
 Check out Cybersyn's [Consumer Spending product](https://app.snowflake.com/marketplace/listing/GZTSZ290BUX62/) and [explore all 60+ public sources](https://app.cybersyn.com/data_catalog/?utm_source=Snowflake+Quickstart&utm_medium=organic&utm_campaign=Snowflake+Quickstart) Cybersyn offers on the [Snowflake Marketplace](https://app.snowflake.com/marketplace/providers/GZTSZAS2KCS/Cybersyn).
+<!-- ------------------------ -->
 
 
 ## Lab Environment Access ##
-Each of you should have received a number when you arrived to allow you to access your your own workspace in Snowflake.
+Each lab participant should have received a number when you arrived to allow you to access your own workspace in Snowflake.
 
-Open a browser window and enter the URL:
+Open a browser window and access the URL:
 
 > https://app.snowflake.com/umnxxyz/lab_data_chat
 
@@ -61,9 +64,9 @@ Password: LAB123
 
 > When you login, you will be prompted to setup multifactor authentication. While this is a best practice and it is strongly recommended that you do that, we will be skipping it for the purposes of the lab, so just click on the `Not now` at the bottom left of the prompt.
 
-## The Snowflake User Interface ##
+<!-- ------------------------ -->
 
-Duration: 8
+## The Snowflake User Interface ##
 
 ### Navigating the Snowflake UI ###
 
@@ -71,12 +74,9 @@ Let's get you acquainted with Snowflake! This section covers the basic component
 
 ### Projects > Worksheets ###
 
-
-Under **Projects** on the left-hand panel, select the ​**Worksheets​** tab.
-
 ![snowflake navbar](assets/3UIStory_2.png)
 
-This provides an interface for submitting SQL queries, performing DDL and DML operations, and viewing results as your queries or operations complete. A new worksheet is created by clicking **`+`** on the top right.
+Under **Projects** on the left-hand panel, select the ​**Worksheets​** tab. This provides an interface for submitting SQL queries, performing DDL and DML operations, and viewing results as your queries or operations complete. A new worksheet is created by clicking **`+`** on the top right.
 
 ![worksheets tab main](assets/3UIStory_3.png)
 
@@ -111,7 +111,7 @@ The various panes on this page can be resized by adjusting their sliders. If you
 
 ### Projects > Notebooks ###
 
-Typically, a lot of SQL work happens in Snowflake's **Worksheets**. However, for this exercise we will use the Snowflake **Notebooks** interface. The **Notebooks** are Snowflake's implementation of Jupyter Notebooks, a powerful tool for data science that allow us to create a sequential mix of Markdown, SQL and Python cells to walk us through a complete data exploration or manipulation process.
+The **Notebooks** are Snowflake's implementation of Jupyter Notebooks, a powerful tool for data science that allow us to create a sequential mix of Markdown, SQL and Python cells to walk us through a complete data exploration or manipulation process.
 
 Under **Projects** on the left-hand panel, select the **Notebooks** tab.
 
@@ -131,7 +131,6 @@ Here’s a breakdown of what each section outlined in red in the Snowflake noteb
 **Main Code Area (Center Panel)**:
 
 - `Code Cells`: The central part of the screen is where you write and execute code. This area contains cells that can be set to different modes, such as SQL, Python, or Markdown, depending on the task you are performing. You can execute these cells individually, allowing for step-by-step data analysis or script execution.
-- `SQL and Python Cells`: The Python cell is likely used for data manipulation or analysis, while the SQL cell interacts with the Snowflake database, pulling or modifying data.
 
 **Top Right Panel (Toolbar)**: 
 - `The toolbar` offers controls for managing the notebook environment. You can add or remove packages, start or stop the execution environment, and run all code cells at once. This section helps manage the workflow, ensuring smooth execution of tasks within the notebook.
@@ -144,7 +143,7 @@ Under **Projects** on the left-hand panel, select the ​**Dashboards​** tab. 
 
 ### Data > Databases ###
 
-Under **Data**, the **Databases**​ tab shows information about the databases you have created or have permission to access. You can create, clone, drop, or transfer ownership of databases, as well as load data in the UI. Notice that a database already exists in your environment.
+Under **Data**, the **Databases**​ tab shows information about the databases you have created or have permission to access. You can create, clone, drop, or transfer ownership of databases, as well as load data in the UI. Notice that a `CHAT_WITH_YOUR_DATA` database already exists in your environment. You will also see the Cybersyn `FINANCIAL__ECONOMIC_ESSENTIALS` database which has been shared with you.
 
 ![databases tab](assets/3UIStory_6.png)
 
@@ -174,6 +173,8 @@ Under **Monitoring** there are multiple tabs for tracking your usage of your Sno
 
 ### Admin > Warehouses ###
 
+>  To see all the information available under the `Admin` menu, switch your role to `ACCOUNTADMIN`.
+
 Under **Admin**, the **​Warehouses​** tab is where you set up and manage compute resources known as virtual warehouses to load or query data in Snowflake. A warehouse called `LAB_USER_WAREHOUSE_<number>` already exists in your environment.
 
 ![warehouses tab](assets/3UIStory_10.png)
@@ -190,9 +191,9 @@ The **Roles** sub-tab of the **Users & Roles** tab shows a list of the roles and
 
 ![roles tab](assets/3UIStory_12.png)
 
-### Users ###
+#### Users ####
 
-The **Users** sub-tab of the **Users & Roles** tab shows a list of users in the account, default roles, and owner of the users. For a new account, no records are shown because no additional roles have been created. Permissions granted through your current role determine the information shown for this tab. To see all the information available on the tab, switch your role to `ACCOUNTADMIN`.
+The **Users** sub-tab of the **Users & Roles** tab shows a list of users in the account, default roles, and owner of the users. For a new account, no records are shown because no additional roles have been created. Permissions granted through your current role determine the information shown for this tab.
 
 ![users tab](assets/3UIStory_13.png)
 
@@ -200,9 +201,9 @@ Clicking on your username in the bottom right of the UI allows you to change you
 
 ![user preferences dropdown](assets/Lab_Image_01.png)
 
-## Data Lab: Stock Price & SEC Filings Data ##
+> For additional information on Snowflake's role-based access control (RBAC) model, see the [Snowflake documentation](https://docs.snowflake.net/manuals/user-guide/security-access-control.html)
 
-Duration: 2
+## Data Lab: Stock Price & SEC Filings Data ##
 
 ### The Lab Story
 You work at a grocery retailer. You want to understand the performance of major consumer goods (CPG) companies in the US that supply your store. This lab takes a look at daily stock price data and quarterly and annual Securities Exchange Commission (SEC) company filings to understand the performance of the CPG landscape. Public companies are required to submit a quarterly and annual report to the SEC detailing their financial data.
