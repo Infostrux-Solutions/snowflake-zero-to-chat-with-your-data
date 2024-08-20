@@ -210,11 +210,12 @@ All data in Snowflake tables is automatically divided into micro-partitions, whi
 
 Snowflake stores metadata about all rows stored in a micro-partition, including:
 
-The range of values for each of the columns in the micro-partition.
+- The range of values for each of the columns in the micro-partition.
 
-The number of distinct values.
+- The number of distinct values.
 
-Additional properties used for both optimization and efficient query processing.
+- Additional properties used for both optimization and efficient query processing.
+
 
 > For more information about micro partition [tables-clustering-micropartitions](https://docs.snowflake.com/en/user-guide/tables-clustering-micropartitions)
 
