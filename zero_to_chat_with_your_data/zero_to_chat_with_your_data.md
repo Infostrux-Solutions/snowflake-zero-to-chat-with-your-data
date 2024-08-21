@@ -217,24 +217,6 @@ We will start by collecting data from three different sources:
 
 ## Loading Structured Data into Snowflake: CSVs ##
 
-Duration: 8
-### What are Micro-partitions? ###
-
-Before loading the data, it is worth knowing how the data is stored in Snowflake
-
-All data in Snowflake tables is automatically divided into micro-partitions, which are contiguous units of storage. Each micro-partition contains between 50 MB and 500 MB of uncompressed data (the actual size in Snowflake is smaller because data is always stored compressed). Data in the micro-partitions is organized in a proprietary columnar format. This architecture allows for the pruning of micro-partitions that need to be scanned at query time for even very large tables.
-
-Snowflake stores metadata about all rows stored in a micro-partition, including:
-
-- The range of values for each of the columns in the micro-partition.
-
-- The number of distinct values.
-
-- Additional properties used for both optimization and efficient query processing.
-
-
-> For more information about micro partition [tables-clustering-micropartitions](https://docs.snowflake.com/en/user-guide/tables-clustering-micropartitions)
-
 Let's start by preparing to load structured `.csv` data into Snowflake.
 
 We are using company metadata developed from the Securities and Exchange Commission (SEC) that details the consumer packaged goods (CPG) companies we want to evaluate. The data has been exported and pre-staged for you in an Amazon AWS S3 bucket in the US-EAST region. It is in comma-delimited format with a single header line and double quotes enclosing all string values, including the field headings in the header line. This will be important when we configure the Snowflake table to store this data.
@@ -454,7 +436,6 @@ SELECT * FROM company_metadata LIMIT 10;
 
 ## Loading Semi-Structured Data into Snowflake: JSONs ##
 
-Duration: 16
 
 >  This section requires loading additional data and, therefore, provides a review of data loading while also introducing loading semi-structured data.
 
@@ -616,7 +597,6 @@ SELECT * FROM sec_filings_attributes_view LIMIT 20;
 
 ## Getting Data from Snowflake Marketplace ##
 
-Duration: 5
 
 ### Snowflake Data Marketplace ###
 
@@ -908,6 +888,24 @@ SELECT company_name FROM company_metadata LIMIT 10;
 ![restored names result](assets/8Time_4.png)
 
 <!-- ------------------------ -->
+
+### Micro-Partitions ###
+A lot of unique Snowflake features such as Zero-Copy Clone and Time Travel are enabled by its unique architecture separating compute from data storage and metadata management.
+
+Snowflake data is stored in compressed, proprietary columnar format in encrypted micro-partitions which are, importantly, immutable. Once written, micro-partitions are never modified but rather a new partition is created whenever data in the micro-partitions needs to be updated.
+
+Zero-Copy Clone is therefore a metadata-only operation where an object is cloned by creating a copy of the metadata pointing to the same micro-partitions as the original. From that point on, the original and the clone can evolve independently as updates to either object will result in their respective metadata sets pointing to their own newly created partitions.
+
+As data is updated, micro-partitions are slated for deletion but they are not deleted until they are age beyond the Time Travel limit (plus, technically the 1-week Fail Safe). The metadata of the previous versions of a micro-partition is also retained during that time which enables Time Travel.
+
+It is also worth mentioning that Snowflake stores metadata about all rows stored in a micro-partition, including:
+- The range of values for each of the columns in the micro-partition.
+- The number of distinct values.
+- Additional properties used for both optimization and efficient query processing.
+
+This architecture allows for dramatically reducing (pruning) the number of of micro-partitions that need to be scanned at query time contributing to Snowflake's excellent query performance for even very large tables.
+
+> For more information about micro partition [tables-clustering-micropartitions](https://docs.snowflake.com/en/user-guide/tables-clustering-micropartitions)
 
 ## The CHAT_WITH_YOUR_DATA App ##
 
