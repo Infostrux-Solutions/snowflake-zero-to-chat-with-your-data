@@ -1479,8 +1479,6 @@ After couple of seconds, the app will respond with:
 
 ## Conclusion & Next Steps
 
-Duration: 2
-
 Congratulations on completing this introductory lab exercise! You've mastered the Snowflake basics and are ready to apply these fundamentals to your own data. Be sure to reference this guide if you ever need a refresher.
 
 We encourage you to continue with your free trial by loading your own sample or production data and by using some of the more advanced capabilities of Snowflake not covered in this lab.
@@ -1498,9 +1496,12 @@ We encourage you to continue with your free trial by loading your own sample or 
 
 ### What we've covered:
 
-- How to create stages, databases, tables, views, and virtual warehouses.
+- How to create stages, tables and views.
 - How to load structured and semi-structured data.
-- How to consume Cybersyn data from the [Snowflake Data Marketplace](https://app.snowflake.com/marketplace/listing/GZTSZAS2KF7/).
 - How to perform analytical queries on data in Snowflake, including joins between tables.
 - How to clone objects.
 - How to undo user errors using Time Travel.
+- How to create a Streamlit app
+- How to leverage Cortex AI queries to create your own Chatbot in Streamlit
+- How to use Cortex AI to ask questions about your data (text-to-SQL)
+- How to use Cortex AI to generate visualizations of data (text-to-Python)
