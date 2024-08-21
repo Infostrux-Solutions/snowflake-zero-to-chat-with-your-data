@@ -909,70 +909,39 @@ SELECT company_name FROM company_metadata LIMIT 10;
 
 <!-- ------------------------ -->
 
-## Creating the Chatbot Streamlit App ##
+## Chatbot Streamlit App ##
 
-We will build an LLM-powered chatbot named "Frosty" that performs data exploration and answers questions by writing and executing SQL queries on Snowflake data.
+We will demo and walk through an LLM-powered chatbot named "Frosty" that performs data exploration and answers questions by constructing and executing SQL queries on Snowflake data. Built with just some 250 lines of code, the application is able to converse and answer questions based on a financial dataset.
 
-The application uses Streamlit and Snowflake and can be plugged into your LLM of choice, alongside data from Snowflake Marketplace. By the end of the session, you will have an interactive web application chatbot that can converse and answer questions based on a financial dataset.
+The application is built using Streamlit and allows you to select one of the number of Snowflake's Cortex AI LLM models and run them against data from the Snowflake Marketplace.
 
-### Key features & technology
-* Large language models (LLMs)
-* Streamlit
+### Streamlit ###
+Streamlit is an open-source Python library that enables developers to quickly create, deploy, and share web apps from Python scripts. It abstracts away the heavy lift in implementing web interfaces and can be deployed either independently or run from within Snowflake. Running Streamlit from within Snowflake eliminates the need to deploy and maintain web app infrastructure in addition to leveraging Snowflake's robust access control mechanisms. Learn more about [Streamlit](https://streamlit.io/).
 
-### What is Streamlit?
-Streamlit is an open-source Python library that enables developers to quickly create, deploy, and share web apps from Python scripts. Learn more about [Streamlit](https://streamlit.io/).
+### Large Language Models ###
+An LLM (Large Language Model) is a type of artificial intelligence model designed to process and generate human-like text based on large datasets of text. These models, such as [GPT-4](https://openai.com/research/gpt-4), [GPT-3](https://openai.com/blog/gpt-3-apps), [BERT](https://cloud.google.com/ai-platform/training/docs/algorithms/bert-start), [LLaMA](https://ai.facebook.com/blog/large-language-model-llama-meta-ai/), and [LaMDA](https://blog.google/technology/ai/lamda/), can "understand" and generate natural language with high levels of accuracy and coherence.
 
-### What is a large language model (LLM)?
-A large language model, or LLM, is a deep learning algorithm that can recognize, summarize, translate, predict and generate text and other content based on knowledge gained from massive datasets. Some examples of popular LLMs are [GPT-4](https://openai.com/research/gpt-4), [GPT-3](https://openai.com/blog/gpt-3-apps), [BERT](https://cloud.google.com/ai-platform/training/docs/algorithms/bert-start), [LLaMA](https://ai.facebook.com/blog/large-language-model-llama-meta-ai/), and [LaMDA](https://blog.google/technology/ai/lamda/).
-
-The application uses Streamlit and Snowflake and can be plugged into your LLM of choice, alongside data from Snowflake Marketplace. By the end of the session, you will have an interactive web application chatbot that can converse and answer questions based on a financial dataset.
-
-In the left Snowsight navigation panel, select `Projects > Streamlit` tab and then click the `+ Streamlit App` button at the top right to create a new Streamlit-in-Snowflake application. Select the following parameters:
-
-![streamlit](assets/streamlit_1.png)
-
-```text
-App Title:  CHATBOT
-Database:   CHAT_WITH_YOUR_DATA
-Schema:     WORKSPACE_<NUMBER>
-Warehouse:  LAB_USER_WAREHOUSE_<NUMBER>
-```
-... and click `Create`. The Streamlit in Snowflake editor opens an example Streamlit app in Viewer mode. Viewer mode allows you to see how the Streamlit application appears to users.
-
-The Streamlit in Snowflake interface is divided into three panes:
-
-* Object browser: Allows you to see the databases, schemas, and views you have permissions to access.
-* Streamlit editor: Provides a Python editor for your Streamlit code.
-* Streamlit preview: Displays the running Streamlit app.
-
-By default, only the Streamlit editor and preview panes are displayed. To change the display, use the show/hide buttons in the lower-left corner of the Streamlit in Snowflake editor.
-
-![streamlit](assets/streamlit_2.png)
-
-Add snowpark-ml-python package from the packages dropdown in the code editor section
-
-### Cortex AI
-
-Snowflake offers two broad categories of powerful, intelligent features based on Artificial Intelligence (AI) and Machine Learning (ML). These features can help you do more with your data in less time than ever before.
+### Cortex AI ###
+Snowflake offers powerful, intelligent features based on Artificial Intelligence (AI) and Machine Learning (ML). These features can help you do more with your data in less time than ever before.
 
 **Snowflake Cortex** is a suite of AI features that use large language models (LLMs) to understand unstructured data, answer freeform questions, and provide intelligent assistance. This suite of Snowflake AI Features comprises:
 
 - **Snowflake Cortex LLM Functions**: These are SQL and Python-based functions that can be used to develop an understanding, query, translate, summarize, and generate free-form text.
-The available functions are summarized below.
+  The available functions are summarized below.
 
-  - [*`COMPLETE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-complete): Given a prompt, returns a response that completes the prompt. This function accepts either a single prompt or a conversation with multiple prompts and responses.
+    - [*`COMPLETE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-complete): Given a prompt, returns a response that completes the prompt. This function accepts either a single prompt or a conversation with multiple prompts and responses.
 
-  - [*`EMBED_TEXT_768`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-embed-text): Creates a vector embedding of 768 dimensions for a given English-language text.
+    - [*`EMBED_TEXT_768`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-embed-text): Creates a vector embedding of 768 dimensions for a given English-language text.
 
-  - [*`EMBED_TEXT_1024`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-embed-text-1024): Creates a vector embedding of 1024 dimensions for a given English-language text. 
+    - [*`EMBED_TEXT_1024`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-embed-text-1024): Creates a vector embedding of 1024 dimensions for a given English-language text.
 
-  - [*`EXTRACT_ANSWER`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-extract-answer): Given a question and unstructured data, returns the answer to the question if it can be found in the data.
+    - [*`EXTRACT_ANSWER`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-extract-answer): Given a question and unstructured data, returns the answer to the question if it can be found in the data.
 
-  - [*`SENTIMENT`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-sentiment): Returns a sentiment score, from -1 to 1, representing the detected positive or negative sentiment of the given text.
+    - [*`SENTIMENT`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-sentiment): Returns a sentiment score, from -1 to 1, representing the detected positive or negative sentiment of the given text.
 
-  - [*`SUMMARIZE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-summarize): The SUMMARIZE function returns a summary of the given English text.
+    - [*`SUMMARIZE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-summarize): Returns a summary of the given English text.
 
-  - [*`TRANSLATE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-translate): The TRANSLATE function translates text from the indicated or detected source language to a target language..
+    - [*`TRANSLATE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-translate): Translates text from the indicated or detected source language to a target language..
 
 
 - **Universal Search** : Universal Search understands your query and information about your database objects and can find objects with names that differ from your search terms.
@@ -987,17 +956,14 @@ The available functions are summarized below.
 
 - **Cortex Analyst** : Cortex Analyst is a fully-managed, LLM-powered Snowflake Cortex feature that helps you create applications capable of reliably answering business questions based on your structured data in Snowflake
 
-**`Cortex AI`** is particularly useful for tasks like generating SQL queries based on natural language inputs, analyzing trends and patterns in large datasets, and supporting decision-making processes with AI-powered recommendations.
+> Learn more about [Snowflake AI and ML](https://docs.snowflake.com/en/guides-overview-ai-features).
 
-> Learn more about [Snowflake AI and ML](https://docs.snowflake.com/en/guides-overview-ai-features) documentation.
+### Some Data Prep for the Streamlit App ###
 
-### Data Prep for the Streamlit App
+Before we can use the chatbot app, we need to create two views to serve as its source dataset. 
 
-Before diving deeper into the creation of the app, we need to create our dataset, which will serve as the source for the application.
+Navigate to the `CHAT_WITH_MY_DATA` worksheet and execute:
 
-First, navigate  to our `CHAT_WITH_MY_DATA` worksheet and execute the following statements.
-
-- This SQL script creates a view called `financial_entity_attributes_limited` that selects and filters specific VARIABLE values from the financial_institution_attributes table.
 ```SQL
 -- Create the limited attributes view
 CREATE VIEW IF NOT EXISTS financial_entity_attributes_limited AS
@@ -1010,14 +976,13 @@ WHERE VARIABLE IN (
                    'SC'
     );
 
--- Confirm the view was created correctly - should show 6 rows with variable name and definition
+-- Confirm the view was created correctly - it should return 6 rows with variable names and definitions
 SELECT * FROM financial_entity_attributes_limited;
 ```
 
-- After that, exectute this SQL script which creates a view named `financial_entity_annual_time_series`, which combines data from financial institution time series, attributes, and entity information. The view filters for records on December 31st of each year and transforms and joins relevant columns to provide a unified dataset.
-
+Now, execute the following SQL query to create a view that combines data from financial institution time series, attributes, and entity information filtered for year-end records only:
 ```SQL
--- Create the modified time series view
+-- Create the end-of-year time series view
 CREATE VIEW IF NOT EXISTS financial_entity_annual_time_series AS
 SELECT
     ent.name as entity_name,
@@ -1040,15 +1005,79 @@ WHERE MONTH(date) = 12
 SELECT * FROM financial_entity_annual_time_series  LIMIT 10;
 ```
 
-### Build the streamlit app to chat with your data 
+### The CHAT_WITH_YOUR_DATA App ###
 
-Let's walk through the Streamlit app code that integrates with Snowflake and utilizes Cortex for dynamic SQL generation... 
+In the left Snowsight navigation panel, click on the `Projects > Streamlit` menu option. Once the lab admin has shared it, you will see an app called `CHAT_WITH_YOUR_DATA`. Clicking on it will run the app. It will take less than a minute for the app to initialize, and perform its initial LLM queries to render its output and be ready for a user prompt.
 
-### 1. Imports, Defaults and Configuration
+> The following is a list of potential questions that you might want to ask your data. Note that, as sophisticated LLMs have become, they are, after all, executed by computer so the "Garbage In, Garbage Out" principle applies fully. Users must craft their questions carefully and answers must be reviewed and validated which has risen the brand new discipline of Prompt Engineering.
 
-- **SLIDE_WINDOW**: sets the number of last conversations to remember.
+> Can you show me the top 10 financial entities with the highest Total Assets value for the year 2020?
+
+<img src="assets/chat_data/chat_data_01.png">
+
+> List the top 10 financial entities that have a Total Securities value below 5000000 for the year 1995.
+
+<img src="assets/chat_data/chat_data_02.png">
+
+> What are the cities with the highest average Total deposits for the year 2000?
+
+<img src="assets/chat_data/chat_data_03.png">
+
+> What are the top 10 financial entities with the highest total assets?
+> > Oops, we did not specify for which year :(
+
+<img src="assets/chat_data/chat_data_04.png">
+
+> Show the number of real estate loans for the city of New York between 2010 and 2020.
+
+<img src="assets/chat_data/chat_data_05.png">
+
+> What is the percentage of insured deposits for the financial entity named 'Bank of America'?
+> > Oops, we did not specify for which year :(
+
+<img src="assets/chat_data/chat_data_06.png">
+
+> What are the total assets of the financial entity named 'Bank of America'in 2020?
+> > It also turns out there is more than one 'Bank of America' :(
+
+<img src="assets/chat_data/chat_data_07.png">
+
+> List all financial entities named like 'Bank of America' with the total assets for each in 2020
+> > Finally! Though we could have asked to have the list sorted by value...
+
+<img src="assets/chat_data/chat_data_08.png">
+
+> What is the total amount of real estate loans for Sacramento in a 2021?
+
+<img src="assets/chat_data/chat_data_10.png">
+
+> What are the names of the top 10 banks with the highest Total Assets?
+> > This likely pulled values from different years so not really comparing apples to apples :(
+
+<img src="assets/chat_data/chat_data_11.png">
+
+> Show me the Total Securities for all banks in New York.
+> > This lumped the securities sums from all years :(
+
+<img src="assets/chat_data/chat_data_12.png">
+
+> What is the average percentage of Insured (Estimated) for all banks in California?
+> > Another all-time mess :(
+
+<img src="assets/chat_data/chat_data_13.png">
+
+> List the financial entities in New York
+> > That ever existed? :(
+
+<img src="assets/chat_data/chat_data_14.png">
+
+#### The Code of the CHAT_WITH_YOUR_DATA App ####
+
+##### Imports, Defaults and Configuration ####
+
+- **SLIDE_WINDOW**: sets the number of last interactions to remember.
 - **pd.set_option**: configures Pandas to show full content in columns without truncation.
-- **database**: extracts digits from the user's name (st.experimental_user.user_name) to generate a workspace identifier.
+- **database**: extracts digits from the user's name (`st.experimental_user.user_name`) to generate a workspace identifier.
 - **SCHEMA_PATH, QUALIFIED_TABLE_NAME, and METADATA_QUERY**: define paths and queries based on the workspace, which are used to interact with the Snowflake database.
 ```PYTHON
 import re
@@ -1066,11 +1095,11 @@ QUALIFIED_TABLE_NAME = f"{SCHEMA_PATH}.FINANCIAL_ENTITY_ANNUAL_TIME_SERIES"
 METADATA_QUERY = f"SELECT VARIABLE_NAME, DEFINITION FROM {SCHEMA_PATH}.FINANCIAL_ENTITY_ATTRIBUTES_LIMITED;"
 ```
 
-### 2. Handling User Questions
+##### Handling User Questions #####
 
 - Manages the interaction with the user when they ask a question.
-- Updates the session state with the user's message and the assistant's response.
-If the assistant's response contains a SQL query, it executes the query and displays the results.
+- Updates the session state with the user's message and the LLM's (`assistant`) response.
+If the LLM's response contains a SQL query, executes the query and displays the results.
 
 ```PYTHON
 def handle_user_question(question):
@@ -1106,7 +1135,7 @@ def handle_user_question(question):
 
             st.session_state.messages.append(message)
 ```
-### 3. Displaying Chat and Handling Input
+##### Displaying Chat and Handling Input #####
 
 - Displays the chat UI, including the chat history and any results from previous queries.
 - Handles user input through a chat interface, passing it to handle_user_question for processing.
@@ -1129,7 +1158,7 @@ def display_chat_and_input():
         handle_user_question(question)
 ```
 
-### 4. Configuration Options
+##### Configuration Options #####
 
 - Provides configuration options in the sidebar for selecting the model, toggling chat history, debugging, and resetting the conversation.
 
@@ -1142,7 +1171,7 @@ def config_options():
     st.sidebar.expander("Session State").write(st.session_state)
 ```
 
-### 5 Initializing Messages
+##### Initializing Messages #####
 
 - Initializes the chat history with a system message when the conversation is reset or on the first run.
 
@@ -1154,7 +1183,7 @@ def init_messages():
         st.markdown(complete(system_prompt)[0].RESPONSE)
 ```
 
-### 6. Generating Prompts
+##### Generating Prompts #####
 
 - Generates the system prompt using the table context and predefined prompts, which is used to set the initial context for the chat.
 
@@ -1168,7 +1197,7 @@ def get_system_prompt():
     return prompts["system"].format(context=table_context)
 ```
 
-### 7. Completing User Queries
+##### Completing User Queries #####
 
 - Sends the user’s question to the Snowflake Cortex model to generate a response based on the prompt.
 
@@ -1180,7 +1209,7 @@ def complete(myquestion):
     return df_response
 ```
 
-### 8. Creating the User Query Prompt and Retrieving Chat History
+##### Creating the User Query Prompt and Retrieving Chat History #####
 
 - Creates a prompt for the Snowflake Cortex model based on the user’s question and chat history.
 
@@ -1204,7 +1233,7 @@ def get_chat_history():
 
 ```
 
-### 9. Getting Table Context
+##### Getting Table Context #####
 
 Retrieves metadata and context for the specified table, which is used in generating the system prompt.
 
@@ -1233,7 +1262,7 @@ Here are the columns of the {'.'.join(table)}
     return context
 ```
 
-### 10. Defining Prompts
+##### Defining Prompts #####
 
 - Consolidates all the prompt templates into a single function that returns a dictionary of prompts. This makes it easier to manage and update the prompts.
 
@@ -1250,101 +1279,7 @@ def get_prompts():
     return prompts
 ```
 
-### Potential questions that you might want to ask your data
-
-- `Can you show me the top 10 financial entities with the highest Total Assets value for the year 2020?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_01.png" alt="Description" width="500">
-</ul>
-
-- `List the top 10 financial entities that have a Total Securities value below 5000000 for the year 1995.`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_02.png" alt="Description" width="500">
-</ul>
-
-- `What are the cities with the highest average Total deposits for the year 2000?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_03.png" alt="Description" width="500">
-</ul>
-
-- `What are the top 10 financial entities with the highest total assets?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_04.png" alt="Description" width="500">
-</ul>
-
-- `Show the number of real estate loans for the city of New York between 2010 and 2020.`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_05.png" alt="Description" width="500">
-</ul>
-
-- `What is the percentage of insured deposits for the financial entity named 'Bank of America'?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_06.png" alt="Description" width="500">
-</ul>
-
-- `What are the total assets of the financial entity named 'Bank of America'in 2020?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_07.png" alt="Description" width="500">
-</ul>
-
-- `List all financial entities named like 'Bank of America' with the total assets for each in 2020`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_08.png" alt="Description" width="500">
-</ul>
-
-- `Which banks have the highest percentage of insured deposits in California?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_09.png" alt="Description" width="500">
-</ul>
-
-- `What is the total amount of real estate loans for Sacramento in a 2021?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_10.png" alt="Description" width="500">
-</ul>
-
-- `What are the names of the top 10 banks with the highest Total Assets?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_11.png" alt="Description" width="500">
-</ul>
-
-- `Show me the Total Securities for all banks in New York.`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_12.png" alt="Description" width="500">
-</ul>
-
-- `What is the average percentage of Insured (Estimated) for all banks in California?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_13.png" alt="Description" width="500">
-</ul>
-
-- `List the financial entities in New York`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_14.png" alt="Description" width="500">
-</ul>
-
-- `List the bank has the most assets?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_15.png" alt="Description" width="500">
-</ul>
-
-### Sample with follow-up questions
-
-- `List the financial entities with their total securities values that have a total securities value below 5000000 for the year 1995`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_16.png" alt="Description" width="500">
-</ul>
-
-- `Sort the last result by total securities value in descending order`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_17.png" alt="Description" width="500">
-</ul>
-
-- `What are the top 5 in this list by Total Securities value?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_18.png" alt="Description" width="500">
-</ul>
-
-## Visualizate your data.
+## The VISUALIZE_YOUR_DATA App ##
 
 To facilitate data visualization, we are utilizing the inherent integration capabilities between Snowflake and Streamlit. We will use Snowflake's Cortex function, COMPLETE (https://docs.snowflake.com/en/sql-reference/functions/complete-snowflake-cortex), to access the pre-trained mistral-large LLM, which will generate the Python code for us. Streamlit will then execute this code to render the graphs. This process requires no development effort, allowing us to create variations of the graph on the fly without needing technical expertise.
 
@@ -1476,6 +1411,26 @@ After couple of seconds, the app will respond with:
 - `Transform value to number, Extract the year and filter by 2024 , Select quote_currency_id and value,  Aggregate and plot the result` using  database `FINANCIAL__ECONOMIC_ESSENTIALS`, schema `CYBERSYN`, table `FX_RATE_TIMESERIES` and `ploty` lib
 
 ![question3](assets/visualize_data/question_3.png)
+
+## Creating a Streamlit App ##
+
+> We explored apps which were created in advance. However, building your own app is simple and easy. The steps below will help you create your first Steamlit app with a sample code that you can adjust to your needs.
+
+In the left Snowsight navigation panel, select `Projects > Streamlit` tab and then click the `+ Streamlit App` button at the top right to create a new Streamlit-in-Snowflake application. Set the values for your app title, the database and schema where the app will be created and the virtual warehouse it will use.
+
+![streamlit](assets/streamlit_1.png)
+
+... and click `Create`. The Streamlit in Snowflake editor opens an example Streamlit app in Viewer mode. Viewer mode allows you to see how the Streamlit application appears to users.
+
+The Streamlit in Snowflake interface is divided into three panes:
+
+* Object browser: Allows you to see the databases, schemas, and views you have permissions to access.
+* Streamlit editor: Provides a Python editor for your Streamlit code.
+* Streamlit preview: Displays the running Streamlit app.
+
+By default, only the Streamlit editor and preview panes are displayed. To change the display, use the show/hide buttons in the lower-left corner of the Streamlit in Snowflake editor.
+
+![streamlit](assets/streamlit_2.png)
 
 ## Conclusion & Next Steps
 

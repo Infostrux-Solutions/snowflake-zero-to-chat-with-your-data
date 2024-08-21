@@ -273,10 +273,10 @@ WHERE VARIABLE IN (
                    'SC'
     );
 
--- Confirm the view was created correctly - should show 6 rows with variable name and definition
+-- Confirm the view was created correctly - it should return 6 rows with variable names and definitions
 SELECT * FROM financial_entity_attributes_limited;
 
--- Create the modified time series view
+-- Create the end-of-year time series view
 CREATE VIEW IF NOT EXISTS financial_entity_annual_time_series AS
 SELECT
     ent.name as entity_name,
