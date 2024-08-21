@@ -430,23 +430,32 @@ Execute the following statements in the worksheet to load the staged data into t
 
 ```SQL
 -- Load the company metadata from the stage into the table 
-COPY INTO company_metadata FROM @cybersyn_company_metadata file_format=csv PATTERN = '.*csv.*' ON_ERROR = 'CONTINUE';
+COPY INTO company_metadata
+  FROM @cybersyn_company_metadata
+  FILE_FORMAT = csv
+  PATTERN = '.*csv.*'
+  ON_ERROR = 'CONTINUE'
+;
 ```
 
 In the result pane, you should see the status of each file that was loaded. Once the load is done, in the **Query Details** pane on the bottom right, you can scroll through the various statuses, error statistics, and visualizations for the last statement executed.
 
 Next, navigate to the **Query History** tab by clicking the **Home** icon and then **Activity** > **Query History**. Select the query at the top of the list, which should be the COPY INTO statement that was last executed. Select the **Query Profile** tab and note the steps taken by the query to execute, query details, most expensive nodes, and additional statistics.
 
+Let's verify the data load:
+```snowflake
+-- Verify the table content
+SELECT * FROM company_metadata LIMIT 10;
+```
+
 ![history and duration](assets/Lab_Image_07.png)
 
 <!-- ------------------------ -->
 
-## Loading Semi-Structured Data into Snowflake: JSONs
+## Loading Semi-Structured Data into Snowflake: JSONs ##
 
 Duration: 16
 
-> aside positive
-> 
 >  This section requires loading additional data and, therefore, provides a review of data loading while also introducing loading semi-structured data.
 
 Going back to the lab's example, our company's analytics team wants to evaluate the performance of CPG companies through the lens of their reported metrics in SEC filings. To do this, in this section, we will:
@@ -460,29 +469,25 @@ The JSON data consists of SEC filings provided by *Cybersyn*, detailing the hist
 
 _(The full dataset available [**for free**](https://app.snowflake.com/marketplace/listing/GZTSZAS2KH9/) in Snowflake Marketplace from Cybersyn -- no ETL required. For the purposes of this demo, we will focus on working with the semi-structured JSON file to learn how to load structured data into Snowflake.)_
 
-> aside negative
-> 
 >  **SEMI-STRUCTURED DATA**
 Snowflake can easily load and query semi-structured data such as JSON, Parquet, or Avro without transformation. This is a key Snowflake feature because an increasing amount of business-relevant data being generated today is semi-structured, and many traditional data warehouses cannot easily load and query such data. Snowflake makes it easy!
 
-### Create New Tables for the Data
+### Create New Tables for the Data ###
 
-> aside positive
-> 
 >  **Executing Multiple Commands** Remember that you need to execute each command individually. However, you can execute them in sequence together by selecting all of the commands and then clicking the **Play/Run** button (or using the keyboard shortcut).
 
 Next, let's create two tables, `SEC_FILINGS_INDEX` and `SEC_FILINGS_ATTRIBUTES` to use for loading JSON data. In the worksheet, execute the following `CREATE TABLE` commands:
 
 ```SQL
+-- Create sec_filings_index table
 CREATE TABLE sec_filings_index (v variant);
 
+-- Create sec_filings_attributes table
 CREATE TABLE sec_filings_attributes (v variant);
 ```
 
 Note that Snowflake has a special data type called `VARIANT` that allows storing the entire JSON object as a single row and querying the object directly.
 
-> aside negative
-> 
 >  **Semi-Structured Data Magic**
 The `VARIANT` data type allows Snowflake to ingest semi-structured data without having to predefine the schema.
 
@@ -495,6 +500,7 @@ In the results pane at the bottom of the worksheet, verify that your tables, `SE
 In the `CHAT_WITH_MY_DATA` worksheet, use the following command to create a stage that points to the bucket where the semi-structured JSON data is stored on AWS S3:
 
 ```SQL
+-- Create the SEC filings stage
 CREATE STAGE cybersyn_sec_filings
 url = 's3://sfquickstarts/zero_to_snowflake/cybersyn_cpg_sec_filings/';
 ```
@@ -502,6 +508,7 @@ url = 's3://sfquickstarts/zero_to_snowflake/cybersyn_cpg_sec_filings/';
 Now let's take a look at the contents of the `cybersyn_sec_filings` stage. Execute the following `LIST` command to display the list of files:
 
 ```SQL
+-- List the contents of the SEC filings stage
 LIST @cybersyn_sec_filings;
 ```
 
@@ -510,15 +517,17 @@ In the results pane, you should see a list of `.gz` files from S3:
 
 ### Load and Verify the Semi-structured Data
 
-We will now use a warehouse to load the data from an S3 bucket into the tables we created earlier. In the `ZERO_TO_SNOWFLAKE_WITH_CYBERSYN` worksheet, execute the `COPY` command below to load the data.
+We will now use a warehouse to load the data from an S3 bucket into the tables we created earlier. In the `CHAT_WITH_MY_DATA` worksheet, execute the `COPY` command below to load the data.
 
 Note that you can specify a `FILE FORMAT` object inline in the command. In the previous section where we loaded structured data in CSV format, we had to define a file format to support the CSV structure. Because the JSON data here is well-formed, we are able to simply specify the JSON type and use all the default settings:
 
 ```SQL
+-- Load staged data into the sec_filings_index table
 COPY INTO sec_filings_index
 FROM @cybersyn_sec_filings/cybersyn_sec_report_index.json.gz
     file_format = (type = json strip_outer_array = true);
 
+-- Load staged data into the sec_filings_attributes table
 COPY INTO sec_filings_attributes
 FROM @cybersyn_sec_filings/cybersyn_sec_report_attributes.json.gz
     file_format = (type = json strip_outer_array = true);
@@ -529,7 +538,10 @@ Verify that each file has a status of `LOADED`:
 
 Now, let's take a look at the data that was loaded:
 ```SQL
+-- Verify the sec_filings_index data load
 SELECT * FROM sec_filings_index LIMIT 10;
+
+-- Verify the sec_filings_attributes data load
 SELECT * FROM sec_filings_attributes LIMIT 10;
 ```
 

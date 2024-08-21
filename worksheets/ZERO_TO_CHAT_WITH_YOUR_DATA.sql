@@ -58,6 +58,7 @@ COPY INTO company_metadata
     ON_ERROR = 'CONTINUE'
 ;
 
+-- Verify the table content
 SELECT * FROM company_metadata LIMIT 10;
 
 -- Create sec_filings_index table
@@ -66,27 +67,30 @@ CREATE TABLE sec_filings_index (v variant);
 -- Create sec_filings_attributes table
 CREATE TABLE sec_filings_attributes (v variant);
 
--- Verify that the table is empty by running the following command:
-SELECT * FROM company_metadata LIMIT 10;
-
+-- Create the SEC filings stage
 CREATE OR REPLACE STAGE cybersyn_sec_filings
     URL = 's3://sfquickstarts/zero_to_snowflake/cybersyn_cpg_sec_filings/'
 ;
 
+-- List the contents of the SEC filings stage
 LIST @cybersyn_sec_filings;
 
+-- Load staged data into the sec_filings_index table
 COPY INTO sec_filings_index
     FROM @cybersyn_sec_filings/cybersyn_sec_report_index.json.gz
     FILE_FORMAT = (type = json strip_outer_array = true)
 ;
 
-SELECT * FROM sec_filings_index LIMIT 10;
-
+-- Load staged data into the sec_filings_attributes table
 COPY INTO sec_filings_attributes
     FROM @cybersyn_sec_filings/cybersyn_sec_report_attributes.json.gz
     FILE_FORMAT = (type = json strip_outer_array = true)
 ;
 
+-- Verify the sec_filings_index data load
+SELECT * FROM sec_filings_index LIMIT 10;
+
+-- Verify the sec_filings_attributes data load
 SELECT * FROM sec_filings_attributes LIMIT 10;
 
 CREATE OR REPLACE VIEW sec_filings_index_view AS
