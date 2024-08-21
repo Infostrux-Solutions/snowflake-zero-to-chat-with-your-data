@@ -21,12 +21,15 @@ CREATE OR REPLACE TABLE company_metadata
     permid_quote_id variant
 );
 
+-- Create the company metadata stage
 CREATE OR REPLACE STAGE cybersyn_company_metadata
     URL = 's3://sfquickstarts/zero_to_snowflake/cybersyn-consumer-company-metadata-csv/'
 ;
 
+-- List the contents of the company metadata stage
 LIST @cybersyn_company_metadata;
 
+-- Create a CSV file format
 CREATE OR REPLACE FILE FORMAT csv
     TYPE = 'CSV'
         COMPRESSION = 'AUTO'  -- Automatically determines the compression of files
@@ -44,8 +47,10 @@ CREATE OR REPLACE FILE FORMAT csv
     COMMENT = 'File format for ingesting data for zero to snowflake'
 ;
 
+-- List file formats
 SHOW FILE FORMATS;
 
+-- Load the company metadata from the stage into the table
 COPY INTO company_metadata
     FROM @cybersyn_company_metadata
     FILE_FORMAT = csv
@@ -53,32 +58,42 @@ COPY INTO company_metadata
     ON_ERROR = 'CONTINUE'
 ;
 
+-- Verify the table content
 SELECT * FROM company_metadata LIMIT 10;
 
+-- Create sec_filings_index table
 CREATE OR REPLACE TABLE sec_filings_index (v variant);
 
+-- Create sec_filings_attributes table
 CREATE OR REPLACE TABLE sec_filings_attributes (v variant);
 
+-- Create the SEC filings stage
 CREATE OR REPLACE STAGE cybersyn_sec_filings
     URL = 's3://sfquickstarts/zero_to_snowflake/cybersyn_cpg_sec_filings/'
 ;
 
+-- List the contents of the SEC filings stage
 LIST @cybersyn_sec_filings;
 
+-- Load staged data into the sec_filings_index table
 COPY INTO sec_filings_index
     FROM @cybersyn_sec_filings/cybersyn_sec_report_index.json.gz
     FILE_FORMAT = (type = json strip_outer_array = true)
 ;
 
-SELECT * FROM sec_filings_index LIMIT 10;
-
+-- Load staged data into the sec_filings_attributes table
 COPY INTO sec_filings_attributes
     FROM @cybersyn_sec_filings/cybersyn_sec_report_attributes.json.gz
     FILE_FORMAT = (type = json strip_outer_array = true)
 ;
 
+-- Verify the sec_filings_index data load
+SELECT * FROM sec_filings_index LIMIT 10;
+
+-- Verify the sec_filings_attributes data load
 SELECT * FROM sec_filings_attributes LIMIT 10;
 
+-- Create a columnar view of the sec_filings_index JSON data
 CREATE OR REPLACE VIEW sec_filings_index_view AS
 SELECT
     v:CIK::string                   AS cik,
@@ -93,6 +108,7 @@ SELECT
 FROM sec_filings_index
 ;
 
+-- Create a columnar view of the sec_filings_attributes JSON data
 CREATE OR REPLACE VIEW sec_filings_attributes_view AS
 SELECT
     v:VARIABLE::string            AS variable,
@@ -112,11 +128,13 @@ SELECT
 FROM sec_filings_attributes
 ;
 
+-- Inspect sec_filings_index_view results
 SELECT * FROM sec_filings_index_view LIMIT 20;
 
+-- Inspect sec_filings_attributes_view results
 SELECT * FROM sec_filings_attributes_view LIMIT 20;
 
--- Closing Price Statistics
+-- Calculate stock price daily returns and 5-day moving averages
 SELECT
     meta.primary_ticker,
     meta.company_name,
@@ -130,7 +148,7 @@ FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
 WHERE ts.variable_name = 'Post-Market Close'
 LIMIT 100;
 
--- Trading Volume Statistics
+-- Calcualate trading volume changes
 SELECT
     meta.primary_ticker,
     meta.company_name,
@@ -143,10 +161,22 @@ FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
 WHERE ts.variable_name = 'Nasdaq Volume'
 LIMIT 100;
 
--- Clone a Table
-CREATE TABLE company_metadata_dev CLONE company_metadata;
+-- Use the query result cache for the stock price daily returns and 5-day moving averages
+SELECT
+    meta.primary_ticker,
+    meta.company_name,
+    ts.date,
+    ts.value AS post_market_close,
+    (ts.value / LAG(ts.value, 1) OVER (PARTITION BY meta.primary_ticker ORDER BY ts.date))::DOUBLE AS daily_return,
+    AVG(ts.value) OVER (PARTITION BY meta.primary_ticker ORDER BY ts.date ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS five_day_moving_avg_price
+FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
+         INNER JOIN company_metadata meta
+                    ON ts.ticker = meta.primary_ticker
+WHERE ts.variable_name = 'Post-Market Close'
+LIMIT 100;
 
-DROP TABLE company_metadata_dev;
+-- Clone the company_metadata_dev table
+CREATE OR REPLACE TABLE company_metadata_dev CLONE company_metadata;
 
 -- Joining Tables (limited to KRAFT HEINZ CO, cik = '0001637459')
 WITH data_prep AS (
@@ -192,21 +222,22 @@ SELECT
 FROM data_prep
 ORDER BY product, period_end_date;
 
--- Using Time Travel
--- Drop and Undrop a Table
+-- Drop the sec_filings_index table
 DROP TABLE sec_filings_index;
 
--- The following query should result in an error because the underlying table has been dropped
+-- Run a query on the non-existent sec_filings_index table
 SELECT * FROM sec_filings_index LIMIT 10;
 
--- Restore the table
+-- Restore the sec_filings_index table
 UNDROP TABLE sec_filings_index;
 
+-- Run a query on the restored sec_filings_index table
 SELECT * FROM sec_filings_index LIMIT 10;
 
--- Roll back changes to a table
--- Let's simulate an accidental column overwrite
+-- Simulate an accidental overwrite of an entire table column
 UPDATE company_metadata SET company_name = 'oops';
+
+-- View the overwritten column data
 SELECT company_name FROM company_metadata LIMIT 10;
 
 -- Set the session variable with the query_id of the last UPDATE query
@@ -218,9 +249,7 @@ SET query_id = (
     LIMIT 1
 );
 
-SELECT $query_id;
-
--- Use the session variable with the identifier syntax (e.g., $query_id)
+-- Restore the table to its state before the accidental UPDATE query
 CREATE OR REPLACE TABLE company_metadata AS
 SELECT *
 FROM company_metadata
@@ -234,7 +263,7 @@ SELECT company_name FROM company_metadata LIMIT 10;
 -- ----------------- --
 
 -- Create the limited attributes view
-CREATE VIEW IF NOT EXISTS financial_entity_attributes_limited AS
+CREATE OR REPLACE VIEW financial_entity_attributes_limited AS
 SELECT * from financial__economic_essentials.cybersyn.financial_institution_attributes
 WHERE VARIABLE IN (
                    'ASSET',
@@ -244,11 +273,11 @@ WHERE VARIABLE IN (
                    'SC'
     );
 
--- Confirm the view was created correctly - should show 6 rows with variable name and definition
+-- Confirm the view was created correctly - it should return 6 rows with variable names and definitions
 SELECT * FROM financial_entity_attributes_limited;
 
--- Create the modified time series view
-CREATE VIEW IF NOT EXISTS financial_entity_annual_time_series AS
+-- Create the end-of-year time series view
+CREATE OR REPLACE VIEW financial_entity_annual_time_series AS
 SELECT
     ent.name as entity_name,
     ent.city,

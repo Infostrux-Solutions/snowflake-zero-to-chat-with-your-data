@@ -1,34 +1,37 @@
 # Zero to Chat with Your Snowflake Data in 120 Minutes #
 
+<!-- ------------------------ -->
+
 ## Introduction ##
 
-> Based on the [Zero to Snowflake Quickstart](https://github.com/Snowflake-Labs/sfquickstarts/blob/master/site/sfguides/src/getting_started_with_snowflake/getting_started_with_snowflake.md) with an LLM twist.
+> Based on the [Zero to Snowflake Quickstart](https://github.com/Snowflake-Labs/sfquickstarts/blob/master/site/sfguides/src/getting_started_with_snowflake/getting_started_with_snowflake.md) enhanced with:
+> - an LLM Chatbot borrowed from [Frosty: Build an LLM Chatbot in Streamlit on your Snowflake Data](https://quickstarts.snowflake.com/guide/frosty_llm_chatbot_on_streamlit_snowflake/#0)
+> - a Visualization implementaiton from [LLM-Driven Plotting in Streamlit in Snowflake (SiS)](https://www.youtube.com/watch?v=WwH8pejGMPI) 
 
-This entry-level lab, designed for database and data warehouse administrators and architects, will give you a brief introduction to Snowflake and will walk you through creating a Cortex AI-powered LLM Chatbot in Streamlit.
+This entry-level lab, designed for database and data warehouse administrators and architects, will give you a brief introduction to Snowflake and will demonstrate Snowflake Cortex LLM functionality with:
+- a text-to-SQL Chatbot
+- a text-to-Python Chart Creator
 
 ### Prerequisites ###
 - Basic knowledge of SQL, database concepts, and objects
 - Familiarity with CSV (comma-delimited) files and JSON semi-structured data
 
 ## What You'll Learn ###
-We will use a Snowflake Enterprise edition account for this lab which has been pre-configured with databases, virtual warehouses and some additional objects to give us enough time to dig into the Streamlit Chatbot component of the lab. The lab will focus on:
+We will use a Snowflake Enterprise edition account for this lab which has been pre-configured with databases, virtual warehouses and some additional objects to give us enough time to dig into the Snowflake Cortex LLM and Streamlit components of the lab. The lab will focus on:
 
 - How to create stages, tables and views.
 - How to load structured and semi-structured data.
-- How to consume Cybersyn data from the [Snowflake Data Marketplace](https://app.snowflake.com/marketplace/listing/GZTSZAS2KF7/).
 - How to perform analytical queries on data in Snowflake, including joins between tables.
 - How to clone objects.
 - How to undo user errors using Time Travel.
-- How to use Cortex AI to ask questions about your data
-- How to use Cortex AI to summarize your data
 - How to create a Streamlit app
 - How to leverage Cortex AI queries to create your own Chatbot in Streamlit
+- How to use Cortex AI to ask questions about your data (text-to-SQL)
+- How to use Cortex AI to generate visualizations of data (text-to-Python)
 
->  SCREENSHOTS, SAMPLE CODE AND ENVIRONMENTS:
-Screenshots in this lab depict examples; results may vary slightly from what you see when you complete the exercises.
+> **SCREENSHOTS, SAMPLE CODE AND ENVIRONMENTS in this lab depict examples; results may vary slightly from what you see when you complete the exercises.**
 
-
-### Data You'll Use: ###
+### Data You'll Use ###
 **Cybersyn** is a next generation data company creating a real-time view of the world's economy with analytics-ready data exclusively on Snowflake Marketplace. Initially focused on consumer insights, Cybersyn enables you to access external data directly in your Snowflake instance — no ETL required.
 
 This lab will use the following Cybersyn datasets:
@@ -37,12 +40,13 @@ This lab will use the following Cybersyn datasets:
 - Company metadata
 
 Check out Cybersyn's [Consumer Spending product](https://app.snowflake.com/marketplace/listing/GZTSZ290BUX62/) and [explore all 60+ public sources](https://app.cybersyn.com/data_catalog/?utm_source=Snowflake+Quickstart&utm_medium=organic&utm_campaign=Snowflake+Quickstart) Cybersyn offers on the [Snowflake Marketplace](https://app.snowflake.com/marketplace/providers/GZTSZAS2KCS/Cybersyn).
+<!-- ------------------------ -->
 
 
 ## Lab Environment Access ##
-Each of you should have received a number when you arrived to allow you to access your your own workspace in Snowflake.
+Each lab participant should have received a number when you arrived to allow you to access your own workspace in Snowflake.
 
-Open a browser window and enter the URL:
+Open a browser window and access the URL:
 
 > https://app.snowflake.com/umnxxyz/lab_data_chat
 
@@ -60,9 +64,9 @@ Password: LAB123
 
 > When you login, you will be prompted to setup multifactor authentication. While this is a best practice and it is strongly recommended that you do that, we will be skipping it for the purposes of the lab, so just click on the `Not now` at the bottom left of the prompt.
 
-## The Snowflake User Interface ##
+<!-- ------------------------ -->
 
-Duration: 8
+## The Snowflake User Interface ##
 
 ### Navigating the Snowflake UI ###
 
@@ -70,12 +74,9 @@ Let's get you acquainted with Snowflake! This section covers the basic component
 
 ### Projects > Worksheets ###
 
-
-Under **Projects** on the left-hand panel, select the ​**Worksheets​** tab.
-
 ![snowflake navbar](assets/3UIStory_2.png)
 
-This provides an interface for submitting SQL queries, performing DDL and DML operations, and viewing results as your queries or operations complete. A new worksheet is created by clicking **`+`** on the top right.
+Under **Projects** on the left-hand panel, select the ​**Worksheets​** tab. This provides an interface for submitting SQL queries, performing DDL and DML operations, and viewing results as your queries or operations complete. A new worksheet is created by clicking **`+`** on the top right.
 
 ![worksheets tab main](assets/3UIStory_3.png)
 
@@ -110,13 +111,13 @@ The various panes on this page can be resized by adjusting their sliders. If you
 
 ### Projects > Notebooks ###
 
-Typically, a lot of SQL work happens in Snowflake's **Worksheets**. However, for this exercise we will use the Snowflake **Notebooks** interface. The **Notebooks** are Snowflake's implementation of Jupyter Notebooks, a powerful tool for data science that allow us to create a sequential mix of Markdown, SQL and Python cells to walk us through a complete data exploration or manipulation process.
+The **Notebooks** are Snowflake's implementation of Jupyter Notebooks, a powerful tool for data science that allow us to create a sequential mix of Markdown, SQL and Python cells to walk us through a complete data exploration or manipulation process.
 
 Under **Projects** on the left-hand panel, select the **Notebooks** tab.
 
 ![notebooks tab main](assets/3UIStory_3.Notebooks.png)
 
-### Notebooks Structure
+### Notebooks Structure ###
 
 ![notebook](assets/notebook_1.png)
 
@@ -130,7 +131,6 @@ Here’s a breakdown of what each section outlined in red in the Snowflake noteb
 **Main Code Area (Center Panel)**:
 
 - `Code Cells`: The central part of the screen is where you write and execute code. This area contains cells that can be set to different modes, such as SQL, Python, or Markdown, depending on the task you are performing. You can execute these cells individually, allowing for step-by-step data analysis or script execution.
-- `SQL and Python Cells`: The Python cell is likely used for data manipulation or analysis, while the SQL cell interacts with the Snowflake database, pulling or modifying data.
 
 **Top Right Panel (Toolbar)**: 
 - `The toolbar` offers controls for managing the notebook environment. You can add or remove packages, start or stop the execution environment, and run all code cells at once. This section helps manage the workflow, ensuring smooth execution of tasks within the notebook.
@@ -143,7 +143,7 @@ Under **Projects** on the left-hand panel, select the ​**Dashboards​** tab. 
 
 ### Data > Databases ###
 
-Under **Data**, the **Databases**​ tab shows information about the databases you have created or have permission to access. You can create, clone, drop, or transfer ownership of databases, as well as load data in the UI. Notice that a database already exists in your environment.
+Under **Data**, the **Databases**​ tab shows information about the databases you have created or have permission to access. You can create, clone, drop, or transfer ownership of databases, as well as load data in the UI. Notice that a `CHAT_WITH_YOUR_DATA` database already exists in your environment. You will also see the Cybersyn `FINANCIAL__ECONOMIC_ESSENTIALS` database which has been shared with you.
 
 ![databases tab](assets/3UIStory_6.png)
 
@@ -173,7 +173,9 @@ Under **Monitoring** there are multiple tabs for tracking your usage of your Sno
 
 ### Admin > Warehouses ###
 
-Under **Admin**, the **​Warehouses​** tab is where you set up and manage compute resources known as virtual warehouses to load or query data in Snowflake. A warehouse called `LAB_USER_WAREHOUSE_<number>` already exists in your environment.
+>  To see all the information available under the `Admin` menu, switch your role to `ACCOUNTADMIN`.
+
+Under **Admin**, the **​Warehouses​** tab is where you set up and manage compute resources known as virtual warehouses to load or query data in Snowflake. A warehouse called `LAB_USER_WAREHOUSE_<NUMBER>` already exists in your environment.
 
 ![warehouses tab](assets/3UIStory_10.png)
 
@@ -189,9 +191,9 @@ The **Roles** sub-tab of the **Users & Roles** tab shows a list of the roles and
 
 ![roles tab](assets/3UIStory_12.png)
 
-### Users ###
+#### Users ####
 
-The **Users** sub-tab of the **Users & Roles** tab shows a list of users in the account, default roles, and owner of the users. For a new account, no records are shown because no additional roles have been created. Permissions granted through your current role determine the information shown for this tab. To see all the information available on the tab, switch your role to `ACCOUNTADMIN`.
+The **Users** sub-tab of the **Users & Roles** tab shows a list of users in the account, default roles, and owner of the users. For a new account, no records are shown because no additional roles have been created. Permissions granted through your current role determine the information shown for this tab.
 
 ![users tab](assets/3UIStory_13.png)
 
@@ -199,39 +201,21 @@ Clicking on your username in the bottom right of the UI allows you to change you
 
 ![user preferences dropdown](assets/Lab_Image_01.png)
 
+> For additional information on Snowflake's role-based access control (RBAC) model, see the [Snowflake documentation](https://docs.snowflake.net/manuals/user-guide/security-access-control.html)
+
 ## Data Lab: Stock Price & SEC Filings Data ##
 
-Duration: 2
-
-### The Lab Story
+### The Lab Story ###
 You work at a grocery retailer. You want to understand the performance of major consumer goods (CPG) companies in the US that supply your store. This lab takes a look at daily stock price data and quarterly and annual Securities Exchange Commission (SEC) company filings to understand the performance of the CPG landscape. Public companies are required to submit a quarterly and annual report to the SEC detailing their financial data.
 
 We will start by collecting data from three different sources:
 1. Load company metadata `.csv` file.
 2. Load SEC filings from a semi-structured JSON format.
-3. Use the Snowflake Marketplace to find free stock price data from Cybersyn.
+3. Use a Snowflake Marketplace dataset from Cybersyn to find free stock price data.
 
 <!-- ------------------------ -->
 
 ## Loading Structured Data into Snowflake: CSVs ##
-
-Duration: 8
-### What are Micro-partitions?
-
-Before loading the data, it is worth knowing how the data is stored in Snowflake
-
-All data in Snowflake tables is automatically divided into micro-partitions, which are contiguous units of storage. Each micro-partition contains between 50 MB and 500 MB of uncompressed data (note that the actual size in Snowflake is smaller because data is always stored compressed). Groups of rows in tables are mapped into individual micro-partitions, organized in a columnar fashion. This size and structure allows for extremely granular pruning of very large tables, which can be comprised of millions, or even hundreds of millions, of micro-partitions.
-
-Snowflake stores metadata about all rows stored in a micro-partition, including:
-
-- The range of values for each of the columns in the micro-partition.
-
-- The number of distinct values.
-
-- Additional properties used for both optimization and efficient query processing.
-
-
-> For more information about micro partition [tables-clustering-micropartitions](https://docs.snowflake.com/en/user-guide/tables-clustering-micropartitions)
 
 Let's start by preparing to load structured `.csv` data into Snowflake.
 
@@ -243,34 +227,33 @@ We are using company metadata developed from the Securities and Exchange Commiss
 Data can be ingested into Snowflake from many locations by using the `COPY` command, Snowpipe auto-ingestion, external connectors, or third-party ETL/ELT solutions. For more information on getting data into Snowflake, see the [Snowflake documentation](https://docs.snowflake.net/manuals/user-guide-data-load.html). For the purposes of this lab, we use the `COPY` command and AWS S3 storage to load data manually. In a real-world scenario, you would more likely use an ETL solution or grab data directly from the Snowflake Marketplace!
 
 ### Preparing to Run the Lab Queries ###
-Now navigate to the **Notebooks** screen. The queries we will be using have been prepared in a Snowflake Worksheet named `ZERO_TO_CHAT_WITH_YOUR_DATA`. This is the "master" worksheet owned by the lab admin. We will create a copy of that worksheet and use our individual copies.
+Now navigate to the **Worksheets** screen. The queries we will be using have been prepared in a Snowflake Worksheet named `ZERO_TO_CHAT_WITH_YOUR_DATA`. This is the "master" worksheet owned by the lab admin. We will create a copy of that worksheet and use our individual copies.
 
 ![Worksheet image](assets/Lab_Image_0.png)
 
-Now, let's create a copy of the worksheet:
-* Navigate to `Projects` > `Worsheets` and open the `ZERO_TO_CHAT_WITH_YOUR_DATA` worksheet
-* Click on three dots `...` which appear to the right of the worksheet name and select `Duplicate`, then close the original Worksheet.
+* Open the `ZERO_TO_CHAT_WITH_YOUR_DATA` worksheet
+* In the left navigation panel, click on three dots `...` which appear to the right of the worksheet name and select `Duplicate`, then close the original Worksheet.
 
 We need to set the context appropriately within the new Worksheet. In the upper right corner of the worksheet, click the box to the left of the **Share** button to show the context menu. Here we control the elements you can see and run from each worksheet. We are using the UI here to set the context. Later in the lab, we will accomplish the same thing via SQL commands within the worksheet.
 
 Select the following context settings:
 
-**Role:** `LAB_USER_<number>`
-**Warehouse:** `LAB_USER_WAREHOUSE_<number>`
+**Role:** `LAB_USER_<NUMBER>`
+**Warehouse:** `LAB_USER_WAREHOUSE_<NUMBER>`
 
 ![context role and warehouse settings](assets/Lab_Image_02.png)
 
-Finally, we need to select the database and schema context of our worksheet:
+Finally, we need to select the database and schema context of our worksheet. We'll run a group of queries:
   * Highlight the group of queries at the top of the worksheet and click the "Play" ▶️ button at the top right of the worksheet.
-  * The header of the worksheet should show the selected database and schema like `CHAT_WITH_YOUR_DATA.WORKSPACE_<number>`
+  * The header of the worksheet should show the selected database and schema like `CHAT_WITH_YOUR_DATA.WORKSPACE_<NUMBER>`
 
-### Create Our First Table
+### Create Our First Table ###
 >  **Data Definition Language (DDL) operations are free!**
 All the DDL operations we have done so far do not require compute resources, so we can create all our objects for free.
 
-To make working in the worksheet easier, let's rename it. In the top left corner, double-click the worksheet name, which is the timestamp when the worksheet was created, and change it to `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN`.
+To make working in the worksheet easier, let's rename it. In the top left corner, double-click the worksheet name, which is the timestamp when the worksheet was created, and change it to `CHAT_WITH_MY_DATA`.
 
-Next we create a table called `COMPANY_METADATA` to use for loading the comma-delimited data. Instead of using the UI, we use the worksheet to run the DDL that creates the table:
+Next we create a table called `COMPANY_METADATA` to use for loading the comma-delimited data. We use the worksheet to run the DDL that creates the table:
 
 ```SQL
 CREATE OR REPLACE TABLE company_metadata
@@ -298,32 +281,37 @@ Verify your `COMPANY_METADATA` table has been created. At the bottom of the work
 
 ![TRIPS confirmation message](assets/Lab_Image_00.png)
 
-Navigate to the **Databases** tab by clicking the **HOME** icon in the upper left corner of the worksheet. Then click **Data** > **Databases**. In the list of databases, click `CHAT_WITH_YOUR_DATA` > `WORKSPACE_<number>` > **TABLES** to see your newly created `COMPANY_METADATA` table. If you don't see any databases on the left, expand your browser because they may be hidden.
+Navigate to the **Databases** tab by clicking the **HOME** icon in the upper left corner of the worksheet. Then click **Data** > **Databases**. In the list of databases, click `CHAT_WITH_YOUR_DATA` > `WORKSPACE_<NUMBER>` > `Tables` to see your newly created `COMPANY_METADATA` table. If you don't see any databases on the left, expand your browser because they may be hidden.
 
 ![TRIPS table](assets/Lab_Image_table1.png)
 
-Click `COMPANY_METADATA` and the **Columns** tab to see the table structure you just created.
+* In the left navigation panel, hover over the `COMPANY_METADATA` table and, in the flyout, click on the `Open Table details in new tab` pop-out button in the top right corner. In the new tab, click on the **Columns** tab to see the table structure you just created.
 
 ![TRIPS table structure](assets/Lab_Image_table2.png)
 
-### Create an External Stage
+### Create an External Stage ###
 
 We are working with structured, comma-delimited data that has already been staged in a public, external S3 bucket. Before we can use this data, we first need to create a _stage_ that specifies the location of our external bucket.
 
 >  For this lab, we are using an AWS-East bucket. To prevent data egress/transfer costs in the future, you should select a staging location from the same cloud provider and region as your Snowflake account.
 
-Create the stage by executing the following SQL statement:
+Back in the `CHAT_WITH_MY_DATA` worksheet, create the stage by executing the following SQL statement:
 
 ```SQL
+-- Create the company metadata stage
 CREATE OR REPLACE  STAGE cybersyn_company_metadata
     URL = 's3://sfquickstarts/zero_to_snowflake/cybersyn-consumer-company-metadata-csv/';
 ```
 
->  The S3 bucket for this lab is public so you can leave the credentials options in the statement empty. In a real-world scenario, the bucket used for an external stage would likely require key information.
+> Make sure to include the final forward slash (`/`) at the end of the URL or you will encounter errors later when loading data from the bucket.
 
-Now let's take a look at the contents of the `cybersyn_company_metadata` stage. Add the following SQL statement below the previous code and then execute:
+> The S3 bucket for this lab is public so you can leave the credentials options in the statement empty. In a real-world scenario, the bucket used for an external stage would likely require key information.
+
+
+Now let's take a look at the contents of the `cybersyn_company_metadata` stage:
 
 ```SQL
+-- List the contents of the company metadata stage
 LIST @cybersyn_company_metadata;
 ```
 
@@ -331,11 +319,12 @@ In the results in the bottom pane, you should see the list of files in the stage
 
 ![worksheet result](assets/Lab_Image_03.png)
 
-### Create a File Format
+### Create a File Format ###
 
-Before we can load the data into Snowflake, we have to create a file format that matches the data structure. In the worksheet, again add the following command below the rest and execute to create the file format:
+Before we can load the data into Snowflake, we have to create a file format that matches the data structure. In the `CHAT_WITH_MY_DATA` worksheet, run the following command to create the file format:
 
 ```SQL
+-- Create a CSF file format
 CREATE OR REPLACE FILE FORMAT csv
     TYPE = 'CSV'
     COMPRESSION = 'AUTO'  -- Automatically determines the compression of files
@@ -358,17 +347,18 @@ CREATE OR REPLACE FILE FORMAT csv
 Verify the file format has been created with the correct settings by executing the following command:
 
 ```SQL
+-- List file formats
 SHOW FILE FORMATS;
 ```
 
 The file format created should be listed in the result:
 ![create file format settings](assets/Lab_Image_05.png)
 
-### Use a Warehouse for Data Loading
+### Use a Warehouse for Data Loading ###
 
 We will now use a virtual warehouse and the `COPY` command to initiate bulk loading of structured data into the Snowflake table we created.
 
-> **Note:** For this lab, the user is granted access to a pre-established warehouse designed specifically for their use.
+> **NOTE:** For this lab, the user is granted access to a pre-established warehouse designed specifically for their use.
 
 Compute resources are needed for loading data. Snowflake's compute nodes are called virtual warehouses and they can be dynamically sized up or out according to workload, whether you are loading data, running a query, or performing a DML operation. Each workload can have its own warehouse so there is no resource contention.
 
@@ -376,16 +366,26 @@ Navigate to the **Warehouses** tab (under **Admin**). This is where you can view
 
 Note the **+ Warehouse** option in the upper right corner of the top. This is where you can quickly add a new warehouse. However, we want to use the existing warehouse `LAB_USER_WAREHOUSE_<NUMBER>`.
 
-
 Click the row of the `LAB_USER_WAREHOUSE_<NUMBER>` warehouse. Then click the **[...]** in the upper right corner text above it to see the actions you can perform on the warehouse. We will use this warehouse to load the data from AWS S3.
 
 ![warehouse image](assets/Lab_Image_1_wh.png)
 
-The **Size** drop-down is where the capacity of the warehouse is selected. For larger data loading operations or more compute-intensive queries, a larger warehouse is recommended. The sizes translate to the underlying compute resources provisioned from the cloud provider (AWS, Azure, or GCP) where your Snowflake account is hosted. It also determines the number of credits consumed by the warehouse for each full hour it runs. The larger the size, the more compute resources from the cloud provider are allocated to the warehouse and the more credits it consumes. For example, the `4X-Large` setting consumes 128 credits for each full hour. This sizing can be changed up or down at any time with a simple click.
+Click **Edit** to walk through the options of this warehouse and learn some of Snowflake's unique functionality.
+
+>  If this account isn't using Snowflake Enterprise Edition (or higher), you will not see the **Mode** or **Clusters** options shown in the screenshot below. The multi-cluster warehouses feature is not used in this lab, but we will discuss it as a key capability of Snowflake.
 
 ![warehouse edit image](assets/Lab_Image_2_wh.png)
 
+- The **Size** drop-down is where the capacity of the warehouse is selected. For larger data loading operations or more compute-intensive queries, a larger warehouse is recommended. The sizes translate to the underlying compute resources provisioned from the cloud provider (AWS, Azure, or GCP) where your Snowflake account is hosted. It also determines the number of credits consumed by the warehouse for each full hour it runs. The larger the size, the more compute resources from the cloud provider are allocated to the warehouse and the more credits it consumes. For example, the `4X-Large` setting consumes 128 credits for each full hour. This sizing can be changed up or down at any time with a simple click.
 
+- If you are using Snowflake Enterprise Edition (or higher) the **Query Acceleration** option is available. When it is enabled for a warehouse, it can improve overall warehouse performance by reducing the impact of outlier queries, which are queries that use more resources than the typical query. Leave this disabled 
+
+- If you are using Snowflake Enterprise Edition (or higher) and the **Multi-cluster Warehouse** option is enabled, you will see additional options. This is where you can set up a warehouse to use multiple clusters of compute resources, up to 10 clusters. For example, if a `4X-Large` multi-cluster warehouse is assigned a maximum cluster size of 10, it can scale out to 10 times the compute resources powering that warehouse...and it can do this in seconds! However, note that this will increase the number of credits consumed by the warehouse to 1280 if all 10 clusters run for a full hour (128 credits/hour x 10 clusters). Multi-cluster is ideal for concurrency scenarios, such as many business analysts simultaneously running different queries using the same warehouse. In this use case, the various queries are allocated across multiple clusters to ensure they run quickly.
+
+- Under **Advanced Warehouse Options**, the options allow you to automatically suspend the warehouse when not in use so no credits are needlessly consumed. There is also an option to automatically resume a suspended warehouse so when a new workload is sent to it, it automatically starts back up. This functionality enables Snowflake's efficient "pay only for what you use" billing model which allows you to scale your resources when necessary and automatically scale down or turn off when not needed, nearly eliminating idle resources. Additionally, there is an option to change the Warehouse type from Standard to Snowpark-optimized. Snowpark-optmized warehouses provide 16x memory per node and are recommended for workloads that have large memory requirements such as ML training use cases using a stored procedure on a single virtual warehouse node. Leave this type as Standard
+
+>  **Snowflake Compute vs Other Data Warehouses**
+Many of the virtual warehouse and compute capabilities we just covered, such as the ability to create, scale up, scale out, and auto-suspend/resume virtual warehouses are easy to use in Snowflake and can be done in seconds. For on-premise data warehouses, these capabilities are much more difficult, if not impossible, as they require significant physical hardware, over-provisioning of hardware for workload spikes, and significant configuration work, as well as additional challenges. Even other cloud-based data warehouses cannot scale up and out like Snowflake without significantly more configuration work and time.
 
 **Warning - Watch Your Spend!**
 During or after this lab, you should be careful about performing the following actions without good reason or you may burn through your $400 of free credits more quickly than desired:
@@ -393,53 +393,16 @@ During or after this lab, you should be careful about performing the following a
 - Do not disable auto-suspend. If auto-suspend is disabled, your warehouses continues to run and consume credits even when not in use.
 - Do not use a warehouse size that is excessive given the workload. The larger the warehouse, the more credits are consumed.
 
-#### Warehouse size pricing 
+We are going to use this virtual warehouse to load the structured data in the CSV files (stored in the AWS S3 bucket) into Snowflake.
 
-The following table shows the spending in credits per hour and per second.
-
-![dwh pride](assets/dwh_img_1.png)
-
-> `Note` : For more information you can refer to the [Overview of warehouses](https://docs.snowflake.com/en/user-guide/warehouses-overview) section of the official Snowflake documentation.
-
-
-### Scaling Up
-
-In Snowflake, "scale up" refers to increasing the computational resources of a virtual warehouse by switching to a larger warehouse size. This means increasing the amount of CPU, memory, and I/O resources available to handle queries and other operations.
-
-***When to Use It?*** You might scale up when you need to process more data, reduce query execution times, or handle a spike in workload. It’s useful for running more resource-intensive queries more quickly.
-
->For more information about scaling up, you can refer to the [Warehouse considerations](https://docs.snowflake.com/en/user-guide/warehouses-considerations) section of the official Snowflake documentation.
-
-
-### Scaling Out / Multi-cluster Warehouses
-
-Multi-clusters are designed specifically for handling queuing and performance issues related to large numbers of concurrent users and/or queries.
-
-With multi-cluster warehouses, Snowflake supports allocating, either statically or dynamically, additional clusters to make a larger pool of compute resources available. A multi-cluster warehouse is defined by specifying the following properties:
-- Maximum number of clusters, greater than 1 (up to 10).
-- Minimum number of clusters, equal to or less than the maximum (up to 10). 
-
-#### Maximized vs. auto-scale
-
-You can run a multi-cluster warehouse in two modes:
-
-- `Maximized`: Set the same value for both the maximum and minimum number of clusters (must be larger than 1). All clusters start simultaneously, providing maximum resources, ideal for consistent high workloads.
-
-- `Auto-scale`: Set different values for the maximum and minimum number of clusters. Snowflake dynamically starts or stops clusters based on demand, optimizing resource use and cost.
- 
->`Note`: It’s helpful to remember that the difference between scaling up > vs. out is that scaling out is best used for higher number of concurrent queries. When there are more queries submitted that can be processed, queries accumulate in the queue and wait to be run.
->
->For more information about scaling out, you can refer to the [What is a Multi-Cluster Warehouse?](https://docs.snowflake.com/en/user-guide/warehouses-multicluster) section of the official Snowflake documentation.
-
-
-### Load the Data
+### Load the Data ###
 
 Now we can run a COPY command to load the data into the `COMPANY_METADATA` table we created earlier.
 
-Navigate back to the `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN` worksheet in the **Worksheets** tab. Make sure the worksheet context is correctly set:
+Navigate back to the `CHAT_WITH_MY_DATA` worksheet in the **Worksheets** tab. Make sure the worksheet context is correctly set:
 
-**Role:** `LAB_USER_<number>`
-**Warehouse:** `LAB_USER_WAREHOUSE`
+**Role:** `LAB_USER_<NUMBER>`
+**Warehouse:** `LAB_USER_WAREHOUSE_<NUMBER>`
 **Database:** `CHAT_WITH_YOUR_DATA`
 **Schema:** `WORKSPACE_<NUMBER>`
 
@@ -448,23 +411,32 @@ Navigate back to the `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN` worksheet in th
 Execute the following statements in the worksheet to load the staged data into the table. This may take up to 30 seconds.
 
 ```SQL
-COPY INTO company_metadata FROM @cybersyn_company_metadata file_format=csv PATTERN = '.*csv.*' ON_ERROR = 'CONTINUE';
+-- Load the company metadata from the stage into the table 
+COPY INTO company_metadata
+  FROM @cybersyn_company_metadata
+  FILE_FORMAT = csv
+  PATTERN = '.*csv.*'
+  ON_ERROR = 'CONTINUE'
+;
 ```
 
 In the result pane, you should see the status of each file that was loaded. Once the load is done, in the **Query Details** pane on the bottom right, you can scroll through the various statuses, error statistics, and visualizations for the last statement executed.
 
 Next, navigate to the **Query History** tab by clicking the **Home** icon and then **Activity** > **Query History**. Select the query at the top of the list, which should be the COPY INTO statement that was last executed. Select the **Query Profile** tab and note the steps taken by the query to execute, query details, most expensive nodes, and additional statistics.
 
+Let's verify the data load:
+```snowflake
+-- Verify the table content
+SELECT * FROM company_metadata LIMIT 10;
+```
+
 ![history and duration](assets/Lab_Image_07.png)
 
 <!-- ------------------------ -->
 
-## Loading Semi-Structured Data into Snowflake: JSONs
+## Loading Semi-Structured Data into Snowflake: JSONs ##
 
-Duration: 16
 
-> aside positive
-> 
 >  This section requires loading additional data and, therefore, provides a review of data loading while also introducing loading semi-structured data.
 
 Going back to the lab's example, our company's analytics team wants to evaluate the performance of CPG companies through the lens of their reported metrics in SEC filings. To do this, in this section, we will:
@@ -478,29 +450,25 @@ The JSON data consists of SEC filings provided by *Cybersyn*, detailing the hist
 
 _(The full dataset available [**for free**](https://app.snowflake.com/marketplace/listing/GZTSZAS2KH9/) in Snowflake Marketplace from Cybersyn -- no ETL required. For the purposes of this demo, we will focus on working with the semi-structured JSON file to learn how to load structured data into Snowflake.)_
 
-> aside negative
-> 
 >  **SEMI-STRUCTURED DATA**
 Snowflake can easily load and query semi-structured data such as JSON, Parquet, or Avro without transformation. This is a key Snowflake feature because an increasing amount of business-relevant data being generated today is semi-structured, and many traditional data warehouses cannot easily load and query such data. Snowflake makes it easy!
 
-### Create New Tables for the Data
+### Create New Tables for the Data ###
 
-> aside positive
-> 
 >  **Executing Multiple Commands** Remember that you need to execute each command individually. However, you can execute them in sequence together by selecting all of the commands and then clicking the **Play/Run** button (or using the keyboard shortcut).
 
 Next, let's create two tables, `SEC_FILINGS_INDEX` and `SEC_FILINGS_ATTRIBUTES` to use for loading JSON data. In the worksheet, execute the following `CREATE TABLE` commands:
 
 ```SQL
+-- Create sec_filings_index table
 CREATE TABLE sec_filings_index (v variant);
 
+-- Create sec_filings_attributes table
 CREATE TABLE sec_filings_attributes (v variant);
 ```
 
 Note that Snowflake has a special data type called `VARIANT` that allows storing the entire JSON object as a single row and querying the object directly.
 
-> aside negative
-> 
 >  **Semi-Structured Data Magic**
 The `VARIANT` data type allows Snowflake to ingest semi-structured data without having to predefine the schema.
 
@@ -510,9 +478,10 @@ In the results pane at the bottom of the worksheet, verify that your tables, `SE
 
 ### Create Another External Stage
 
-In the `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN` worksheet, use the following command to create a stage that points to the bucket where the semi-structured JSON data is stored on AWS S3:
+In the `CHAT_WITH_MY_DATA` worksheet, use the following command to create a stage that points to the bucket where the semi-structured JSON data is stored on AWS S3:
 
 ```SQL
+-- Create the SEC filings stage
 CREATE STAGE cybersyn_sec_filings
 url = 's3://sfquickstarts/zero_to_snowflake/cybersyn_cpg_sec_filings/';
 ```
@@ -520,23 +489,26 @@ url = 's3://sfquickstarts/zero_to_snowflake/cybersyn_cpg_sec_filings/';
 Now let's take a look at the contents of the `cybersyn_sec_filings` stage. Execute the following `LIST` command to display the list of files:
 
 ```SQL
+-- List the contents of the SEC filings stage
 LIST @cybersyn_sec_filings;
 ```
 
 In the results pane, you should see a list of `.gz` files from S3:
 ![results output](assets/7SemiStruct_3_1.png)
 
-### Load and Verify the Semi-structured Data
+### Load and Verify the Semi-structured Data ##
 
-We will now use a warehouse to load the data from an S3 bucket into the tables we created earlier. In the `ZERO_TO_SNOWFLAKE_WITH_CYBERSYN` worksheet, execute the `COPY` command below to load the data.
+We will now use a warehouse to load the data from an S3 bucket into the tables we created earlier. In the `CHAT_WITH_MY_DATA` worksheet, execute the `COPY` command below to load the data.
 
 Note that you can specify a `FILE FORMAT` object inline in the command. In the previous section where we loaded structured data in CSV format, we had to define a file format to support the CSV structure. Because the JSON data here is well-formed, we are able to simply specify the JSON type and use all the default settings:
 
 ```SQL
+-- Load staged data into the sec_filings_index table
 COPY INTO sec_filings_index
 FROM @cybersyn_sec_filings/cybersyn_sec_report_index.json.gz
     file_format = (type = json strip_outer_array = true);
 
+-- Load staged data into the sec_filings_attributes table
 COPY INTO sec_filings_attributes
 FROM @cybersyn_sec_filings/cybersyn_sec_report_attributes.json.gz
     file_format = (type = json strip_outer_array = true);
@@ -547,7 +519,10 @@ Verify that each file has a status of `LOADED`:
 
 Now, let's take a look at the data that was loaded:
 ```SQL
+-- Verify the sec_filings_index data load
 SELECT * FROM sec_filings_index LIMIT 10;
+
+-- Verify the sec_filings_attributes data load
 SELECT * FROM sec_filings_attributes LIMIT 10;
 ```
 
@@ -557,12 +532,10 @@ Click any of the rows to display the formatted JSON in the right panel:
 
 To close the display in the panel and display the query details again, click the **X** (Close) button that appears when you hover your mouse in the right corner of the panel.
 
-### Create a View and Query Semi-Structured Data
+### Create a View and Query Semi-Structured Data ##
 
 Next, let's look at how Snowflake allows us to create a view and also query the JSON data directly using SQL.
 
-> aside negative
-> 
 >  **Views & Materialized Views**
 A view allows the result of a query to be accessed as if it were a table. Views can help present data to end users in a cleaner manner, limit what end users can view in a source table, and write more modular SQL.
 
@@ -571,6 +544,7 @@ Snowflake also supports materialized views in which the query results are stored
 Run the following command to create a columnar view of the semi-structured JSON SEC filing data, so it is easier for analysts to understand and query. The CIK corresponds to the Central Index Key, or unique identifier that SEC gives to each filing entity. The ADSH is the document number for any filing submitted to the SEC.
 
 ```SQL
+-- Create a columnar view of the sec_filings_index JSON data
 CREATE OR REPLACE VIEW sec_filings_index_view AS
 SELECT
     v:CIK::string                   AS cik,
@@ -584,6 +558,7 @@ SELECT
     v:FISCAL_YEAR::string           AS fiscal_year
 FROM sec_filings_index;
 
+-- Create a columnar view of the sec_filings_attributes JSON data
 CREATE OR REPLACE VIEW sec_filings_attributes_view AS
 SELECT
     v:VARIABLE::string            AS variable,
@@ -612,25 +587,26 @@ The new view should appear as `SEC_FILINGS_INDEX_VIEW` under `CHAT_WITH_YOUR_DAT
 Notice the results look just like a regular structured data source: 
 
 ```SQL
-SELECT *
-FROM sec_filings_index_view
-LIMIT 20;
+-- Inspect sec_filings_index_view results
+SELECT * FROM sec_filings_index_view LIMIT 20;
+
+-- Inspect sec_filings_attributes_view results
+SELECT * FROM sec_filings_attributes_view LIMIT 20;
 ```
 <!-- ------------------------ -->
 
-## Getting Data from Snowflake Marketplace
+## Getting Data from Snowflake Marketplace ##
 
-Duration: 5
 
-### Snowflake Data Marketplace
+### Snowflake Data Marketplace ###
 
-> **Note**: For this lab, we are going to use the FINANCIAL__ECONOMIC_ESSENTIALS database that is already pre-installed; however, here are the step-by-step instructions to get the database from the marketplace.
+> **NOTE**: For this lab, we are going to use the `FINANCIAL__ECONOMIC_ESSENTIALS` database that has already been shared with your user account. However, the following are the step-by-step instructions to get the database from the marketplace should you need to.
 
 Make sure you're using the `ACCOUNTADMIN` role and, navigate to **Data Products** > **Marketplace**:
 
 ![data marketplace tab](assets/10Share_7.png)
 
-#### Find a listing
+#### Find a listing ####
 
 Type `stock prices` in the search box at the top, scroll through the results, and select [**Financial & Economic Essentials**](https://app.snowflake.com/marketplace/listing/GZTSZAS2KF7/) (provided by Cybersyn).
 
@@ -648,23 +624,37 @@ You can now click **Done** or choose to run the sample queries provided by Cyber
 
 ![get data fields](assets/10Share_cybersyn_query_data.png)
 
+If you chose **Query Data**, a new worksheet opens in a new browser tab/window:
+1. Set your context 
+2. Select the query you want to run (or place your cursor in the query text).
+3. Click the **Run/Play** button (or use the keyboard shortcut).
+4. You can view the data results in the bottom pane.
+5. When you are done running the sample queries, click the **Home** icon in the upper left corner.
+
+![get data fields](assets/10Share_cybersyn_query_data2.png)
+
+Next:
+1. Click **Data** > **Databases**.
+2. Click the `Financial__Economic_Essentials` database.
+3. You can see details about the schemas, tables, and views that are available to query.
+
+![covid19 databases](assets/10Share_cybersyn_db_info.png)
+
 That's it! You have now successfully subscribed to the Financial & Economic Essentials datasets from Cybersyn, which are updated daily with global financial data. Notice we didn't have to create databases, tables, views, or an ETL process. We simply searched for and accessed shared data from the Snowflake Data Marketplace.
 
-> aside positive
-> 
 > To learn more about how to use the new worksheet interface, go to the [Snowsight Docs](https://docs.snowflake.com/en/user-guide/ui-snowsight.html#using-snowsight).
 
 <!-- ------------------------ -->
 
-## Querying, the Results Cache, & Cloning
+## Querying, the Results Cache, & Cloning ##
 
-### Execute Some Queries
+### Execute Some Queries ###
 
 Go to the 
-**ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN** worksheet. Your worksheet context should be the following:
+**CHAT_WITH_MY_DATA** worksheet. Your worksheet context should be the following:
 
 **Role:** `LAB_USER_ROLE_<NUMBER>`
-**Warehouse:** `LAB_USER_WAREHOUSE`
+**Warehouse:** `LAB_USER_WAREHOUSE_<NUMBER>`
 **Database:** `CHAT_WITH_YOUR_DATA`
 **Schema:** `WORKSPACE_<NUMBER>`
 
@@ -675,6 +665,7 @@ Now, let's look at the performance of these companies in the stock market. Run t
 **Closing Price Statistics:** First, calculate the daily return of a stock (the percent change in the stock price from the close of the previous day to the close of the current day) and 5-day moving average from closing prices (which helps smooth out daily price fluctuations to identify trends).
 
 ```SQL
+-- Calculate stock price daily returns and 5-day moving averages
 SELECT
     meta.primary_ticker,
     meta.company_name,
@@ -690,13 +681,12 @@ WHERE ts.variable_name = 'Post-Market Close';
 
 ![post-market close query results](assets/6Query_3.png)
 
-> aside positive
-> 
 >  If you have defined a particular database in the worksheet and want to use a table from a different database, you must fully qualify the reference to the other table by providing its database and schema name.
 
 **Trading Volume Statistics:** Then, calculate the trading volume change from one day to the next to see if there's an increase or decrease in trading activity. This can be a sign of increasing or decreasing interest in a stock.
 
 ```SQL
+-- Calcualate trading volume changes
 SELECT
     meta.primary_ticker,
     meta.company_name,
@@ -711,13 +701,14 @@ WHERE ts.variable_name = 'Nasdaq Volume';
 
 ![volume query results](assets/6Query_3b.png)
 
-### Use the Result Cache
+### Use the Result Cache ###
 
 Snowflake has a result cache that holds the results of every query executed in the past 24 hours. These are available across warehouses, so query results returned to one user are available to any other user on the system who executes the same query, provided the underlying data has not changed. Not only do these repeated queries return extremely fast, but they also use no compute credits.
 
 Let's see the result cache in action by running the exact same query again.
 
 ```SQL
+-- Use the query cache for the stock price daily returns and 5-day moving averages
 SELECT
     meta.primary_ticker,
     meta.company_name,
@@ -734,26 +725,21 @@ WHERE variable_name = 'Post-Market Close';
 In the **Query Details** pane on the right, note that the query runs significantly faster because the results have been cached.
 ![cached query duration](assets/6Query_4.png)
 
-### Clone a Table
+### Clone a Table ###
 
 Snowflake allows you to create clones, also known as "zero-copy clones" of tables, schemas, and databases in seconds. When a clone is created, Snowflake takes a snapshot of data present in the source object and makes it available to the cloned object. The cloned object is writable and independent of the clone source. Therefore, changes made to either the source object or the clone object are not included in the other.
 
 _A popular use case for zero-copy cloning is to clone a production environment for use by Development & Testing teams to test and experiment without adversely impacting the production environment and eliminating the need to set up and manage two separate environments._
 
-> aside negative
-> 
 >  **Zero-Copy Cloning**
 A massive benefit of zero-copy cloning is that the underlying data is not copied. Only the metadata and pointers to the underlying data change. Hence, clones are “zero-copy" and storage requirements are not doubled when the data is cloned. Most data warehouses cannot do this, but for Snowflake it is easy!
->
-> ***Use Cases:***
-> - `Testing and Development`: Developers can use clones of production data to create safe, isolated environments for testing without risking changes to production data.
-> - `Data Analytics`: Analysts can create clones to experiment with different data transformations and analyses without altering the original dataset.
->
+
 > Learn more about [Cloning](https://docs.snowflake.com/en/user-guide/object-clone)
 
 Run the following command in the worksheet to create a development (dev) table clone of the `company_metadata` table:
 
 ```SQL
+-- Clone the company_metadata_dev table
 CREATE TABLE company_metadata_dev CLONE company_metadata;
 ```
 
@@ -761,11 +747,12 @@ Click the three dots (**...**) in the left pane and select **Refresh**. Expand t
 
 ![trips_dev table](assets/Lab_Image_11.png)
 
-### Joining Tables
+### Joining Tables ###
 
 We will now join the JSON SEC filing datasets together to investigate the revenue of one CPG company, Kraft Heinz. Run the query below to join `SEC_FILINGS_INDEX` to `SEC_FILINGS_ATTRIBUTES` to see how Kraft Heinz (KHC) business segments have performed over time:
 
 ```SQL
+-- Joining Tables (limited to KRAFT HEINZ CO, cik = '0001637459')
 WITH data_prep AS (
     SELECT 
         idx.cik,
@@ -813,9 +800,7 @@ ORDER BY product, period_end_date;
 
 <!-- ------------------------ -->
 
-## Using Time Travel
-
-Duration: 6
+## Using Time Travel ##
 
 Snowflake's powerful Time Travel feature enables accessing historical data, as well as the objects storing the data, at any point within a period of time. The default window is 24 hours and, if you are using Snowflake Enterprise Edition, can be increased up to 90 days. Most data warehouses cannot offer this functionality, but - you guessed it - Snowflake makes it easy!
 
@@ -825,16 +810,17 @@ Some useful applications include:
 - Duplicating and backing up data from key points in the past.
 - Analyzing data usage and manipulation over specified periods of time.
 
-### Drop and Undrop a Table
+### Drop and Restore a Table ###
 
 First let's see how we can restore data objects that have been accidentally or intentionally deleted.
 
-In the `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN` worksheet, run the following DROP command to remove the `SEC_FILINGS_INDEX` table:
+In the `CHAT_WITH_MY_DATA` worksheet, run the following DROP command to remove the `SEC_FILINGS_INDEX` table:
 
 ```SQL
+-- Drop the sec_filings_index table
 DROP TABLE sec_filings_index;
 
--- Run a query on the table:
+-- Run a query on the non-existent sec_filings_index table
 SELECT * FROM sec_filings_index LIMIT 10;
 ```
 
@@ -843,32 +829,35 @@ In the results pane at the bottom, you should see an error because the underlyin
 
 Now, restore the table:
 ```SQL
+-- Restore the sec_filings_index table
 UNDROP TABLE sec_filings_index;
 ```
 
 The SEC filing index table should be restored. Verify by running the following query:
 
 ```SQL 
+-- Run a query on the restored sec_filings_index table
 SELECT * FROM sec_filings_index LIMIT 10;
 ```
 
 ![restored table result](assets/8Time_2.png)
 
-### Roll Back a Table
+### Roll Back a Table ###
 
 Let's roll back the `COMPANY_METADATA` table in the `CHAT_WITH_YOUR_DATA` database to a previous state to fix an unintentional DML error that replaces all the company names in the table with the word "oops".
 
 Run the following command to replace all of the company names in the table with the word "oops":
 
 ```SQL
+-- Simulate an accidental overwrite of the entire table column
 UPDATE company_metadata SET company_name = 'oops';
 ```
 
 Now, run a query that returns the companies. Notice that the company names are all the same:
 
 ```SQL
-SELECT *
-FROM company_metadata;
+-- View the overwritten column data
+SELECT * FROM company_metadata LIMIT 10;
 ```
 
 ![one row result](assets/8Time_3.png)
@@ -877,7 +866,7 @@ Normally we would need to scramble and hope we have a backup lying around. In Sn
 
 Use Time Travel to recreate the table with the correct company names and verify the company names have been restored:
 ```SQL
--- Set the session variable for the query_id
+-- Set the session variable with the query_id of the last UPDATE query
 SET query_id = (
   SELECT query_id
   FROM TABLE(information_schema.query_history_by_session(result_limit=>5))
@@ -886,85 +875,71 @@ SET query_id = (
   LIMIT 1
 );
 
--- Use the session variable with the identifier syntax (e.g., $query_id)
+-- Restore the table to its state before the accidental UPDATE query
 CREATE OR REPLACE TABLE company_metadata AS
 SELECT *
 FROM company_metadata
 BEFORE (STATEMENT => $query_id);
 
 -- Verify the company names have been restored
-SELECT *
-FROM company_metadata;
+SELECT company_name FROM company_metadata LIMIT 10;
 ```
 
 ![restored names result](assets/8Time_4.png)
 
 <!-- ------------------------ -->
 
-## Creating the Chatbot Streamlit App ##
+### Micro-Partitions ###
+A lot of unique Snowflake features such as Zero-Copy Clone and Time Travel are enabled by its unique architecture separating compute from data storage and metadata management.
 
-We will build an LLM-powered chatbot named "Frosty" that performs data exploration and answers questions by writing and executing SQL queries on Snowflake data.
+Snowflake data is stored in compressed, proprietary columnar format in encrypted micro-partitions which are, importantly, immutable. Once written, micro-partitions are never modified but rather a new partition is created whenever data in the micro-partitions needs to be updated.
 
-The application uses Streamlit and Snowflake and can be plugged into your LLM of choice, alongside data from Snowflake Marketplace. By the end of the session, you will have an interactive web application chatbot that can converse and answer questions based on a financial dataset.
+Zero-Copy Clone is therefore a metadata-only operation where an object is cloned by creating a copy of the metadata pointing to the same micro-partitions as the original. From that point on, the original and the clone can evolve independently as updates to either object will result in their respective metadata sets pointing to their own newly created partitions.
 
-### Key features & technology
-* Large language models (LLMs)
-* Streamlit
+As data is updated, micro-partitions are slated for deletion but they are not deleted until they are age beyond the Time Travel limit (plus, technically the 1-week Fail Safe). The metadata of the previous versions of a micro-partition is also retained during that time which enables Time Travel.
 
-### What is Streamlit?
-Streamlit is an open-source Python library that enables developers to quickly create, deploy, and share web apps from Python scripts. Learn more about [Streamlit](https://streamlit.io/).
+It is also worth mentioning that Snowflake stores metadata about all rows stored in a micro-partition, including:
+- The range of values for each of the columns in the micro-partition.
+- The number of distinct values.
+- Additional properties used for both optimization and efficient query processing.
 
-### What is a large language model (LLM)?
-A large language model, or LLM, is a deep learning algorithm that can recognize, summarize, translate, predict and generate text and other content based on knowledge gained from massive datasets. Some examples of popular LLMs are [GPT-4](https://openai.com/research/gpt-4), [GPT-3](https://openai.com/blog/gpt-3-apps), [BERT](https://cloud.google.com/ai-platform/training/docs/algorithms/bert-start), [LLaMA](https://ai.facebook.com/blog/large-language-model-llama-meta-ai/), and [LaMDA](https://blog.google/technology/ai/lamda/).
+This architecture allows for dramatically reducing (pruning) the number of of micro-partitions that need to be scanned at query time contributing to Snowflake's excellent query performance for even very large tables.
 
-The application uses Streamlit and Snowflake and can be plugged into your LLM of choice, alongside data from Snowflake Marketplace. By the end of the session, you will have an interactive web application chatbot that can converse and answer questions based on a financial dataset.
+> For more information about micro partition [tables-clustering-micropartitions](https://docs.snowflake.com/en/user-guide/tables-clustering-micropartitions)
 
-In the left Snowsight navigation panel, select `Projects > Streamlit` tab and then click the `+ Streamlit App` button at the top right to create a new Streamlit-in-Snowflake application. Select the following parameters:
+## The CHAT_WITH_YOUR_DATA App ##
 
-![streamlit](assets/streamlit_1.png)
+We will demo and walk through an LLM-powered chatbot named "Frosty" that performs data exploration and answers questions by constructing and executing SQL queries on Snowflake data. Built with just some 250 lines of code, the application is able to converse and answer questions based on a financial dataset.
 
-```text
-App Title:  CHATBOT
-Database:   CHAT_WITH_YOUR_DATA
-Schema:     WORKSPACE_<number>
-Warehouse:  LAB_USER_WAREHOUSE_<number>
-```
-... and click `Create`. The Streamlit in Snowflake editor opens an example Streamlit app in Viewer mode. Viewer mode allows you to see how the Streamlit application appears to users.
+The application is built using Streamlit and allows you to select one of the number of Snowflake's Cortex AI LLM models and run them against data from the Snowflake Marketplace.
 
-The Streamlit in Snowflake interface is divided into three panes:
+### Streamlit ###
+Streamlit is an open-source Python library that enables developers to quickly create, deploy, and share web apps from Python scripts. It abstracts away the heavy lift in implementing web interfaces and can be deployed either independently or run from within Snowflake. Running Streamlit from within Snowflake eliminates the need to deploy and maintain web app infrastructure in addition to leveraging Snowflake's robust access control mechanisms. Learn more about [Streamlit](https://streamlit.io/).
 
-* Object browser: Allows you to see the databases, schemas, and views you have permissions to access.
-* Streamlit editor: Provides a Python editor for your Streamlit code.
-* Streamlit preview: Displays the running Streamlit app.
+### Large Language Models ###
+An LLM (Large Language Model) is a type of artificial intelligence model designed to process and generate human-like text based on large datasets of text. These models, such as [GPT-4](https://openai.com/research/gpt-4), [GPT-3](https://openai.com/blog/gpt-3-apps), [BERT](https://cloud.google.com/ai-platform/training/docs/algorithms/bert-start), [LLaMA](https://ai.facebook.com/blog/large-language-model-llama-meta-ai/), and [LaMDA](https://blog.google/technology/ai/lamda/), can "understand" and generate natural language with high levels of accuracy and coherence.
 
-By default, only the Streamlit editor and preview panes are displayed. To change the display, use the show/hide buttons in the lower-left corner of the Streamlit in Snowflake editor.
-
-![streamlit](assets/streamlit_2.png)
-
-Add snowpark-ml-python package from the packages dropdown in the code editor section
-
-### Cortex AI
-
-Snowflake offers two broad categories of powerful, intelligent features based on Artificial Intelligence (AI) and Machine Learning (ML). These features can help you do more with your data in less time than ever before.
+### Cortex AI ###
+Snowflake offers powerful, intelligent features based on Artificial Intelligence (AI) and Machine Learning (ML). These features can help you do more with your data in less time than ever before.
 
 **Snowflake Cortex** is a suite of AI features that use large language models (LLMs) to understand unstructured data, answer freeform questions, and provide intelligent assistance. This suite of Snowflake AI Features comprises:
 
 - **Snowflake Cortex LLM Functions**: These are SQL and Python-based functions that can be used to develop an understanding, query, translate, summarize, and generate free-form text.
-The available functions are summarized below.
+  The available functions are summarized below.
 
-  - [*`COMPLETE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-complete): Given a prompt, returns a response that completes the prompt. This function accepts either a single prompt or a conversation with multiple prompts and responses.
+    - [*`COMPLETE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-complete): Given a prompt, returns a response that completes the prompt. This function accepts either a single prompt or a conversation with multiple prompts and responses.
 
-  - [*`EMBED_TEXT_768`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-embed-text): Creates a vector embedding of 768 dimensions for a given English-language text.
+    - [*`EMBED_TEXT_768`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-embed-text): Creates a vector embedding of 768 dimensions for a given English-language text.
 
-  - [*`EMBED_TEXT_1024`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-embed-text-1024): Creates a vector embedding of 1024 dimensions for a given English-language text. 
+    - [*`EMBED_TEXT_1024`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-embed-text-1024): Creates a vector embedding of 1024 dimensions for a given English-language text.
 
-  - [*`EXTRACT_ANSWER`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-extract-answer): Given a question and unstructured data, returns the answer to the question if it can be found in the data.
+    - [*`EXTRACT_ANSWER`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-extract-answer): Given a question and unstructured data, returns the answer to the question if it can be found in the data.
 
-  - [*`SENTIMENT`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-sentiment): Returns a sentiment score, from -1 to 1, representing the detected positive or negative sentiment of the given text.
+    - [*`SENTIMENT`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-sentiment): Returns a sentiment score, from -1 to 1, representing the detected positive or negative sentiment of the given text.
 
-  - [*`SUMMARIZE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-summarize): The SUMMARIZE function returns a summary of the given English text.
+    - [*`SUMMARIZE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-summarize): Returns a summary of the given English text.
 
-  - [*`TRANSLATE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-translate): The TRANSLATE function translates text from the indicated or detected source language to a target language..
+    - [*`TRANSLATE`*](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions#label-cortex-llm-translate): Translates text from the indicated or detected source language to a target language..
 
 
 - **Universal Search** : Universal Search understands your query and information about your database objects and can find objects with names that differ from your search terms.
@@ -979,17 +954,14 @@ The available functions are summarized below.
 
 - **Cortex Analyst** : Cortex Analyst is a fully-managed, LLM-powered Snowflake Cortex feature that helps you create applications capable of reliably answering business questions based on your structured data in Snowflake
 
-**`Cortex AI`** is particularly useful for tasks like generating SQL queries based on natural language inputs, analyzing trends and patterns in large datasets, and supporting decision-making processes with AI-powered recommendations.
+> Learn more about [Snowflake AI and ML](https://docs.snowflake.com/en/guides-overview-ai-features).
 
-> Learn more about [Snowflake AI and ML](https://docs.snowflake.com/en/guides-overview-ai-features) documentation.
+### Some Data Prep for the Streamlit App ###
 
-### Data Prep for the Streamlit App
+Before we can use the chatbot app, we need to create two views to serve as its source dataset. 
 
-Before diving deeper into the creation of the app, we need to create our dataset, which will serve as the source for the application.
+Navigate to the `CHAT_WITH_MY_DATA` worksheet and execute:
 
-First, navigate  to our `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN` worksheet and execute the following statements.
-
-- This SQL script creates a view called `financial_entity_attributes_limited` that selects and filters specific VARIABLE values from the financial_institution_attributes table.
 ```SQL
 -- Create the limited attributes view
 CREATE VIEW IF NOT EXISTS financial_entity_attributes_limited AS
@@ -1002,14 +974,13 @@ WHERE VARIABLE IN (
                    'SC'
     );
 
--- Confirm the view was created correctly - should show 6 rows with variable name and definition
+-- Confirm the view was created correctly - it should return 6 rows with variable names and definitions
 SELECT * FROM financial_entity_attributes_limited;
 ```
 
-- After that, exectute this SQL script which creates a view named `financial_entity_annual_time_series`, which combines data from financial institution time series, attributes, and entity information. The view filters for records on December 31st of each year and transforms and joins relevant columns to provide a unified dataset.
-
+Now, execute the following SQL query to create a view that combines data from financial institution time series, attributes, and entity information filtered for year-end records only:
 ```SQL
--- Create the modified time series view
+-- Create the end-of-year time series view
 CREATE VIEW IF NOT EXISTS financial_entity_annual_time_series AS
 SELECT
     ent.name as entity_name,
@@ -1032,15 +1003,79 @@ WHERE MONTH(date) = 12
 SELECT * FROM financial_entity_annual_time_series  LIMIT 10;
 ```
 
-### Build the streamlit app to chat with your data 
+### Using the CHAT_WITH_YOUR_DATA App ###
 
-Let's walk through the Streamlit app code that integrates with Snowflake and utilizes Cortex for dynamic SQL generation... 
+In the left Snowsight navigation panel, click on the `Projects > Streamlit` menu option. Once the lab admin has shared it, you will see an app called `CHAT_WITH_YOUR_DATA`. Clicking on it will run the app. It will take less than a minute for the app to initialize, and perform its initial LLM queries to render its output and be ready for a user prompt.
 
-### 1. Imports, Defaults and Configuration
+> The following is a list of potential questions that you might want to ask your data. Note that, as sophisticated LLMs have become, they are, after all, executed by computer so the "Garbage In, Garbage Out" principle applies fully. Users must craft their questions carefully and answers must be reviewed and validated which has risen the brand new discipline of Prompt Engineering.
 
-- **SLIDE_WINDOW**: sets the number of last conversations to remember.
+> Can you show me the top 10 financial entities with the highest Total Assets value for the year 2020?
+
+<img src="assets/chat_data/chat_data_01.png">
+
+> List the top 10 financial entities that have a Total Securities value below 5000000 for the year 1995.
+
+<img src="assets/chat_data/chat_data_02.png">
+
+> What are the cities with the highest average Total deposits for the year 2000?
+
+<img src="assets/chat_data/chat_data_03.png">
+
+> What are the top 10 financial entities with the highest total assets?
+> > Oops, we did not specify for which year :(
+
+<img src="assets/chat_data/chat_data_04.png">
+
+> Show the number of real estate loans for the city of New York between 2010 and 2020.
+
+<img src="assets/chat_data/chat_data_05.png">
+
+> What is the percentage of insured deposits for the financial entity named 'Bank of America'?
+> > Oops, we did not specify for which year :(
+
+<img src="assets/chat_data/chat_data_06.png">
+
+> What are the total assets of the financial entity named 'Bank of America'in 2020?
+> > It also turns out there is more than one 'Bank of America' :(
+
+<img src="assets/chat_data/chat_data_07.png">
+
+> List all financial entities named like 'Bank of America' with the total assets for each in 2020
+> > Finally! Though we could have asked to have the list sorted by value...
+
+<img src="assets/chat_data/chat_data_08.png">
+
+> What is the total amount of real estate loans for Sacramento in a 2021?
+
+<img src="assets/chat_data/chat_data_10.png">
+
+> What are the names of the top 10 banks with the highest Total Assets?
+> > This likely pulled values from different years so not really comparing apples to apples :(
+
+<img src="assets/chat_data/chat_data_11.png">
+
+> Show me the Total Securities for all banks in New York.
+> > This lumped the securities sums from all years :(
+
+<img src="assets/chat_data/chat_data_12.png">
+
+> What is the average percentage of Insured (Estimated) for all banks in California?
+> > Another all-time mess :(
+
+<img src="assets/chat_data/chat_data_13.png">
+
+> List the financial entities in New York
+> > That ever existed? :(
+
+<img src="assets/chat_data/chat_data_14.png">
+
+### The Code of the CHAT_WITH_YOUR_DATA App ###
+
+#### Imports, Defaults and Configuration ####
+
+- **SLIDE_WINDOW**: sets the number of last interactions to remember.
 - **pd.set_option**: configures Pandas to show full content in columns without truncation.
-- **database**: extracts digits from the user's name (st.experimental_user.user_name) to generate a workspace identifier.
+- **database**: extracts digits from the user's name (`st.experimental_user.user_name`) to generate a workspace identifier.
 - **SCHEMA_PATH, QUALIFIED_TABLE_NAME, and METADATA_QUERY**: define paths and queries based on the workspace, which are used to interact with the Snowflake database.
 ```PYTHON
 import re
@@ -1058,11 +1093,11 @@ QUALIFIED_TABLE_NAME = f"{SCHEMA_PATH}.FINANCIAL_ENTITY_ANNUAL_TIME_SERIES"
 METADATA_QUERY = f"SELECT VARIABLE_NAME, DEFINITION FROM {SCHEMA_PATH}.FINANCIAL_ENTITY_ATTRIBUTES_LIMITED;"
 ```
 
-### 2. Handling User Questions
+#### Handling User Questions ####
 
 - Manages the interaction with the user when they ask a question.
-- Updates the session state with the user's message and the assistant's response.
-If the assistant's response contains a SQL query, it executes the query and displays the results.
+- Updates the session state with the user's message and the LLM's (`assistant`) response.
+If the LLM's response contains a SQL query, executes the query and displays the results.
 
 ```PYTHON
 def handle_user_question(question):
@@ -1098,7 +1133,7 @@ def handle_user_question(question):
 
             st.session_state.messages.append(message)
 ```
-### 3. Displaying Chat and Handling Input
+#### Displaying Chat and Handling Input ####
 
 - Displays the chat UI, including the chat history and any results from previous queries.
 - Handles user input through a chat interface, passing it to handle_user_question for processing.
@@ -1121,7 +1156,7 @@ def display_chat_and_input():
         handle_user_question(question)
 ```
 
-### 4. Configuration Options
+#### Configuration Options ####
 
 - Provides configuration options in the sidebar for selecting the model, toggling chat history, debugging, and resetting the conversation.
 
@@ -1134,7 +1169,7 @@ def config_options():
     st.sidebar.expander("Session State").write(st.session_state)
 ```
 
-### 5 Initializing Messages
+#### Initializing Messages ####
 
 - Initializes the chat history with a system message when the conversation is reset or on the first run.
 
@@ -1146,7 +1181,7 @@ def init_messages():
         st.markdown(complete(system_prompt)[0].RESPONSE)
 ```
 
-### 6. Generating Prompts
+#### Generating Prompts ####
 
 - Generates the system prompt using the table context and predefined prompts, which is used to set the initial context for the chat.
 
@@ -1160,7 +1195,7 @@ def get_system_prompt():
     return prompts["system"].format(context=table_context)
 ```
 
-### 7. Completing User Queries
+#### Completing User Queries ####
 
 - Sends the user’s question to the Snowflake Cortex model to generate a response based on the prompt.
 
@@ -1172,7 +1207,7 @@ def complete(myquestion):
     return df_response
 ```
 
-### 8. Creating the User Query Prompt and Retrieving Chat History
+#### Creating the User Query Prompt and Retrieving Chat History ####
 
 - Creates a prompt for the Snowflake Cortex model based on the user’s question and chat history.
 
@@ -1196,7 +1231,7 @@ def get_chat_history():
 
 ```
 
-### 9. Getting Table Context
+#### Getting Table Context ####
 
 Retrieves metadata and context for the specified table, which is used in generating the system prompt.
 
@@ -1225,7 +1260,7 @@ Here are the columns of the {'.'.join(table)}
     return context
 ```
 
-### 10. Defining Prompts
+#### Defining Prompts ####
 
 - Consolidates all the prompt templates into a single function that returns a dictionary of prompts. This makes it easier to manage and update the prompts.
 
@@ -1242,109 +1277,54 @@ def get_prompts():
     return prompts
 ```
 
-### Potential questions that you might want to ask your data
+## The VISUALIZE_YOUR_DATA App ##
+ This simple app leverages the integration synergy of Snowflake, its Cortex AI LLM capabilities and Streamlit. It uses the Cortex [COMPLETE](https://docs.snowflake.com/en/sql-reference/functions/complete-snowflake-cortex) function to access the pre-trained `mistral-large` LLM, which will generate Python code to render our desired visualization. Streamlit will then execute this code and render the graph. Other than implementing the Streamlit app and being aware of which Python plotting library to use, this process requires minimal technical expertise, allowing us to create visualizations on the fly without being tied to implementation lifecycles.
 
-- `Can you show me the top 10 financial entities with the highest Total Assets value for the year 2020?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_01.png" alt="Description" width="500">
-</ul>
+### Using the VISUALIZE_YOUR_DATA App ###
 
-- `List the top 10 financial entities that have a Total Securities value below 5000000 for the year 1995.`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_02.png" alt="Description" width="500">
-</ul>
+> Create a bar chart for the top ten months with the highest number of EINs
+```text
+DATABASE:   CHAT_WITH_YOUR_DATA
+SCHEMA:     WORKSPACE_<NUMBER>
+TABLE:      SEC_FILINGS_INDEX_VIEW
+LIBRARY:    Matplotlib
+```
+![Question](assets/visualize_data/streamlit_3.png)
 
-- `What are the cities with the highest average Total deposits for the year 2000?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_03.png" alt="Description" width="500">
-</ul>
+After a couple of seconds, the app will respond with the requested chartt as well as the Python code it generated and used to render it:
 
-- `What are the top 10 financial entities with the highest total assets?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_04.png" alt="Description" width="500">
-</ul>
+![respond](assets/visualize_data/streamlit_4.png)
 
-- `Show the number of real estate loans for the city of New York between 2010 and 2020.`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_05.png" alt="Description" width="500">
-</ul>
+> Transform Value to number and give me the top ten year bar chart with most value
+```text
+DATABASE:   FINANCIAL__ECONOMIC_ESSENTIALS
+SCHEMA:     CYBERSYN
+TABLE:      BANK_FOR_INTERNATIONAL_SETTLEMENTS_TIMESERIES
+LIBRARY:    ploty
+```
+![question1](assets/visualize_data/question_1.png)
 
-- `What is the percentage of insured deposits for the financial entity named 'Bank of America'?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_06.png" alt="Description" width="500">
-</ul>
+> Give me a list of all unique company names
+```text
+DATABASE:   FINANCIAL__ECONOMIC_ESSENTIALS
+SCHEMA:     CYBERSYN
+TABLE:      COMPANY_INDEX
+LIBRARY:    ploty
+```
+![question2](assets/visualize_data/question_2.png)
 
-- `What are the total assets of the financial entity named 'Bank of America'in 2020?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_07.png" alt="Description" width="500">
-</ul>
+> Transform value to number, Extract the year and filter by 2024 , Select quote_currency_id and value, Aggregate and plot the result
+```text
+DATABASE:   FINANCIAL__ECONOMIC_ESSENTIALS
+SCHEMA:     CYBERSYN
+TABLE:      FX_RATE_TIMESERIES
+LIBRARY:    ploty
+```
+![question3](assets/visualize_data/question_3.png)
 
-- `List all financial entities named like 'Bank of America' with the total assets for each in 2020`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_08.png" alt="Description" width="500">
-</ul>
+### The Code of the VISUALIZE_YOUR_DATA App ###
 
-- `Which banks have the highest percentage of insured deposits in California?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_09.png" alt="Description" width="500">
-</ul>
-
-- `What is the total amount of real estate loans for Sacramento in a 2021?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_10.png" alt="Description" width="500">
-</ul>
-
-- `What are the names of the top 10 banks with the highest Total Assets?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_11.png" alt="Description" width="500">
-</ul>
-
-- `Show me the Total Securities for all banks in New York.`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_12.png" alt="Description" width="500">
-</ul>
-
-- `What is the average percentage of Insured (Estimated) for all banks in California?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_13.png" alt="Description" width="500">
-</ul>
-
-- `List the financial entities in New York`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_14.png" alt="Description" width="500">
-</ul>
-
-- `List the bank has the most assets?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_15.png" alt="Description" width="500">
-</ul>
-
-### Sample with follow-up questions
-
-- `List the financial entities with their total securities values that have a total securities value below 5000000 for the year 1995`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_16.png" alt="Description" width="500">
-</ul>
-
-- `Sort the last result by total securities value in descending order`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_17.png" alt="Description" width="500">
-</ul>
-
-- `What are the top 5 in this list by Total Securities value?`
-<ul style="list-style-type:none;">
-<img src="assets/chat_data/chat_data_18.png" alt="Description" width="500">
-</ul>
-
-## Visualizate your data.
-
-To facilitate data visualization, we are utilizing the inherent integration capabilities between Snowflake and Streamlit. We will use Snowflake's Cortex function, COMPLETE (https://docs.snowflake.com/en/sql-reference/functions/complete-snowflake-cortex), to access the pre-trained mistral-large LLM, which will generate the Python code for us. Streamlit will then execute this code to render the graphs. This process requires no development effort, allowing us to create variations of the graph on the fly without needing technical expertise.
-
-### Build the streamlit app
-
-Let's walk through the Streamlit app code involving data manipulation...
-
-### 1. Import the necesary libs to create the streamlit app
+#### Import the necessary Python modules for the Streamlit app ####
  ```PYTHON 
 # Import necessary packages for the Streamlit app and Snowflake integration
 import streamlit as st
@@ -1355,7 +1335,7 @@ from snowflake.cortex import Complete
 from snowflake.snowpark.context import get_active_session
  ```
 
- ### 2. Streamlit Configuration
+#### Streamlit Configuration ####
  Streamlit's options and page configurations are set, like disabling the deprecation warning for global use of pyplot and setting the page layout to "wide" and initializes an active session with Snowflake, allowing SQL commands to be executed directly from Streamlit.
 ```PYTHON
 # Set global options and page configuration for Streamlit
@@ -1369,7 +1349,7 @@ session = get_active_session()
 st.title("Visualize your data! :brain:")
 ```
 
-### 3. Streamlit Sidebar Configuration
+#### Streamlit Sidebar Configuration ####
 - **Sidebar Setup**: Uses Streamlit's sidebar feature to create interactive widgets.
 - **Database Selection**: Queries Snowflake to retrieve databases and allows the user to select a database through a dropdown box. Similar structures are used to select schemas, views, and specific settings such as the number of rows to plot.
 
@@ -1387,7 +1367,7 @@ with st.sidebar:
     table = st.selectbox('Select VIEW:', views)
     rows_to_plot = st.number_input('Rows to plot', min_value=1, max_value=10000, value=1000)
 ```
-### 4. Data Retrieval and Display
+#### Data Retrieval and Display ####
 - **Dataframe Creation**: Constructs a Pandas dataframe by querying a table in Snowflake, limited to a user-defined number of rows.
 - **Display**: Outputs the dataframe's first few rows directly on the Streamlit page, giving a preview of the data.
 
@@ -1400,7 +1380,7 @@ st.subheader('Data:')
 st.dataframe(df.head()) 
 ```
 
-### 5. Visualization Prompt
+#### Visualization Prompt ####
 - **Library Selection**: Users can choose the Python visualization library they wish to use.
 - **User Input for Visualization**: Collects user input on what they want to visualize from the data.
 
@@ -1409,7 +1389,7 @@ library = st.selectbox('Library', ['matplotlib','seaborn','plotly','wordcloud'])
 ll_prompt = st.text_area('What do you want to visualize?')
 ```
 
-### 6. Visualization Execution
+#### Visualization Execution ####
 - **Visualization Trigger**: A button that, when clicked, processes the input and generates Python code for visualization.
 - **Dynamic Code Generation**: Uses a Large Language Model (LLM) to generate Python code based on the user's specifications.
 - **Code Execution**: Executes the generated Python code to render visualizations directly in Streamlit.
@@ -1426,10 +1406,8 @@ if st.button('Visualize'):
     execution_code = extract_python_code(code)
 ```
 
-### 7. Output Display
-
+#### Output Display ####
 - **Code and Plot Display**: Displays the generated Python code in one column and executes it to render the plot in another, providing a comprehensive interface that showcases both the underlying code and its visual output.
-
 ```PYTHON
   with col1:
         st.subheader('This is the executed code:')
@@ -1439,39 +1417,26 @@ if st.button('Visualize'):
             exec(execution_code)
 ```
 
-Once you have assembled all the code, you can proceed to deploy the app
+## Creating Your Own Streamlit App ##
+> We explored apps which were created in advance. However, building your own app is simple and easy. The steps below will help you create your first Steamlit app with a sample code that you can adjust to your needs.
 
-![Deploy App](assets/visualize_data/streamlit_1.png)
+In the left Snowsight navigation panel, select `Projects > Streamlit` tab and then click the `+ Streamlit App` button at the top right to create a new Streamlit-in-Snowflake application. Set the values for your app title, the database and schema where the app will be created and the virtual warehouse it will use.
 
-Additionally, the app has access to the views that we have created.
+![streamlit](assets/streamlit_1.png)
 
-![views](assets/visualize_data/streamlit_2.png)
+... and click `Create`. The Streamlit in Snowflake editor opens an example Streamlit app in Viewer mode. Viewer mode allows you to see how the Streamlit application appears to users.
 
-For testing purposes, enter the following question: `Create a bar chart for the top ten months with the highest number of EINs` using database `CHAT_WITH_YOUR_DATA`, schema `WORKSPACE_<NUMBER>`, table `SEC_FILINGS_INDEX_VIEW` and the library `Matplotlib` and then click `Visualize`.
-![Question](assets/visualize_data/streamlit_3.png)
+The Streamlit in Snowflake interface is divided into three panes:
 
-After couple of seconds, the app will respond with: 
+* Object browser: Allows you to see the databases, schemas, and views you have permissions to access.
+* Streamlit editor: Provides a Python editor for your Streamlit code.
+* Streamlit preview: Displays the running Streamlit app.
 
-![respond](assets/visualize_data/streamlit_4.png)
+By default, only the Streamlit editor and preview panes are displayed. To change the display, use the show/hide buttons in the lower-left corner of the Streamlit in Snowflake editor.
 
-#### Here is a list of potential questions that you may ask the application
-
-- `Transform Value to number and Give me the top ten year bar chart with most value` using  database `FINANCIAL__ECONOMIC_ESSENTIALS`, schema `CYBERSYN`, table `BANK_FOR_INTERNATIONAL_SETTLEMENTS_TIMESERIES` and `ploty` lib
-
-![question1](assets/visualize_data/question_1.png)
-
-- `Give me a list of all unique company names` using  database `FINANCIAL__ECONOMIC_ESSENTIALS`, schema `CYBERSYN`, table `COMPANY_INDEX`  and `ploty` lib
-
-![question2](assets/visualize_data/question_2.png)
-
-
-- `Transform value to number, Extract the year and filter by 2024 , Select quote_currency_id and value,  Aggregate and plot the result` using  database `FINANCIAL__ECONOMIC_ESSENTIALS`, schema `CYBERSYN`, table `FX_RATE_TIMESERIES` and `ploty` lib
-
-![question3](assets/visualize_data/question_3.png)
+![streamlit](assets/streamlit_2.png)
 
 ## Conclusion & Next Steps
-
-Duration: 2
 
 Congratulations on completing this introductory lab exercise! You've mastered the Snowflake basics and are ready to apply these fundamentals to your own data. Be sure to reference this guide if you ever need a refresher.
 
@@ -1490,9 +1455,12 @@ We encourage you to continue with your free trial by loading your own sample or 
 
 ### What we've covered:
 
-- How to create stages, databases, tables, views, and virtual warehouses.
+- How to create stages, tables and views.
 - How to load structured and semi-structured data.
-- How to consume Cybersyn data from the [Snowflake Data Marketplace](https://app.snowflake.com/marketplace/listing/GZTSZAS2KF7/).
 - How to perform analytical queries on data in Snowflake, including joins between tables.
 - How to clone objects.
 - How to undo user errors using Time Travel.
+- How to create a Streamlit app
+- How to leverage Cortex AI queries to create your own Chatbot in Streamlit
+- How to use Cortex AI to ask questions about your data (text-to-SQL)
+- How to use Cortex AI to generate visualizations of data (text-to-Python)
