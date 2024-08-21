@@ -4,7 +4,7 @@
 -- SETUP USER OBJECTS --
 -- ------------------ --
 SET participant_count = 2;
-SET initial_password = 'LAB123';
+SET initial_password = '******';
 
 USE WAREHOUSE LAB_ADMIN_WAREHOUSE;
 
