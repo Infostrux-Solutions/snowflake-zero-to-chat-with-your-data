@@ -6,6 +6,7 @@
 SET participant_count = 2;
 SET initial_password = '******';
 
+USE ROLE SYSADMIN;
 USE WAREHOUSE LAB_ADMIN_WAREHOUSE;
 
 DECLARE

@@ -19,19 +19,20 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 ## Lab Presentation ##
 * Go through introductory presentation
-* Direct lab users to log into Snowflake at https://app.snowflake.com/umnxxyz/lab_data_chat
-  * User should change their password and record the new one
-  * Initial login credentials
-    * Username `LAB_USER_<number>`
-    * Password `******`
 * Open the [Lab Walkthrough](https://github.com/Infostrux-Solutions/snowflake-hol-zero-to-chat-with-your-data/blob/main/zero_to_chat_with_your_data/zero_to_chat_with_your_data.md)
-* In a separate browser window, login as admin to Snowflake https://app.snowflake.com/umnxxyz/lab_data_chat
 * Start the lab walkthrough
-* When you reach the point of users running queries, share workshop assets
-  * Switch role to `LAB_ADMIN`
-  * Open the `ZERO_TO_CHAT_WITH_YOUR_DATA` worksheet
-    * Click `SHARE` and add all the lab users with a `View results` permission
-      > NOTE: You will not be able to share a worksheet with a lab user who has not logged in
+* When you reach the point of users running queries
+  * In a separate browser window, login as admin to Snowflake https://app.snowflake.com/umnxxyz/lab_data_chat
+  * Direct lab users to log into Snowflake at https://app.snowflake.com/umnxxyz/lab_data_chat
+    * User should change their password and record the new one
+    * Initial login credentials
+      * Username `LAB_USER_<NUMBER>`
+      * Password `******`
+  * Share workshop assets
+    * Switch role to `LAB_ADMIN`
+    * Open the `ZERO_TO_CHAT_WITH_YOUR_DATA` worksheet
+      * Click `SHARE` and add all the lab users with a `View results` permission
+      >   NOTE: You will not be able to share a worksheet with a lab user who has not logged in
 * When you reach the point of presenting a Streamlit app, share it to the `PUBLIC` role
   * Switch role to `LAB_ADMIN`
   * Open the Streamlit app

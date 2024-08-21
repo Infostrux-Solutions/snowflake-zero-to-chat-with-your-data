@@ -10,7 +10,7 @@ session = get_active_session() # Get the current credentials
 ############
 
 # Sliding window for the number of last conversations to remember
-SLIDE_WINDOW = 20
+SLIDE_WINDOW = 30
 pd.set_option("max_colwidth",None)
 database =  ''.join(filter(str.isdigit, st.experimental_user.user_name)) or '0'
 
@@ -47,11 +47,11 @@ def handle_user_question(question):
             sql_match = re.search(r"```sql\n(.*)\n```", res_text.replace(";", ""), re.DOTALL)
             if sql_match:
                 sql = sql_match.group(1)
-                try: 
+                try:
                     message["results"] = session.sql(sql)
                     st.dataframe(message["results"])
                 except:
-                    st.markdown("Looks like Cortex is having a '404 Brain Not Found' moment 🤖. Let's try that again!") 
+                    st.markdown("Looks like Cortex is having a '404 Brain Not Found' moment 🤖. Let's try that again!")
 
 
             st.session_state.messages.append(message)
@@ -237,7 +237,7 @@ def get_prompts():
         """
     }
     return prompts
-    
+
 prompts = get_prompts()
 
 if __name__ == "__main__":
