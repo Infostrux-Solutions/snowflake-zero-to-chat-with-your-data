@@ -134,7 +134,7 @@ SELECT * FROM sec_filings_index_view LIMIT 20;
 -- Inspect sec_filings_attributes_view results
 SELECT * FROM sec_filings_attributes_view LIMIT 20;
 
--- Closing Price Statistics
+-- Calculate stock price daily returns and 5-day moving averages
 SELECT
     meta.primary_ticker,
     meta.company_name,
@@ -148,7 +148,7 @@ FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
 WHERE ts.variable_name = 'Post-Market Close'
 LIMIT 100;
 
--- Trading Volume Statistics
+-- Calcualate trading volume changes
 SELECT
     meta.primary_ticker,
     meta.company_name,
@@ -161,10 +161,22 @@ FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
 WHERE ts.variable_name = 'Nasdaq Volume'
 LIMIT 100;
 
--- Clone a Table
-CREATE TABLE company_metadata_dev CLONE company_metadata;
+-- Use the query cache for the stock price daily returns and 5-day moving averages
+SELECT
+    meta.primary_ticker,
+    meta.company_name,
+    ts.date,
+    ts.value AS post_market_close,
+    (ts.value / LAG(ts.value, 1) OVER (PARTITION BY meta.primary_ticker ORDER BY ts.date))::DOUBLE AS daily_return,
+    AVG(ts.value) OVER (PARTITION BY meta.primary_ticker ORDER BY ts.date ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS five_day_moving_avg_price
+FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
+         INNER JOIN company_metadata meta
+                    ON ts.ticker = meta.primary_ticker
+WHERE ts.variable_name = 'Post-Market Close'
+LIMIT 100;
 
-DROP TABLE company_metadata_dev;
+-- Clone the company_metadata_dev table
+CREATE TABLE company_metadata_dev CLONE company_metadata;
 
 -- Joining Tables (limited to KRAFT HEINZ CO, cik = '0001637459')
 WITH data_prep AS (
@@ -210,21 +222,22 @@ SELECT
 FROM data_prep
 ORDER BY product, period_end_date;
 
--- Using Time Travel
--- Drop and Undrop a Table
+-- Drop the sec_filings_index table
 DROP TABLE sec_filings_index;
 
--- The following query should result in an error because the underlying table has been dropped
+-- Run a query on the non-existent sec_filings_index table
 SELECT * FROM sec_filings_index LIMIT 10;
 
--- Restore the table
+-- Restore the sec_filings_index table
 UNDROP TABLE sec_filings_index;
 
+-- Run a query on the restored sec_filings_index table
 SELECT * FROM sec_filings_index LIMIT 10;
 
--- Roll back changes to a table
--- Let's simulate an accidental column overwrite
+-- Simulate an accidental overwrite of the entire table column
 UPDATE company_metadata SET company_name = 'oops';
+
+-- View the overwritten column data
 SELECT company_name FROM company_metadata LIMIT 10;
 
 -- Set the session variable with the query_id of the last UPDATE query
@@ -236,9 +249,7 @@ SET query_id = (
     LIMIT 1
 );
 
-SELECT $query_id;
-
--- Use the session variable with the identifier syntax (e.g., $query_id)
+-- Restore the table to its state before the accidental UPDATE query
 CREATE OR REPLACE TABLE company_metadata AS
 SELECT *
 FROM company_metadata

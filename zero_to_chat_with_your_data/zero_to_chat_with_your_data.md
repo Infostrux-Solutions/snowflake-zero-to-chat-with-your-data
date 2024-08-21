@@ -175,7 +175,7 @@ Under **Monitoring** there are multiple tabs for tracking your usage of your Sno
 
 >  To see all the information available under the `Admin` menu, switch your role to `ACCOUNTADMIN`.
 
-Under **Admin**, the **​Warehouses​** tab is where you set up and manage compute resources known as virtual warehouses to load or query data in Snowflake. A warehouse called `LAB_USER_WAREHOUSE_<number>` already exists in your environment.
+Under **Admin**, the **​Warehouses​** tab is where you set up and manage compute resources known as virtual warehouses to load or query data in Snowflake. A warehouse called `LAB_USER_WAREHOUSE_<NUMBER>` already exists in your environment.
 
 ![warehouses tab](assets/3UIStory_10.png)
 
@@ -256,14 +256,14 @@ We need to set the context appropriately within the new Worksheet. In the upper 
 
 Select the following context settings:
 
-**Role:** `LAB_USER_<number>`
-**Warehouse:** `LAB_USER_WAREHOUSE_<number>`
+**Role:** `LAB_USER_<NUMBER>`
+**Warehouse:** `LAB_USER_WAREHOUSE_<NUMBER>`
 
 ![context role and warehouse settings](assets/Lab_Image_02.png)
 
 Finally, we need to select the database and schema context of our worksheet. We'll run a group of queries:
   * Highlight the group of queries at the top of the worksheet and click the "Play" ▶️ button at the top right of the worksheet.
-  * The header of the worksheet should show the selected database and schema like `CHAT_WITH_YOUR_DATA.WORKSPACE_<number>`
+  * The header of the worksheet should show the selected database and schema like `CHAT_WITH_YOUR_DATA.WORKSPACE_<NUMBER>`
 
 ### Create Our First Table ###
 >  **Data Definition Language (DDL) operations are free!**
@@ -299,7 +299,7 @@ Verify your `COMPANY_METADATA` table has been created. At the bottom of the work
 
 ![TRIPS confirmation message](assets/Lab_Image_00.png)
 
-Navigate to the **Databases** tab by clicking the **HOME** icon in the upper left corner of the worksheet. Then click **Data** > **Databases**. In the list of databases, click `CHAT_WITH_YOUR_DATA` > `WORKSPACE_<number>` > `Tables` to see your newly created `COMPANY_METADATA` table. If you don't see any databases on the left, expand your browser because they may be hidden.
+Navigate to the **Databases** tab by clicking the **HOME** icon in the upper left corner of the worksheet. Then click **Data** > **Databases**. In the list of databases, click `CHAT_WITH_YOUR_DATA` > `WORKSPACE_<NUMBER>` > `Tables` to see your newly created `COMPANY_METADATA` table. If you don't see any databases on the left, expand your browser because they may be hidden.
 
 ![TRIPS table](assets/Lab_Image_table1.png)
 
@@ -419,8 +419,8 @@ Now we can run a COPY command to load the data into the `COMPANY_METADATA` table
 
 Navigate back to the `CHAT_WITH_MY_DATA` worksheet in the **Worksheets** tab. Make sure the worksheet context is correctly set:
 
-**Role:** `LAB_USER_<number>`
-**Warehouse:** `LAB_USER_WAREHOUSE_<number>`
+**Role:** `LAB_USER_<NUMBER>`
+**Warehouse:** `LAB_USER_WAREHOUSE_<NUMBER>`
 **Database:** `CHAT_WITH_YOUR_DATA`
 **Schema:** `WORKSPACE_<NUMBER>`
 
@@ -668,13 +668,13 @@ That's it! You have now successfully subscribed to the Financial & Economic Esse
 
 ## Querying, the Results Cache, & Cloning ##
 
-### Execute Some Queries
+### Execute Some Queries ###
 
 Go to the 
 **CHAT_WITH_MY_DATA** worksheet. Your worksheet context should be the following:
 
 **Role:** `LAB_USER_ROLE_<NUMBER>`
-**Warehouse:** `LAB_USER_WAREHOUSE`
+**Warehouse:** `LAB_USER_WAREHOUSE_<NUMBER>`
 **Database:** `CHAT_WITH_YOUR_DATA`
 **Schema:** `WORKSPACE_<NUMBER>`
 
@@ -685,6 +685,7 @@ Now, let's look at the performance of these companies in the stock market. Run t
 **Closing Price Statistics:** First, calculate the daily return of a stock (the percent change in the stock price from the close of the previous day to the close of the current day) and 5-day moving average from closing prices (which helps smooth out daily price fluctuations to identify trends).
 
 ```SQL
+-- Calculate stock price daily returns and 5-day moving averages
 SELECT
     meta.primary_ticker,
     meta.company_name,
@@ -705,6 +706,7 @@ WHERE ts.variable_name = 'Post-Market Close';
 **Trading Volume Statistics:** Then, calculate the trading volume change from one day to the next to see if there's an increase or decrease in trading activity. This can be a sign of increasing or decreasing interest in a stock.
 
 ```SQL
+-- Calcualate trading volume changes
 SELECT
     meta.primary_ticker,
     meta.company_name,
@@ -719,13 +721,14 @@ WHERE ts.variable_name = 'Nasdaq Volume';
 
 ![volume query results](assets/6Query_3b.png)
 
-### Use the Result Cache
+### Use the Result Cache ###
 
 Snowflake has a result cache that holds the results of every query executed in the past 24 hours. These are available across warehouses, so query results returned to one user are available to any other user on the system who executes the same query, provided the underlying data has not changed. Not only do these repeated queries return extremely fast, but they also use no compute credits.
 
 Let's see the result cache in action by running the exact same query again.
 
 ```SQL
+-- Use the query cache for the stock price daily returns and 5-day moving averages
 SELECT
     meta.primary_ticker,
     meta.company_name,
@@ -742,7 +745,7 @@ WHERE variable_name = 'Post-Market Close';
 In the **Query Details** pane on the right, note that the query runs significantly faster because the results have been cached.
 ![cached query duration](assets/6Query_4.png)
 
-### Clone a Table
+### Clone a Table ###
 
 Snowflake allows you to create clones, also known as "zero-copy clones" of tables, schemas, and databases in seconds. When a clone is created, Snowflake takes a snapshot of data present in the source object and makes it available to the cloned object. The cloned object is writable and independent of the clone source. Therefore, changes made to either the source object or the clone object are not included in the other.
 
@@ -750,16 +753,13 @@ _A popular use case for zero-copy cloning is to clone a production environment f
 
 >  **Zero-Copy Cloning**
 A massive benefit of zero-copy cloning is that the underlying data is not copied. Only the metadata and pointers to the underlying data change. Hence, clones are “zero-copy" and storage requirements are not doubled when the data is cloned. Most data warehouses cannot do this, but for Snowflake it is easy!
->
-> ***Use Cases:***
-> - `Testing and Development`: Developers can use clones of production data to create safe, isolated environments for testing without risking changes to production data.
-> - `Data Analytics`: Analysts can create clones to experiment with different data transformations and analyses without altering the original dataset.
->
+
 > Learn more about [Cloning](https://docs.snowflake.com/en/user-guide/object-clone)
 
 Run the following command in the worksheet to create a development (dev) table clone of the `company_metadata` table:
 
 ```SQL
+-- Clone the company_metadata_dev table
 CREATE TABLE company_metadata_dev CLONE company_metadata;
 ```
 
@@ -767,11 +767,12 @@ Click the three dots (**...**) in the left pane and select **Refresh**. Expand t
 
 ![trips_dev table](assets/Lab_Image_11.png)
 
-### Joining Tables
+### Joining Tables ###
 
 We will now join the JSON SEC filing datasets together to investigate the revenue of one CPG company, Kraft Heinz. Run the query below to join `SEC_FILINGS_INDEX` to `SEC_FILINGS_ATTRIBUTES` to see how Kraft Heinz (KHC) business segments have performed over time:
 
 ```SQL
+-- Joining Tables (limited to KRAFT HEINZ CO, cik = '0001637459')
 WITH data_prep AS (
     SELECT 
         idx.cik,
@@ -819,9 +820,7 @@ ORDER BY product, period_end_date;
 
 <!-- ------------------------ -->
 
-## Using Time Travel
-
-Duration: 6
+## Using Time Travel ##
 
 Snowflake's powerful Time Travel feature enables accessing historical data, as well as the objects storing the data, at any point within a period of time. The default window is 24 hours and, if you are using Snowflake Enterprise Edition, can be increased up to 90 days. Most data warehouses cannot offer this functionality, but - you guessed it - Snowflake makes it easy!
 
@@ -831,16 +830,17 @@ Some useful applications include:
 - Duplicating and backing up data from key points in the past.
 - Analyzing data usage and manipulation over specified periods of time.
 
-### Drop and Undrop a Table
+### Drop and Restore a Table ###
 
 First let's see how we can restore data objects that have been accidentally or intentionally deleted.
 
 In the `CHAT_WITH_MY_DATA` worksheet, run the following DROP command to remove the `SEC_FILINGS_INDEX` table:
 
 ```SQL
+-- Drop the sec_filings_index table
 DROP TABLE sec_filings_index;
 
--- Run a query on the table:
+-- Run a query on the non-existent sec_filings_index table
 SELECT * FROM sec_filings_index LIMIT 10;
 ```
 
@@ -849,32 +849,35 @@ In the results pane at the bottom, you should see an error because the underlyin
 
 Now, restore the table:
 ```SQL
+-- Restore the sec_filings_index table
 UNDROP TABLE sec_filings_index;
 ```
 
 The SEC filing index table should be restored. Verify by running the following query:
 
 ```SQL 
+-- Run a query on the restored sec_filings_index table
 SELECT * FROM sec_filings_index LIMIT 10;
 ```
 
 ![restored table result](assets/8Time_2.png)
 
-### Roll Back a Table
+### Roll Back a Table ###
 
 Let's roll back the `COMPANY_METADATA` table in the `CHAT_WITH_YOUR_DATA` database to a previous state to fix an unintentional DML error that replaces all the company names in the table with the word "oops".
 
 Run the following command to replace all of the company names in the table with the word "oops":
 
 ```SQL
+-- Simulate an accidental overwrite of the entire table column
 UPDATE company_metadata SET company_name = 'oops';
 ```
 
 Now, run a query that returns the companies. Notice that the company names are all the same:
 
 ```SQL
-SELECT *
-FROM company_metadata;
+-- View the overwritten column data
+SELECT * FROM company_metadata LIMIT 10;
 ```
 
 ![one row result](assets/8Time_3.png)
@@ -883,7 +886,7 @@ Normally we would need to scramble and hope we have a backup lying around. In Sn
 
 Use Time Travel to recreate the table with the correct company names and verify the company names have been restored:
 ```SQL
--- Set the session variable for the query_id
+-- Set the session variable with the query_id of the last UPDATE query
 SET query_id = (
   SELECT query_id
   FROM TABLE(information_schema.query_history_by_session(result_limit=>5))
@@ -892,15 +895,14 @@ SET query_id = (
   LIMIT 1
 );
 
--- Use the session variable with the identifier syntax (e.g., $query_id)
+-- Restore the table to its state before the accidental UPDATE query
 CREATE OR REPLACE TABLE company_metadata AS
 SELECT *
 FROM company_metadata
 BEFORE (STATEMENT => $query_id);
 
 -- Verify the company names have been restored
-SELECT *
-FROM company_metadata;
+SELECT company_name FROM company_metadata LIMIT 10;
 ```
 
 ![restored names result](assets/8Time_4.png)
@@ -932,8 +934,8 @@ In the left Snowsight navigation panel, select `Projects > Streamlit` tab and th
 ```text
 App Title:  CHATBOT
 Database:   CHAT_WITH_YOUR_DATA
-Schema:     WORKSPACE_<number>
-Warehouse:  LAB_USER_WAREHOUSE_<number>
+Schema:     WORKSPACE_<NUMBER>
+Warehouse:  LAB_USER_WAREHOUSE_<NUMBER>
 ```
 ... and click `Create`. The Streamlit in Snowflake editor opens an example Streamlit app in Viewer mode. Viewer mode allows you to see how the Streamlit application appears to users.
 
