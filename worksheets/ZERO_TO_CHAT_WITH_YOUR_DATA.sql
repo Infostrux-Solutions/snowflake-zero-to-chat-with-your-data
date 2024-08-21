@@ -29,7 +29,7 @@ CREATE OR REPLACE STAGE cybersyn_company_metadata
 -- List the contents of the company metadata stage
 LIST @cybersyn_company_metadata;
 
--- Create a CSF file format
+-- Create a CSV file format
 CREATE OR REPLACE FILE FORMAT csv
     TYPE = 'CSV'
         COMPRESSION = 'AUTO'  -- Automatically determines the compression of files
@@ -62,10 +62,10 @@ COPY INTO company_metadata
 SELECT * FROM company_metadata LIMIT 10;
 
 -- Create sec_filings_index table
-CREATE TABLE sec_filings_index (v variant);
+CREATE OR REPLACE TABLE sec_filings_index (v variant);
 
 -- Create sec_filings_attributes table
-CREATE TABLE sec_filings_attributes (v variant);
+CREATE OR REPLACE TABLE sec_filings_attributes (v variant);
 
 -- Create the SEC filings stage
 CREATE OR REPLACE STAGE cybersyn_sec_filings
@@ -161,7 +161,7 @@ FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
 WHERE ts.variable_name = 'Nasdaq Volume'
 LIMIT 100;
 
--- Use the query cache for the stock price daily returns and 5-day moving averages
+-- Use the query result cache for the stock price daily returns and 5-day moving averages
 SELECT
     meta.primary_ticker,
     meta.company_name,
@@ -176,7 +176,7 @@ WHERE ts.variable_name = 'Post-Market Close'
 LIMIT 100;
 
 -- Clone the company_metadata_dev table
-CREATE TABLE company_metadata_dev CLONE company_metadata;
+CREATE OR REPLACE TABLE company_metadata_dev CLONE company_metadata;
 
 -- Joining Tables (limited to KRAFT HEINZ CO, cik = '0001637459')
 WITH data_prep AS (
@@ -234,7 +234,7 @@ UNDROP TABLE sec_filings_index;
 -- Run a query on the restored sec_filings_index table
 SELECT * FROM sec_filings_index LIMIT 10;
 
--- Simulate an accidental overwrite of the entire table column
+-- Simulate an accidental overwrite of an entire table column
 UPDATE company_metadata SET company_name = 'oops';
 
 -- View the overwritten column data
@@ -263,7 +263,7 @@ SELECT company_name FROM company_metadata LIMIT 10;
 -- ----------------- --
 
 -- Create the limited attributes view
-CREATE VIEW IF NOT EXISTS financial_entity_attributes_limited AS
+CREATE OR REPLACE VIEW financial_entity_attributes_limited AS
 SELECT * from financial__economic_essentials.cybersyn.financial_institution_attributes
 WHERE VARIABLE IN (
                    'ASSET',
@@ -277,7 +277,7 @@ WHERE VARIABLE IN (
 SELECT * FROM financial_entity_attributes_limited;
 
 -- Create the end-of-year time series view
-CREATE VIEW IF NOT EXISTS financial_entity_annual_time_series AS
+CREATE OR REPLACE VIEW financial_entity_annual_time_series AS
 SELECT
     ent.name as entity_name,
     ent.city,
