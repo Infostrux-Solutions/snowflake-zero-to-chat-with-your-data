@@ -59,7 +59,7 @@ Open a browser window and access the URL:
 Log in with these credentials (replace the `<NUMBER>` with the number you were assigned):
 ```text
 Username: LAB_USER_<NUMBER>
-Password: LAB123
+Password: ******
 ```
 
 > When you login, you will be prompted to setup multifactor authentication. While this is a best practice and it is strongly recommended that you do that, we will be skipping it for the purposes of the lab, so just click on the `Not now` at the bottom left of the prompt.

@@ -6,6 +6,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 ## Lab Setup ##
 * Log in to https://app.snowflake.com/umnxxyz/lab_data_chat
 * Run `worksheets/SETUP_BASE` SQL script
+* Set the initial password for the lab participants in `worksheets/SETUP_USERS`
 * Run `worksheets/SETUP_USERS` SQL script
 * Make the Cybersyn data shares available to everyone in the account:
   * Switch role to `ACCOUNTADMIN`
@@ -22,7 +23,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
   * User should change their password and record the new one
   * Initial login credentials
     * Username `LAB_USER_<number>`
-    * Password `LAB123`
+    * Password `******`
 * Open the [Lab Walkthrough](https://github.com/Infostrux-Solutions/snowflake-hol-zero-to-chat-with-your-data/blob/main/zero_to_chat_with_your_data/zero_to_chat_with_your_data.md)
 * In a separate browser window, login as admin to Snowflake https://app.snowflake.com/umnxxyz/lab_data_chat
 * Start the lab walkthrough
