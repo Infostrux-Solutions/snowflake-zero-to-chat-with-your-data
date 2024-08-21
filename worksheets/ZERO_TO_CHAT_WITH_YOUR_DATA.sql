@@ -21,12 +21,15 @@ CREATE OR REPLACE TABLE company_metadata
     permid_quote_id variant
 );
 
+-- Create the company metadata stage
 CREATE OR REPLACE STAGE cybersyn_company_metadata
     URL = 's3://sfquickstarts/zero_to_snowflake/cybersyn-consumer-company-metadata-csv/'
 ;
 
+-- List the contents of the company metadata stage
 LIST @cybersyn_company_metadata;
 
+-- Create a CSF file format
 CREATE OR REPLACE FILE FORMAT csv
     TYPE = 'CSV'
         COMPRESSION = 'AUTO'  -- Automatically determines the compression of files
@@ -44,8 +47,10 @@ CREATE OR REPLACE FILE FORMAT csv
     COMMENT = 'File format for ingesting data for zero to snowflake'
 ;
 
+-- List file formats
 SHOW FILE FORMATS;
 
+-- Load the company metadata from the stage into the table
 COPY INTO company_metadata
     FROM @cybersyn_company_metadata
     FILE_FORMAT = csv
@@ -55,9 +60,14 @@ COPY INTO company_metadata
 
 SELECT * FROM company_metadata LIMIT 10;
 
-CREATE OR REPLACE TABLE sec_filings_index (v variant);
+-- Create sec_filings_index table
+CREATE TABLE sec_filings_index (v variant);
 
-CREATE OR REPLACE TABLE sec_filings_attributes (v variant);
+-- Create sec_filings_attributes table
+CREATE TABLE sec_filings_attributes (v variant);
+
+-- Verify that the table is empty by running the following command:
+SELECT * FROM company_metadata LIMIT 10;
 
 CREATE OR REPLACE STAGE cybersyn_sec_filings
     URL = 's3://sfquickstarts/zero_to_snowflake/cybersyn_cpg_sec_filings/'

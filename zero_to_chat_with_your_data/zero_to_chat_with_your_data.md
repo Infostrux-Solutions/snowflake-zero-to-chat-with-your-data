@@ -211,7 +211,7 @@ You work at a grocery retailer. You want to understand the performance of major 
 We will start by collecting data from three different sources:
 1. Load company metadata `.csv` file.
 2. Load SEC filings from a semi-structured JSON format.
-3. Use the Snowflake Marketplace to find free stock price data from Cybersyn.
+3. Use a Snowflake Marketplace dataset from Cybersyn to find free stock price data.
 
 <!-- ------------------------ -->
 
@@ -222,7 +222,7 @@ Duration: 8
 
 Before loading the data, it is worth knowing how the data is stored in Snowflake
 
-All data in Snowflake tables is automatically divided into micro-partitions, which are contiguous units of storage. Each micro-partition contains between 50 MB and 500 MB of uncompressed data (note that the actual size in Snowflake is smaller because data is always stored compressed). Groups of rows in tables are mapped into individual micro-partitions, organized in a columnar fashion. This size and structure allows for extremely granular pruning of very large tables, which can be comprised of millions, or even hundreds of millions, of micro-partitions.
+All data in Snowflake tables is automatically divided into micro-partitions, which are contiguous units of storage. Each micro-partition contains between 50 MB and 500 MB of uncompressed data (the actual size in Snowflake is smaller because data is always stored compressed). Data in the micro-partitions is organized in a proprietary columnar format. This architecture allows for the pruning of micro-partitions that need to be scanned at query time for even very large tables.
 
 Snowflake stores metadata about all rows stored in a micro-partition, including:
 
@@ -245,13 +245,12 @@ We are using company metadata developed from the Securities and Exchange Commiss
 Data can be ingested into Snowflake from many locations by using the `COPY` command, Snowpipe auto-ingestion, external connectors, or third-party ETL/ELT solutions. For more information on getting data into Snowflake, see the [Snowflake documentation](https://docs.snowflake.net/manuals/user-guide-data-load.html). For the purposes of this lab, we use the `COPY` command and AWS S3 storage to load data manually. In a real-world scenario, you would more likely use an ETL solution or grab data directly from the Snowflake Marketplace!
 
 ### Preparing to Run the Lab Queries ###
-Now navigate to the **Notebooks** screen. The queries we will be using have been prepared in a Snowflake Worksheet named `ZERO_TO_CHAT_WITH_YOUR_DATA`. This is the "master" worksheet owned by the lab admin. We will create a copy of that worksheet and use our individual copies.
+Now navigate to the **Worksheets** screen. The queries we will be using have been prepared in a Snowflake Worksheet named `ZERO_TO_CHAT_WITH_YOUR_DATA`. This is the "master" worksheet owned by the lab admin. We will create a copy of that worksheet and use our individual copies.
 
 ![Worksheet image](assets/Lab_Image_0.png)
 
-Now, let's create a copy of the worksheet:
-* Navigate to `Projects` > `Worsheets` and open the `ZERO_TO_CHAT_WITH_YOUR_DATA` worksheet
-* Click on three dots `...` which appear to the right of the worksheet name and select `Duplicate`, then close the original Worksheet.
+* Open the `ZERO_TO_CHAT_WITH_YOUR_DATA` worksheet
+* In the left navigation panel, click on three dots `...` which appear to the right of the worksheet name and select `Duplicate`, then close the original Worksheet.
 
 We need to set the context appropriately within the new Worksheet. In the upper right corner of the worksheet, click the box to the left of the **Share** button to show the context menu. Here we control the elements you can see and run from each worksheet. We are using the UI here to set the context. Later in the lab, we will accomplish the same thing via SQL commands within the worksheet.
 
@@ -262,17 +261,17 @@ Select the following context settings:
 
 ![context role and warehouse settings](assets/Lab_Image_02.png)
 
-Finally, we need to select the database and schema context of our worksheet:
+Finally, we need to select the database and schema context of our worksheet. We'll run a group of queries:
   * Highlight the group of queries at the top of the worksheet and click the "Play" ▶️ button at the top right of the worksheet.
   * The header of the worksheet should show the selected database and schema like `CHAT_WITH_YOUR_DATA.WORKSPACE_<number>`
 
-### Create Our First Table
+### Create Our First Table ###
 >  **Data Definition Language (DDL) operations are free!**
 All the DDL operations we have done so far do not require compute resources, so we can create all our objects for free.
 
-To make working in the worksheet easier, let's rename it. In the top left corner, double-click the worksheet name, which is the timestamp when the worksheet was created, and change it to `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN`.
+To make working in the worksheet easier, let's rename it. In the top left corner, double-click the worksheet name, which is the timestamp when the worksheet was created, and change it to `CHAT_WITH_MY_DATA`.
 
-Next we create a table called `COMPANY_METADATA` to use for loading the comma-delimited data. Instead of using the UI, we use the worksheet to run the DDL that creates the table:
+Next we create a table called `COMPANY_METADATA` to use for loading the comma-delimited data. We use the worksheet to run the DDL that creates the table:
 
 ```SQL
 CREATE OR REPLACE TABLE company_metadata
@@ -300,32 +299,37 @@ Verify your `COMPANY_METADATA` table has been created. At the bottom of the work
 
 ![TRIPS confirmation message](assets/Lab_Image_00.png)
 
-Navigate to the **Databases** tab by clicking the **HOME** icon in the upper left corner of the worksheet. Then click **Data** > **Databases**. In the list of databases, click `CHAT_WITH_YOUR_DATA` > `WORKSPACE_<number>` > **TABLES** to see your newly created `COMPANY_METADATA` table. If you don't see any databases on the left, expand your browser because they may be hidden.
+Navigate to the **Databases** tab by clicking the **HOME** icon in the upper left corner of the worksheet. Then click **Data** > **Databases**. In the list of databases, click `CHAT_WITH_YOUR_DATA` > `WORKSPACE_<number>` > `Tables` to see your newly created `COMPANY_METADATA` table. If you don't see any databases on the left, expand your browser because they may be hidden.
 
 ![TRIPS table](assets/Lab_Image_table1.png)
 
-Click `COMPANY_METADATA` and the **Columns** tab to see the table structure you just created.
+* In the left navigation panel, hover over the `COMPANY_METADATA` table and, in the flyout, click on the `Open Table details in new tab` pop-out button in the top right corner. In the new tab, click on the **Columns** tab to see the table structure you just created.
 
 ![TRIPS table structure](assets/Lab_Image_table2.png)
 
-### Create an External Stage
+### Create an External Stage ###
 
 We are working with structured, comma-delimited data that has already been staged in a public, external S3 bucket. Before we can use this data, we first need to create a _stage_ that specifies the location of our external bucket.
 
 >  For this lab, we are using an AWS-East bucket. To prevent data egress/transfer costs in the future, you should select a staging location from the same cloud provider and region as your Snowflake account.
 
-Create the stage by executing the following SQL statement:
+Back in the `CHAT_WITH_MY_DATA` worksheet, create the stage by executing the following SQL statement:
 
 ```SQL
+-- Create the company metadata stage
 CREATE OR REPLACE  STAGE cybersyn_company_metadata
     URL = 's3://sfquickstarts/zero_to_snowflake/cybersyn-consumer-company-metadata-csv/';
 ```
 
->  The S3 bucket for this lab is public so you can leave the credentials options in the statement empty. In a real-world scenario, the bucket used for an external stage would likely require key information.
+> Make sure to include the final forward slash (`/`) at the end of the URL or you will encounter errors later when loading data from the bucket.
 
-Now let's take a look at the contents of the `cybersyn_company_metadata` stage. Add the following SQL statement below the previous code and then execute:
+> The S3 bucket for this lab is public so you can leave the credentials options in the statement empty. In a real-world scenario, the bucket used for an external stage would likely require key information.
+
+
+Now let's take a look at the contents of the `cybersyn_company_metadata` stage:
 
 ```SQL
+-- List the contents of the company metadata stage
 LIST @cybersyn_company_metadata;
 ```
 
@@ -333,11 +337,12 @@ In the results in the bottom pane, you should see the list of files in the stage
 
 ![worksheet result](assets/Lab_Image_03.png)
 
-### Create a File Format
+### Create a File Format ###
 
-Before we can load the data into Snowflake, we have to create a file format that matches the data structure. In the worksheet, again add the following command below the rest and execute to create the file format:
+Before we can load the data into Snowflake, we have to create a file format that matches the data structure. In the `CHAT_WITH_MY_DATA` worksheet, run the following command to create the file format:
 
 ```SQL
+-- Create a CSF file format
 CREATE OR REPLACE FILE FORMAT csv
     TYPE = 'CSV'
     COMPRESSION = 'AUTO'  -- Automatically determines the compression of files
@@ -360,17 +365,18 @@ CREATE OR REPLACE FILE FORMAT csv
 Verify the file format has been created with the correct settings by executing the following command:
 
 ```SQL
+-- List file formats
 SHOW FILE FORMATS;
 ```
 
 The file format created should be listed in the result:
 ![create file format settings](assets/Lab_Image_05.png)
 
-### Use a Warehouse for Data Loading
+### Use a Warehouse for Data Loading ###
 
 We will now use a virtual warehouse and the `COPY` command to initiate bulk loading of structured data into the Snowflake table we created.
 
-> **Note:** For this lab, the user is granted access to a pre-established warehouse designed specifically for their use.
+> **NOTE:** For this lab, the user is granted access to a pre-established warehouse designed specifically for their use.
 
 Compute resources are needed for loading data. Snowflake's compute nodes are called virtual warehouses and they can be dynamically sized up or out according to workload, whether you are loading data, running a query, or performing a DML operation. Each workload can have its own warehouse so there is no resource contention.
 
@@ -378,16 +384,26 @@ Navigate to the **Warehouses** tab (under **Admin**). This is where you can view
 
 Note the **+ Warehouse** option in the upper right corner of the top. This is where you can quickly add a new warehouse. However, we want to use the existing warehouse `LAB_USER_WAREHOUSE_<NUMBER>`.
 
-
 Click the row of the `LAB_USER_WAREHOUSE_<NUMBER>` warehouse. Then click the **[...]** in the upper right corner text above it to see the actions you can perform on the warehouse. We will use this warehouse to load the data from AWS S3.
 
 ![warehouse image](assets/Lab_Image_1_wh.png)
 
-The **Size** drop-down is where the capacity of the warehouse is selected. For larger data loading operations or more compute-intensive queries, a larger warehouse is recommended. The sizes translate to the underlying compute resources provisioned from the cloud provider (AWS, Azure, or GCP) where your Snowflake account is hosted. It also determines the number of credits consumed by the warehouse for each full hour it runs. The larger the size, the more compute resources from the cloud provider are allocated to the warehouse and the more credits it consumes. For example, the `4X-Large` setting consumes 128 credits for each full hour. This sizing can be changed up or down at any time with a simple click.
+Click **Edit** to walk through the options of this warehouse and learn some of Snowflake's unique functionality.
+
+>  If this account isn't using Snowflake Enterprise Edition (or higher), you will not see the **Mode** or **Clusters** options shown in the screenshot below. The multi-cluster warehouses feature is not used in this lab, but we will discuss it as a key capability of Snowflake.
 
 ![warehouse edit image](assets/Lab_Image_2_wh.png)
 
+- The **Size** drop-down is where the capacity of the warehouse is selected. For larger data loading operations or more compute-intensive queries, a larger warehouse is recommended. The sizes translate to the underlying compute resources provisioned from the cloud provider (AWS, Azure, or GCP) where your Snowflake account is hosted. It also determines the number of credits consumed by the warehouse for each full hour it runs. The larger the size, the more compute resources from the cloud provider are allocated to the warehouse and the more credits it consumes. For example, the `4X-Large` setting consumes 128 credits for each full hour. This sizing can be changed up or down at any time with a simple click.
 
+- If you are using Snowflake Enterprise Edition (or higher) the **Query Acceleration** option is available. When it is enabled for a warehouse, it can improve overall warehouse performance by reducing the impact of outlier queries, which are queries that use more resources than the typical query. Leave this disabled 
+
+- If you are using Snowflake Enterprise Edition (or higher) and the **Multi-cluster Warehouse** option is enabled, you will see additional options. This is where you can set up a warehouse to use multiple clusters of compute resources, up to 10 clusters. For example, if a `4X-Large` multi-cluster warehouse is assigned a maximum cluster size of 10, it can scale out to 10 times the compute resources powering that warehouse...and it can do this in seconds! However, note that this will increase the number of credits consumed by the warehouse to 1280 if all 10 clusters run for a full hour (128 credits/hour x 10 clusters). Multi-cluster is ideal for concurrency scenarios, such as many business analysts simultaneously running different queries using the same warehouse. In this use case, the various queries are allocated across multiple clusters to ensure they run quickly.
+
+- Under **Advanced Warehouse Options**, the options allow you to automatically suspend the warehouse when not in use so no credits are needlessly consumed. There is also an option to automatically resume a suspended warehouse so when a new workload is sent to it, it automatically starts back up. This functionality enables Snowflake's efficient "pay only for what you use" billing model which allows you to scale your resources when necessary and automatically scale down or turn off when not needed, nearly eliminating idle resources. Additionally, there is an option to change the Warehouse type from Standard to Snowpark-optimized. Snowpark-optmized warehouses provide 16x memory per node and are recommended for workloads that have large memory requirements such as ML training use cases using a stored procedure on a single virtual warehouse node. Leave this type as Standard
+
+>  **Snowflake Compute vs Other Data Warehouses**
+Many of the virtual warehouse and compute capabilities we just covered, such as the ability to create, scale up, scale out, and auto-suspend/resume virtual warehouses are easy to use in Snowflake and can be done in seconds. For on-premise data warehouses, these capabilities are much more difficult, if not impossible, as they require significant physical hardware, over-provisioning of hardware for workload spikes, and significant configuration work, as well as additional challenges. Even other cloud-based data warehouses cannot scale up and out like Snowflake without significantly more configuration work and time.
 
 **Warning - Watch Your Spend!**
 During or after this lab, you should be careful about performing the following actions without good reason or you may burn through your $400 of free credits more quickly than desired:
@@ -395,53 +411,16 @@ During or after this lab, you should be careful about performing the following a
 - Do not disable auto-suspend. If auto-suspend is disabled, your warehouses continues to run and consume credits even when not in use.
 - Do not use a warehouse size that is excessive given the workload. The larger the warehouse, the more credits are consumed.
 
-#### Warehouse size pricing 
-
-The following table shows the spending in credits per hour and per second.
-
-![dwh pride](assets/dwh_img_1.png)
-
-> `Note` : For more information you can refer to the [Overview of warehouses](https://docs.snowflake.com/en/user-guide/warehouses-overview) section of the official Snowflake documentation.
-
-
-### Scaling Up
-
-In Snowflake, "scale up" refers to increasing the computational resources of a virtual warehouse by switching to a larger warehouse size. This means increasing the amount of CPU, memory, and I/O resources available to handle queries and other operations.
-
-***When to Use It?*** You might scale up when you need to process more data, reduce query execution times, or handle a spike in workload. It’s useful for running more resource-intensive queries more quickly.
-
->For more information about scaling up, you can refer to the [Warehouse considerations](https://docs.snowflake.com/en/user-guide/warehouses-considerations) section of the official Snowflake documentation.
-
-
-### Scaling Out / Multi-cluster Warehouses
-
-Multi-clusters are designed specifically for handling queuing and performance issues related to large numbers of concurrent users and/or queries.
-
-With multi-cluster warehouses, Snowflake supports allocating, either statically or dynamically, additional clusters to make a larger pool of compute resources available. A multi-cluster warehouse is defined by specifying the following properties:
-- Maximum number of clusters, greater than 1 (up to 10).
-- Minimum number of clusters, equal to or less than the maximum (up to 10). 
-
-#### Maximized vs. auto-scale
-
-You can run a multi-cluster warehouse in two modes:
-
-- `Maximized`: Set the same value for both the maximum and minimum number of clusters (must be larger than 1). All clusters start simultaneously, providing maximum resources, ideal for consistent high workloads.
-
-- `Auto-scale`: Set different values for the maximum and minimum number of clusters. Snowflake dynamically starts or stops clusters based on demand, optimizing resource use and cost.
- 
->`Note`: It’s helpful to remember that the difference between scaling up > vs. out is that scaling out is best used for higher number of concurrent queries. When there are more queries submitted that can be processed, queries accumulate in the queue and wait to be run.
->
->For more information about scaling out, you can refer to the [What is a Multi-Cluster Warehouse?](https://docs.snowflake.com/en/user-guide/warehouses-multicluster) section of the official Snowflake documentation.
-
+We are going to use this virtual warehouse to load the structured data in the CSV files (stored in the AWS S3 bucket) into Snowflake.
 
 ### Load the Data
 
 Now we can run a COPY command to load the data into the `COMPANY_METADATA` table we created earlier.
 
-Navigate back to the `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN` worksheet in the **Worksheets** tab. Make sure the worksheet context is correctly set:
+Navigate back to the `CHAT_WITH_MY_DATA` worksheet in the **Worksheets** tab. Make sure the worksheet context is correctly set:
 
 **Role:** `LAB_USER_<number>`
-**Warehouse:** `LAB_USER_WAREHOUSE`
+**Warehouse:** `LAB_USER_WAREHOUSE_<number>`
 **Database:** `CHAT_WITH_YOUR_DATA`
 **Schema:** `WORKSPACE_<NUMBER>`
 
@@ -450,6 +429,7 @@ Navigate back to the `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN` worksheet in th
 Execute the following statements in the worksheet to load the staged data into the table. This may take up to 30 seconds.
 
 ```SQL
+-- Load the company metadata from the stage into the table 
 COPY INTO company_metadata FROM @cybersyn_company_metadata file_format=csv PATTERN = '.*csv.*' ON_ERROR = 'CONTINUE';
 ```
 
@@ -512,7 +492,7 @@ In the results pane at the bottom of the worksheet, verify that your tables, `SE
 
 ### Create Another External Stage
 
-In the `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN` worksheet, use the following command to create a stage that points to the bucket where the semi-structured JSON data is stored on AWS S3:
+In the `CHAT_WITH_MY_DATA` worksheet, use the following command to create a stage that points to the bucket where the semi-structured JSON data is stored on AWS S3:
 
 ```SQL
 CREATE STAGE cybersyn_sec_filings
@@ -663,7 +643,7 @@ That's it! You have now successfully subscribed to the Financial & Economic Esse
 ### Execute Some Queries
 
 Go to the 
-**ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN** worksheet. Your worksheet context should be the following:
+**CHAT_WITH_MY_DATA** worksheet. Your worksheet context should be the following:
 
 **Role:** `LAB_USER_ROLE_<NUMBER>`
 **Warehouse:** `LAB_USER_WAREHOUSE`
@@ -831,7 +811,7 @@ Some useful applications include:
 
 First let's see how we can restore data objects that have been accidentally or intentionally deleted.
 
-In the `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN` worksheet, run the following DROP command to remove the `SEC_FILINGS_INDEX` table:
+In the `CHAT_WITH_MY_DATA` worksheet, run the following DROP command to remove the `SEC_FILINGS_INDEX` table:
 
 ```SQL
 DROP TABLE sec_filings_index;
@@ -989,7 +969,7 @@ The available functions are summarized below.
 
 Before diving deeper into the creation of the app, we need to create our dataset, which will serve as the source for the application.
 
-First, navigate  to our `ZERO_TO_CHAT_WITH_YOUR_DATA_WITH_CYBERSYN` worksheet and execute the following statements.
+First, navigate  to our `CHAT_WITH_MY_DATA` worksheet and execute the following statements.
 
 - This SQL script creates a view called `financial_entity_attributes_limited` that selects and filters specific VARIABLE values from the financial_institution_attributes table.
 ```SQL
