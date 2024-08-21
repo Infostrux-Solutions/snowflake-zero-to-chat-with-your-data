@@ -17,13 +17,13 @@ DECLARE
 BEGIN
     FOR i IN 1 TO $participant_count DO
             LET user_schema_name := schema_prefix || i;
-            DROP SCHEMA IDENTIFIER(:user_schema_name);
+            DROP SCHEMA IF EXISTS IDENTIFIER(:user_schema_name);
             LET user_role_name := role_prefix || i;
             DROP ROLE IF EXISTS IDENTIFIER(:user_role_name);
             LET user_name := user_prefix || i;
             DROP USER IF EXISTS IDENTIFIER(:user_name);
             LET user_warehouse_name := warehouse_prefix || i;
-            DROP WAREHOUSE IDENTIFIER(:user_warehouse_name);
+            DROP WAREHOUSE IF EXISTS IDENTIFIER(:user_warehouse_name);
         END FOR;
     RETURN 'Done';
 END;

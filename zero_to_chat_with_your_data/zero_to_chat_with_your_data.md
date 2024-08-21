@@ -1007,7 +1007,7 @@ SELECT * FROM financial_entity_annual_time_series  LIMIT 10;
 
 In the left Snowsight navigation panel, click on the `Projects > Streamlit` menu option. Once the lab admin has shared it, you will see an app called `CHAT_WITH_YOUR_DATA`. Clicking on it will run the app. It will take less than a minute for the app to initialize, and perform its initial LLM queries to render its output and be ready for a user prompt.
 
-> The following is a list of potential questions that you might want to ask your data. Note that, as sophisticated LLMs have become, they are, after all, executed by computer so the "Garbage In, Garbage Out" principle applies fully. Users must craft their questions carefully and answers must be reviewed and validated which has risen the brand new discipline of Prompt Engineering.
+The following is a list of potential questions that you might want to ask your data. Note that, as sophisticated LLMs have become, they are, after all, executed by computer so the "Garbage In, Garbage Out" principle applies fully. Users must craft their questions carefully and answers must be reviewed and validated which has risen the brand new discipline of Prompt Engineering.
 
 > Can you show me the top 10 financial entities with the highest Total Assets value for the year 2020?
 
@@ -1295,21 +1295,12 @@ After a couple of seconds, the app will respond with the requested chartt as wel
 
 ![respond](assets/visualize_data/streamlit_4.png)
 
-> Transform Value to number and give me the top ten year bar chart with most value
-```text
-DATABASE:   FINANCIAL__ECONOMIC_ESSENTIALS
-SCHEMA:     CYBERSYN
-TABLE:      BANK_FOR_INTERNATIONAL_SETTLEMENTS_TIMESERIES
-LIBRARY:    ploty
-```
-![question1](assets/visualize_data/question_1.png)
-
 > Give me a list of all unique company names
 ```text
 DATABASE:   FINANCIAL__ECONOMIC_ESSENTIALS
 SCHEMA:     CYBERSYN
 TABLE:      COMPANY_INDEX
-LIBRARY:    ploty
+LIBRARY:    plotly
 ```
 ![question2](assets/visualize_data/question_2.png)
 
@@ -1318,7 +1309,7 @@ LIBRARY:    ploty
 DATABASE:   FINANCIAL__ECONOMIC_ESSENTIALS
 SCHEMA:     CYBERSYN
 TABLE:      FX_RATE_TIMESERIES
-LIBRARY:    ploty
+LIBRARY:    plotly
 ```
 ![question3](assets/visualize_data/question_3.png)
 
