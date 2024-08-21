@@ -93,6 +93,7 @@ SELECT * FROM sec_filings_index LIMIT 10;
 -- Verify the sec_filings_attributes data load
 SELECT * FROM sec_filings_attributes LIMIT 10;
 
+-- Create a columnar view of the sec_filings_index JSON data
 CREATE OR REPLACE VIEW sec_filings_index_view AS
 SELECT
     v:CIK::string                   AS cik,
@@ -107,6 +108,7 @@ SELECT
 FROM sec_filings_index
 ;
 
+-- Create a columnar view of the sec_filings_attributes JSON data
 CREATE OR REPLACE VIEW sec_filings_attributes_view AS
 SELECT
     v:VARIABLE::string            AS variable,
@@ -126,8 +128,10 @@ SELECT
 FROM sec_filings_attributes
 ;
 
+-- Inspect sec_filings_index_view results
 SELECT * FROM sec_filings_index_view LIMIT 20;
 
+-- Inspect sec_filings_attributes_view results
 SELECT * FROM sec_filings_attributes_view LIMIT 20;
 
 -- Closing Price Statistics

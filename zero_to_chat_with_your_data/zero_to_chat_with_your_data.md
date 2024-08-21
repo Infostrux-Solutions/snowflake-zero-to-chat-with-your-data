@@ -117,7 +117,7 @@ Under **Projects** on the left-hand panel, select the **Notebooks** tab.
 
 ![notebooks tab main](assets/3UIStory_3.Notebooks.png)
 
-### Notebooks Structure
+### Notebooks Structure ###
 
 ![notebook](assets/notebook_1.png)
 
@@ -205,7 +205,7 @@ Clicking on your username in the bottom right of the UI allows you to change you
 
 ## Data Lab: Stock Price & SEC Filings Data ##
 
-### The Lab Story
+### The Lab Story ###
 You work at a grocery retailer. You want to understand the performance of major consumer goods (CPG) companies in the US that supply your store. This lab takes a look at daily stock price data and quarterly and annual Securities Exchange Commission (SEC) company filings to understand the performance of the CPG landscape. Public companies are required to submit a quarterly and annual report to the SEC detailing their financial data.
 
 We will start by collecting data from three different sources:
@@ -218,7 +218,7 @@ We will start by collecting data from three different sources:
 ## Loading Structured Data into Snowflake: CSVs ##
 
 Duration: 8
-### What are Micro-partitions?
+### What are Micro-partitions? ###
 
 Before loading the data, it is worth knowing how the data is stored in Snowflake
 
@@ -413,7 +413,7 @@ During or after this lab, you should be careful about performing the following a
 
 We are going to use this virtual warehouse to load the structured data in the CSV files (stored in the AWS S3 bucket) into Snowflake.
 
-### Load the Data
+### Load the Data ###
 
 Now we can run a COPY command to load the data into the `COMPANY_METADATA` table we created earlier.
 
@@ -515,7 +515,7 @@ LIST @cybersyn_sec_filings;
 In the results pane, you should see a list of `.gz` files from S3:
 ![results output](assets/7SemiStruct_3_1.png)
 
-### Load and Verify the Semi-structured Data
+### Load and Verify the Semi-structured Data ##
 
 We will now use a warehouse to load the data from an S3 bucket into the tables we created earlier. In the `CHAT_WITH_MY_DATA` worksheet, execute the `COPY` command below to load the data.
 
@@ -551,12 +551,10 @@ Click any of the rows to display the formatted JSON in the right panel:
 
 To close the display in the panel and display the query details again, click the **X** (Close) button that appears when you hover your mouse in the right corner of the panel.
 
-### Create a View and Query Semi-Structured Data
+### Create a View and Query Semi-Structured Data ##
 
 Next, let's look at how Snowflake allows us to create a view and also query the JSON data directly using SQL.
 
-> aside negative
-> 
 >  **Views & Materialized Views**
 A view allows the result of a query to be accessed as if it were a table. Views can help present data to end users in a cleaner manner, limit what end users can view in a source table, and write more modular SQL.
 
@@ -565,6 +563,7 @@ Snowflake also supports materialized views in which the query results are stored
 Run the following command to create a columnar view of the semi-structured JSON SEC filing data, so it is easier for analysts to understand and query. The CIK corresponds to the Central Index Key, or unique identifier that SEC gives to each filing entity. The ADSH is the document number for any filing submitted to the SEC.
 
 ```SQL
+-- Create a columnar view of the sec_filings_index JSON data
 CREATE OR REPLACE VIEW sec_filings_index_view AS
 SELECT
     v:CIK::string                   AS cik,
@@ -578,6 +577,7 @@ SELECT
     v:FISCAL_YEAR::string           AS fiscal_year
 FROM sec_filings_index;
 
+-- Create a columnar view of the sec_filings_attributes JSON data
 CREATE OR REPLACE VIEW sec_filings_attributes_view AS
 SELECT
     v:VARIABLE::string            AS variable,
@@ -606,25 +606,27 @@ The new view should appear as `SEC_FILINGS_INDEX_VIEW` under `CHAT_WITH_YOUR_DAT
 Notice the results look just like a regular structured data source: 
 
 ```SQL
-SELECT *
-FROM sec_filings_index_view
-LIMIT 20;
+-- Inspect sec_filings_index_view results
+SELECT * FROM sec_filings_index_view LIMIT 20;
+
+-- Inspect sec_filings_attributes_view results
+SELECT * FROM sec_filings_attributes_view LIMIT 20;
 ```
 <!-- ------------------------ -->
 
-## Getting Data from Snowflake Marketplace
+## Getting Data from Snowflake Marketplace ##
 
 Duration: 5
 
-### Snowflake Data Marketplace
+### Snowflake Data Marketplace ###
 
-> **Note**: For this lab, we are going to use the FINANCIAL__ECONOMIC_ESSENTIALS database that is already pre-installed; however, here are the step-by-step instructions to get the database from the marketplace.
+> **NOTE**: For this lab, we are going to use the `FINANCIAL__ECONOMIC_ESSENTIALS` database that has already been shared with your user account. However, the following are the step-by-step instructions to get the database from the marketplace should you need to.
 
 Make sure you're using the `ACCOUNTADMIN` role and, navigate to **Data Products** > **Marketplace**:
 
 ![data marketplace tab](assets/10Share_7.png)
 
-#### Find a listing
+#### Find a listing ####
 
 Type `stock prices` in the search box at the top, scroll through the results, and select [**Financial & Economic Essentials**](https://app.snowflake.com/marketplace/listing/GZTSZAS2KF7/) (provided by Cybersyn).
 
@@ -642,15 +644,29 @@ You can now click **Done** or choose to run the sample queries provided by Cyber
 
 ![get data fields](assets/10Share_cybersyn_query_data.png)
 
+If you chose **Query Data**, a new worksheet opens in a new browser tab/window:
+1. Set your context 
+2. Select the query you want to run (or place your cursor in the query text).
+3. Click the **Run/Play** button (or use the keyboard shortcut).
+4. You can view the data results in the bottom pane.
+5. When you are done running the sample queries, click the **Home** icon in the upper left corner.
+
+![get data fields](assets/10Share_cybersyn_query_data2.png)
+
+Next:
+1. Click **Data** > **Databases**.
+2. Click the `Financial__Economic_Essentials` database.
+3. You can see details about the schemas, tables, and views that are available to query.
+
+![covid19 databases](assets/10Share_cybersyn_db_info.png)
+
 That's it! You have now successfully subscribed to the Financial & Economic Essentials datasets from Cybersyn, which are updated daily with global financial data. Notice we didn't have to create databases, tables, views, or an ETL process. We simply searched for and accessed shared data from the Snowflake Data Marketplace.
 
-> aside positive
-> 
 > To learn more about how to use the new worksheet interface, go to the [Snowsight Docs](https://docs.snowflake.com/en/user-guide/ui-snowsight.html#using-snowsight).
 
 <!-- ------------------------ -->
 
-## Querying, the Results Cache, & Cloning
+## Querying, the Results Cache, & Cloning ##
 
 ### Execute Some Queries
 
@@ -684,8 +700,6 @@ WHERE ts.variable_name = 'Post-Market Close';
 
 ![post-market close query results](assets/6Query_3.png)
 
-> aside positive
-> 
 >  If you have defined a particular database in the worksheet and want to use a table from a different database, you must fully qualify the reference to the other table by providing its database and schema name.
 
 **Trading Volume Statistics:** Then, calculate the trading volume change from one day to the next to see if there's an increase or decrease in trading activity. This can be a sign of increasing or decreasing interest in a stock.
@@ -734,8 +748,6 @@ Snowflake allows you to create clones, also known as "zero-copy clones" of table
 
 _A popular use case for zero-copy cloning is to clone a production environment for use by Development & Testing teams to test and experiment without adversely impacting the production environment and eliminating the need to set up and manage two separate environments._
 
-> aside negative
-> 
 >  **Zero-Copy Cloning**
 A massive benefit of zero-copy cloning is that the underlying data is not copied. Only the metadata and pointers to the underlying data change. Hence, clones are “zero-copy" and storage requirements are not doubled when the data is cloned. Most data warehouses cannot do this, but for Snowflake it is easy!
 >
