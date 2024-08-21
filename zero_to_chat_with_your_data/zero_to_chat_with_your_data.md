@@ -909,7 +909,7 @@ SELECT company_name FROM company_metadata LIMIT 10;
 
 <!-- ------------------------ -->
 
-## Chatbot Streamlit App ##
+## The CHAT_WITH_YOUR_DATA App ##
 
 We will demo and walk through an LLM-powered chatbot named "Frosty" that performs data exploration and answers questions by constructing and executing SQL queries on Snowflake data. Built with just some 250 lines of code, the application is able to converse and answer questions based on a financial dataset.
 
@@ -1005,7 +1005,7 @@ WHERE MONTH(date) = 12
 SELECT * FROM financial_entity_annual_time_series  LIMIT 10;
 ```
 
-### The CHAT_WITH_YOUR_DATA App ###
+### Using the CHAT_WITH_YOUR_DATA App ###
 
 In the left Snowsight navigation panel, click on the `Projects > Streamlit` menu option. Once the lab admin has shared it, you will see an app called `CHAT_WITH_YOUR_DATA`. Clicking on it will run the app. It will take less than a minute for the app to initialize, and perform its initial LLM queries to render its output and be ready for a user prompt.
 
@@ -1071,9 +1071,9 @@ In the left Snowsight navigation panel, click on the `Projects > Streamlit` menu
 
 <img src="assets/chat_data/chat_data_14.png">
 
-#### The Code of the CHAT_WITH_YOUR_DATA App ####
+### The Code of the CHAT_WITH_YOUR_DATA App ###
 
-##### Imports, Defaults and Configuration ####
+#### Imports, Defaults and Configuration ####
 
 - **SLIDE_WINDOW**: sets the number of last interactions to remember.
 - **pd.set_option**: configures Pandas to show full content in columns without truncation.
@@ -1095,7 +1095,7 @@ QUALIFIED_TABLE_NAME = f"{SCHEMA_PATH}.FINANCIAL_ENTITY_ANNUAL_TIME_SERIES"
 METADATA_QUERY = f"SELECT VARIABLE_NAME, DEFINITION FROM {SCHEMA_PATH}.FINANCIAL_ENTITY_ATTRIBUTES_LIMITED;"
 ```
 
-##### Handling User Questions #####
+#### Handling User Questions ####
 
 - Manages the interaction with the user when they ask a question.
 - Updates the session state with the user's message and the LLM's (`assistant`) response.
@@ -1135,7 +1135,7 @@ def handle_user_question(question):
 
             st.session_state.messages.append(message)
 ```
-##### Displaying Chat and Handling Input #####
+#### Displaying Chat and Handling Input ####
 
 - Displays the chat UI, including the chat history and any results from previous queries.
 - Handles user input through a chat interface, passing it to handle_user_question for processing.
@@ -1158,7 +1158,7 @@ def display_chat_and_input():
         handle_user_question(question)
 ```
 
-##### Configuration Options #####
+#### Configuration Options ####
 
 - Provides configuration options in the sidebar for selecting the model, toggling chat history, debugging, and resetting the conversation.
 
@@ -1171,7 +1171,7 @@ def config_options():
     st.sidebar.expander("Session State").write(st.session_state)
 ```
 
-##### Initializing Messages #####
+#### Initializing Messages ####
 
 - Initializes the chat history with a system message when the conversation is reset or on the first run.
 
@@ -1183,7 +1183,7 @@ def init_messages():
         st.markdown(complete(system_prompt)[0].RESPONSE)
 ```
 
-##### Generating Prompts #####
+#### Generating Prompts ####
 
 - Generates the system prompt using the table context and predefined prompts, which is used to set the initial context for the chat.
 
@@ -1197,7 +1197,7 @@ def get_system_prompt():
     return prompts["system"].format(context=table_context)
 ```
 
-##### Completing User Queries #####
+#### Completing User Queries ####
 
 - Sends the user’s question to the Snowflake Cortex model to generate a response based on the prompt.
 
@@ -1209,7 +1209,7 @@ def complete(myquestion):
     return df_response
 ```
 
-##### Creating the User Query Prompt and Retrieving Chat History #####
+#### Creating the User Query Prompt and Retrieving Chat History ####
 
 - Creates a prompt for the Snowflake Cortex model based on the user’s question and chat history.
 
@@ -1233,7 +1233,7 @@ def get_chat_history():
 
 ```
 
-##### Getting Table Context #####
+#### Getting Table Context ####
 
 Retrieves metadata and context for the specified table, which is used in generating the system prompt.
 
@@ -1262,7 +1262,7 @@ Here are the columns of the {'.'.join(table)}
     return context
 ```
 
-##### Defining Prompts #####
+#### Defining Prompts ####
 
 - Consolidates all the prompt templates into a single function that returns a dictionary of prompts. This makes it easier to manage and update the prompts.
 
@@ -1280,14 +1280,53 @@ def get_prompts():
 ```
 
 ## The VISUALIZE_YOUR_DATA App ##
+ This simple app leverages the integration synergy of Snowflake, its Cortex AI LLM capabilities and Streamlit. It uses the Cortex [COMPLETE](https://docs.snowflake.com/en/sql-reference/functions/complete-snowflake-cortex) function to access the pre-trained `mistral-large` LLM, which will generate Python code to render our desired visualization. Streamlit will then execute this code and render the graph. Other than implementing the Streamlit app and being aware of which Python plotting library to use, this process requires minimal technical expertise, allowing us to create visualizations on the fly without being tied to implementation lifecycles.
 
-To facilitate data visualization, we are utilizing the inherent integration capabilities between Snowflake and Streamlit. We will use Snowflake's Cortex function, COMPLETE (https://docs.snowflake.com/en/sql-reference/functions/complete-snowflake-cortex), to access the pre-trained mistral-large LLM, which will generate the Python code for us. Streamlit will then execute this code to render the graphs. This process requires no development effort, allowing us to create variations of the graph on the fly without needing technical expertise.
+### Using the VISUALIZE_YOUR_DATA App ###
 
-### Build the streamlit app
+> Create a bar chart for the top ten months with the highest number of EINs
+```text
+DATABASE:   CHAT_WITH_YOUR_DATA
+SCHEMA:     WORKSPACE_<NUMBER>
+TABLE:      SEC_FILINGS_INDEX_VIEW
+LIBRARY:    Matplotlib
+```
+![Question](assets/visualize_data/streamlit_3.png)
 
-Let's walk through the Streamlit app code involving data manipulation...
+After a couple of seconds, the app will respond with the requested chartt as well as the Python code it generated and used to render it:
 
-### 1. Import the necesary libs to create the streamlit app
+![respond](assets/visualize_data/streamlit_4.png)
+
+> Transform Value to number and give me the top ten year bar chart with most value
+```text
+DATABASE:   FINANCIAL__ECONOMIC_ESSENTIALS
+SCHEMA:     CYBERSYN
+TABLE:      BANK_FOR_INTERNATIONAL_SETTLEMENTS_TIMESERIES
+LIBRARY:    ploty
+```
+![question1](assets/visualize_data/question_1.png)
+
+> Give me a list of all unique company names
+```text
+DATABASE:   FINANCIAL__ECONOMIC_ESSENTIALS
+SCHEMA:     CYBERSYN
+TABLE:      COMPANY_INDEX
+LIBRARY:    ploty
+```
+![question2](assets/visualize_data/question_2.png)
+
+> Transform value to number, Extract the year and filter by 2024 , Select quote_currency_id and value, Aggregate and plot the result
+```text
+DATABASE:   FINANCIAL__ECONOMIC_ESSENTIALS
+SCHEMA:     CYBERSYN
+TABLE:      FX_RATE_TIMESERIES
+LIBRARY:    ploty
+```
+![question3](assets/visualize_data/question_3.png)
+
+### The Code of the VISUALIZE_YOUR_DATA App ###
+
+#### Import the necessary Python modules for the Streamlit app ####
  ```PYTHON 
 # Import necessary packages for the Streamlit app and Snowflake integration
 import streamlit as st
@@ -1298,7 +1337,7 @@ from snowflake.cortex import Complete
 from snowflake.snowpark.context import get_active_session
  ```
 
- ### 2. Streamlit Configuration
+#### Streamlit Configuration ####
  Streamlit's options and page configurations are set, like disabling the deprecation warning for global use of pyplot and setting the page layout to "wide" and initializes an active session with Snowflake, allowing SQL commands to be executed directly from Streamlit.
 ```PYTHON
 # Set global options and page configuration for Streamlit
@@ -1312,7 +1351,7 @@ session = get_active_session()
 st.title("Visualize your data! :brain:")
 ```
 
-### 3. Streamlit Sidebar Configuration
+#### Streamlit Sidebar Configuration ####
 - **Sidebar Setup**: Uses Streamlit's sidebar feature to create interactive widgets.
 - **Database Selection**: Queries Snowflake to retrieve databases and allows the user to select a database through a dropdown box. Similar structures are used to select schemas, views, and specific settings such as the number of rows to plot.
 
@@ -1330,7 +1369,7 @@ with st.sidebar:
     table = st.selectbox('Select VIEW:', views)
     rows_to_plot = st.number_input('Rows to plot', min_value=1, max_value=10000, value=1000)
 ```
-### 4. Data Retrieval and Display
+#### Data Retrieval and Display ####
 - **Dataframe Creation**: Constructs a Pandas dataframe by querying a table in Snowflake, limited to a user-defined number of rows.
 - **Display**: Outputs the dataframe's first few rows directly on the Streamlit page, giving a preview of the data.
 
@@ -1343,7 +1382,7 @@ st.subheader('Data:')
 st.dataframe(df.head()) 
 ```
 
-### 5. Visualization Prompt
+#### Visualization Prompt ####
 - **Library Selection**: Users can choose the Python visualization library they wish to use.
 - **User Input for Visualization**: Collects user input on what they want to visualize from the data.
 
@@ -1352,7 +1391,7 @@ library = st.selectbox('Library', ['matplotlib','seaborn','plotly','wordcloud'])
 ll_prompt = st.text_area('What do you want to visualize?')
 ```
 
-### 6. Visualization Execution
+#### Visualization Execution ####
 - **Visualization Trigger**: A button that, when clicked, processes the input and generates Python code for visualization.
 - **Dynamic Code Generation**: Uses a Large Language Model (LLM) to generate Python code based on the user's specifications.
 - **Code Execution**: Executes the generated Python code to render visualizations directly in Streamlit.
@@ -1369,10 +1408,8 @@ if st.button('Visualize'):
     execution_code = extract_python_code(code)
 ```
 
-### 7. Output Display
-
+#### Output Display ####
 - **Code and Plot Display**: Displays the generated Python code in one column and executes it to render the plot in another, providing a comprehensive interface that showcases both the underlying code and its visual output.
-
 ```PYTHON
   with col1:
         st.subheader('This is the executed code:')
@@ -1382,38 +1419,7 @@ if st.button('Visualize'):
             exec(execution_code)
 ```
 
-Once you have assembled all the code, you can proceed to deploy the app
-
-![Deploy App](assets/visualize_data/streamlit_1.png)
-
-Additionally, the app has access to the views that we have created.
-
-![views](assets/visualize_data/streamlit_2.png)
-
-For testing purposes, enter the following question: `Create a bar chart for the top ten months with the highest number of EINs` using database `CHAT_WITH_YOUR_DATA`, schema `WORKSPACE_<NUMBER>`, table `SEC_FILINGS_INDEX_VIEW` and the library `Matplotlib` and then click `Visualize`.
-![Question](assets/visualize_data/streamlit_3.png)
-
-After couple of seconds, the app will respond with: 
-
-![respond](assets/visualize_data/streamlit_4.png)
-
-#### Here is a list of potential questions that you may ask the application
-
-- `Transform Value to number and Give me the top ten year bar chart with most value` using  database `FINANCIAL__ECONOMIC_ESSENTIALS`, schema `CYBERSYN`, table `BANK_FOR_INTERNATIONAL_SETTLEMENTS_TIMESERIES` and `ploty` lib
-
-![question1](assets/visualize_data/question_1.png)
-
-- `Give me a list of all unique company names` using  database `FINANCIAL__ECONOMIC_ESSENTIALS`, schema `CYBERSYN`, table `COMPANY_INDEX`  and `ploty` lib
-
-![question2](assets/visualize_data/question_2.png)
-
-
-- `Transform value to number, Extract the year and filter by 2024 , Select quote_currency_id and value,  Aggregate and plot the result` using  database `FINANCIAL__ECONOMIC_ESSENTIALS`, schema `CYBERSYN`, table `FX_RATE_TIMESERIES` and `ploty` lib
-
-![question3](assets/visualize_data/question_3.png)
-
-## Creating a Streamlit App ##
-
+## Creating Your Own Streamlit App ##
 > We explored apps which were created in advance. However, building your own app is simple and easy. The steps below will help you create your first Steamlit app with a sample code that you can adjust to your needs.
 
 In the left Snowsight navigation panel, select `Projects > Streamlit` tab and then click the `+ Streamlit App` button at the top right to create a new Streamlit-in-Snowflake application. Set the values for your app title, the database and schema where the app will be created and the virtual warehouse it will use.
