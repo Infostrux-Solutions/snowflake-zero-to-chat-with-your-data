@@ -44,7 +44,8 @@ BEGIN
             CREATE USER IDENTIFIER(:user_name)
                 PASSWORD = $initial_password
                 DEFAULT_ROLE = :user_role_name
-                MUST_CHANGE_PASSWORD = TRUE;
+                MUST_CHANGE_PASSWORD = FALSE
+                TYPE = LEGACY_SERVICE;
             ;
 
             GRANT ROLE IDENTIFIER(:user_role_name) TO USER IDENTIFIER(:user_name);
