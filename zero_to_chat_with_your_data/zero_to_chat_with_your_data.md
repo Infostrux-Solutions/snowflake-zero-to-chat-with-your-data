@@ -48,7 +48,7 @@ Each lab participant should have received a number when you arrived to allow you
 
 Open a browser window and access the URL:
 
-> https://app.snowflake.com/umnxxyz/lab_data_chat
+> https://reb98628.snowflakecomputing.com//umnxxyz/
 
 > IMPORTANT: As soon as you log in, you will be prompted to change your password. Your new password must be at least 8 characters long and contain at least 1 number, 1 uppercase and 1 lowercase letter.
 > 
