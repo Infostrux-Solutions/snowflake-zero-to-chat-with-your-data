@@ -121,7 +121,7 @@ Under **Projects** on the left-hand panel, select the **Notebooks** tab.
 
 ![notebook](assets/notebook_1.png)
 
-Here’s a breakdown of what each section outlined in red in the Snowflake notebook:
+Here's a breakdown of what each section outlined in red in the Snowflake notebook:
 
 **Left Panel (Files and Databases)**:
 
@@ -143,7 +143,7 @@ Under **Projects** on the left-hand panel, select the ​**Dashboards​** tab. 
 
 ### Data > Databases ###
 
-Under **Data**, the **Databases**​ tab shows information about the databases you have created or have permission to access. You can create, clone, drop, or transfer ownership of databases, as well as load data in the UI. Notice that a `CHAT_WITH_YOUR_DATA` database already exists in your environment. You will also see the Cybersyn `FINANCIAL__ECONOMIC_ESSENTIALS` database which has been shared with you.
+Under **Data**, the **Databases**​ tab shows information about the databases you have created or have permission to access. You can create, clone, drop, or transfer ownership of databases, as well as load data in the UI. Notice that a `CHAT_WITH_YOUR_DATA` database already exists in your environment. You will also see the Cybersyn `FINANCE__ECONOMICS` database which has been shared with you.
 
 ![databases tab](assets/3UIStory_6.png)
 
@@ -600,7 +600,7 @@ SELECT * FROM sec_filings_attributes_view LIMIT 20;
 
 ### Snowflake Data Marketplace ###
 
-> **NOTE**: For this lab, we are going to use the `FINANCIAL__ECONOMIC_ESSENTIALS` database that has already been shared with your user account. However, the following are the step-by-step instructions to get the database from the marketplace should you need to.
+> **NOTE**: For this lab, we are going to use the `FINANCE__ECONOMICS` database that has already been shared with your user account. However, the following are the step-by-step instructions to get the database from the marketplace should you need to.
 
 Make sure you're using the `ACCOUNTADMIN` role and, navigate to **Data Products** > **Marketplace**:
 
@@ -635,7 +635,7 @@ If you chose **Query Data**, a new worksheet opens in a new browser tab/window:
 
 Next:
 1. Click **Data** > **Databases**.
-2. Click the `Financial__Economic_Essentials` database.
+2. Click the `Finance__Economics` database.
 3. You can see details about the schemas, tables, and views that are available to query.
 
 ![covid19 databases](assets/10Share_cybersyn_db_info.png)
@@ -673,7 +673,7 @@ SELECT
     ts.value AS post_market_close,
     (ts.value / LAG(ts.value, 1) OVER (PARTITION BY meta.primary_ticker ORDER BY ts.date))::DOUBLE AS daily_return,
     AVG(ts.value) OVER (PARTITION BY meta.primary_ticker ORDER BY ts.date ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS five_day_moving_avg_price
-FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
+FROM Finance__Economics.cybersyn.stock_price_timeseries ts
 INNER JOIN company_metadata meta
 ON ts.ticker = meta.primary_ticker
 WHERE ts.variable_name = 'Post-Market Close';
@@ -732,7 +732,7 @@ Snowflake allows you to create clones, also known as "zero-copy clones" of table
 _A popular use case for zero-copy cloning is to clone a production environment for use by Development & Testing teams to test and experiment without adversely impacting the production environment and eliminating the need to set up and manage two separate environments._
 
 >  **Zero-Copy Cloning**
-A massive benefit of zero-copy cloning is that the underlying data is not copied. Only the metadata and pointers to the underlying data change. Hence, clones are “zero-copy" and storage requirements are not doubled when the data is cloned. Most data warehouses cannot do this, but for Snowflake it is easy!
+A massive benefit of zero-copy cloning is that the underlying data is not copied. Only the metadata and pointers to the underlying data change. Hence, clones are "zero-copy" and storage requirements are not doubled when the data is cloned. Most data warehouses cannot do this, but for Snowflake it is easy!
 
 > Learn more about [Cloning](https://docs.snowflake.com/en/user-guide/object-clone)
 
@@ -950,7 +950,7 @@ Snowflake offers powerful, intelligent features based on Artificial Intelligence
 
 - **Cortex Fine-tuning** : Cortex Fine-Tuning is a fully managed service that lets you fine-tune popular LLMs using your data, all within Snowflake.
 
-- **Cortex Search** : Snowflake’s fully managed search service for documents and other unstructured data, is designed to be that reliable retrieval partner in an enterprise RAG stack.
+- **Cortex Search** : Snowflake's fully managed search service for documents and other unstructured data, is designed to be that reliable retrieval partner in an enterprise RAG stack.
 
 - **Cortex Analyst** : Cortex Analyst is a fully-managed, LLM-powered Snowflake Cortex feature that helps you create applications capable of reliably answering business questions based on your structured data in Snowflake
 
@@ -965,7 +965,7 @@ Navigate to the `CHAT_WITH_MY_DATA` worksheet and execute:
 ```SQL
 -- Create the limited attributes view
 CREATE VIEW IF NOT EXISTS financial_entity_attributes_limited AS
-SELECT * from financial__economic_essentials.cybersyn.financial_institution_attributes
+SELECT * from finance__economics.cybersyn.financial_institution_attributes
 WHERE VARIABLE IN (
                    'ASSET',
                    'ESTINS',
@@ -991,10 +991,10 @@ SELECT
     to_double(ts.value) as value,
     ts.unit,
     att.definition
-FROM financial__economic_essentials.cybersyn.financial_institution_timeseries AS ts
+FROM finance__economics.cybersyn.financial_institution_timeseries AS ts
          INNER JOIN financial_entity_attributes_limited att
                     ON (ts.variable = att.variable)
-         INNER JOIN financial__economic_essentials.cybersyn.financial_institution_entities AS ent
+         INNER JOIN finance__economics.cybersyn.financial_institution_entities AS ent
                     ON (ts.id_rssd = ent.id_rssd)
 WHERE MONTH(date) = 12
   AND DAY(date) = 31;
@@ -1197,7 +1197,7 @@ def get_system_prompt():
 
 #### Completing User Queries ####
 
-- Sends the user’s question to the Snowflake Cortex model to generate a response based on the prompt.
+- Sends the user's question to the Snowflake Cortex model to generate a response based on the prompt.
 
 ```PYTHON
 def complete(myquestion):
@@ -1209,7 +1209,7 @@ def complete(myquestion):
 
 #### Creating the User Query Prompt and Retrieving Chat History ####
 
-- Creates a prompt for the Snowflake Cortex model based on the user’s question and chat history.
+- Creates a prompt for the Snowflake Cortex model based on the user's question and chat history.
 
 ```PYTHON
 def create_prompt(myquestion):
@@ -1297,7 +1297,7 @@ After a couple of seconds, the app will respond with the requested chartt as wel
 
 > Give me a list of all unique company names
 ```text
-DATABASE:   FINANCIAL__ECONOMIC_ESSENTIALS
+DATABASE:   FINANCE__ECONOMICS
 SCHEMA:     CYBERSYN
 TABLE:      COMPANY_INDEX
 LIBRARY:    plotly
@@ -1306,7 +1306,7 @@ LIBRARY:    plotly
 
 > Transform value to number, Extract the year and filter by 2024 , Select quote_currency_id and value, Aggregate and plot the result
 ```text
-DATABASE:   FINANCIAL__ECONOMIC_ESSENTIALS
+DATABASE:   FINANCE__ECONOMICS
 SCHEMA:     CYBERSYN
 TABLE:      FX_RATE_TIMESERIES
 LIBRARY:    plotly

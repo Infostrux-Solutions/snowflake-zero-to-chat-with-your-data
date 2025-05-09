@@ -9,7 +9,6 @@ from snowflake.cortex import Complete
 from snowflake.snowpark.context import get_active_session
 
 # Set global options and page configuration for Streamlit
-st.set_option('deprecation.showPyplotGlobalUse', False)
 st.set_page_config(layout="wide") # Set the layout of the page to wide mode
 
 # Initialize session from Snowflake to perform database operations

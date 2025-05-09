@@ -11,11 +11,14 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 * Make the Cybersyn data shares available to everyone in the account:
   * Switch role to `ACCOUNTADMIN`
   * Navigate to `Data Products > Marketplace`
-  * Type `stock prices` in the search box at the top, scroll through the results, and select [Financial & Economic Essentials](https://app.snowflake.com/marketplace/listing/GZTSZAS2KF7/) (provided by Cybersyn).
+  * Type `stock prices` in the search box at the top, scroll through the results, and select [Finance & Economics](https://app.snowflake.com/marketplace/listing/GZTSZAS2KF7/snowflake-data-finance-economics?search=stock%20prices) (provided by Snowflake).
   * Click `Get` and enter your contact information in the prompt window
   * In the next window
-  * leave the default database name as-is: `FINANCIAL__ECONOMIC_ESSENTIALS`
+  * leave the default database name as-is: `Finance__Economics`
   * choose to make the data available to the `PUBLIC` role, then click `Get`.
+* For the `Visualize your data` streamlit app, make sure to add the following packages :
+  * snowflake.core
+  * snowflake-ml-python
 
 ## Lab Presentation ##
 * Go through introductory presentation

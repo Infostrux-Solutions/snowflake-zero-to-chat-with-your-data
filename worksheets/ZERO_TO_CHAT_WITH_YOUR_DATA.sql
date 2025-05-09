@@ -1,7 +1,7 @@
 -- Select user workspace
 SET user_id = (SELECT ZEROIFNULL(REGEXP_SUBSTR(CURRENT_USER, '\\d+')));
 SET user_namespace = (SELECT CONCAT('CHAT_WITH_YOUR_DATA.WORKSPACE_' || $user_id));
-USE DATABASE CHAT_WITH_YOUR_DATA;
+USE DATABASE CHAT_WITH_YOUR_DATA;   
 USE SCHEMA IDENTIFIER($user_namespace);
 
 -- Create company_metadata table
@@ -142,7 +142,7 @@ SELECT
     ts.value AS post_market_close,
     (ts.value / LAG(ts.value, 1) OVER (PARTITION BY meta.primary_ticker ORDER BY ts.date))::DOUBLE AS daily_return,
     AVG(ts.value) OVER (PARTITION BY meta.primary_ticker ORDER BY ts.date ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS five_day_moving_avg_price
-FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
+FROM Finance__Economics.cybersyn.stock_price_timeseries ts
          INNER JOIN company_metadata meta
                     ON ts.ticker = meta.primary_ticker
 WHERE ts.variable_name = 'Post-Market Close'
@@ -155,7 +155,7 @@ SELECT
     ts.date,
     ts.value AS nasdaq_volume,
     (ts.value / LAG(ts.value, 1) OVER (PARTITION BY meta.primary_ticker ORDER BY ts.date))::DOUBLE AS volume_change
-FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
+FROM Finance__Economics.cybersyn.stock_price_timeseries ts
          INNER JOIN company_metadata meta
                     ON ts.ticker = meta.primary_ticker
 WHERE ts.variable_name = 'Nasdaq Volume'
@@ -169,7 +169,7 @@ SELECT
     ts.value AS post_market_close,
     (ts.value / LAG(ts.value, 1) OVER (PARTITION BY meta.primary_ticker ORDER BY ts.date))::DOUBLE AS daily_return,
     AVG(ts.value) OVER (PARTITION BY meta.primary_ticker ORDER BY ts.date ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS five_day_moving_avg_price
-FROM Financial__Economic_Essentials.cybersyn.stock_price_timeseries ts
+FROM Finance__Economics.cybersyn.stock_price_timeseries ts
          INNER JOIN company_metadata meta
                     ON ts.ticker = meta.primary_ticker
 WHERE ts.variable_name = 'Post-Market Close'
@@ -264,7 +264,7 @@ SELECT company_name FROM company_metadata LIMIT 10;
 
 -- Create the limited attributes view
 CREATE OR REPLACE VIEW financial_entity_attributes_limited AS
-SELECT * from financial__economic_essentials.cybersyn.financial_institution_attributes
+SELECT * from finance__economics.cybersyn.financial_institution_attributes
 WHERE VARIABLE IN (
                    'ASSET',
                    'ESTINS',
@@ -287,10 +287,10 @@ SELECT
     to_double(ts.value) as value,
     ts.unit,
     att.definition
-FROM financial__economic_essentials.cybersyn.financial_institution_timeseries AS ts
+FROM finance__economics.cybersyn.financial_institution_timeseries AS ts
          INNER JOIN financial_entity_attributes_limited att
                     ON (ts.variable = att.variable)
-         INNER JOIN financial__economic_essentials.cybersyn.financial_institution_entities AS ent
+         INNER JOIN finance__economics.cybersyn.financial_institution_entities AS ent
                     ON (ts.id_rssd = ent.id_rssd)
 WHERE MONTH(date) = 12
   AND DAY(date) = 31;
